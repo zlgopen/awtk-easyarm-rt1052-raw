@@ -1,0 +1,3 @@
+[submodule "middleware/awtk"]
+	path = middleware/awtk
+	url = https://github.com/damon-yun/awtk.git
