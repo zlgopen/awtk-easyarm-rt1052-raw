@@ -289,7 +289,7 @@ void APP_ELCDIF_Init(void)
     ELCDIF_RgbModeInit(APP_ELCDIF, &config);
 }
 
-uint32_t g_systick_count = 0;
+volatile uint32_t g_systick_count = 0;
 
 void SysTick_Handler (void)
 {

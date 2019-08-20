@@ -27,7 +27,7 @@
 #include "base/timer.h"
 #include "tkc/platform.h"
 
-extern uint32_t g_systick_count;
+extern volatile uint32_t g_systick_count;
 
 uint32_t get_time_ms() {
   return g_systick_count;
