@@ -301,7 +301,7 @@ void SysTick_Handler (void)
  */
 int main(void)
 {
-    uint32_t frameBufferIndex = 0;
+//    uint32_t frameBufferIndex = 0;
 
     BOARD_ConfigMPU();
     BOARD_InitPins();
@@ -330,8 +330,8 @@ int main(void)
     
     return gui_app_start(APP_IMG_WIDTH, APP_IMG_HEIGHT);
     
-    while (1)
-    {
+//    while (1)
+//    {
 //        frameBufferIndex ^= 1U;
 
 //        ELCDIF_SetNextBufferAddr(APP_ELCDIF, (uint32_t)s_frameBuffer[frameBufferIndex]);
@@ -341,5 +341,5 @@ int main(void)
 //        while (!s_frameDone)
 //        {
 //        }
-    }
+//    }
 }
