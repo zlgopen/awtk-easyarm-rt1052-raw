@@ -1,0 +1,6 @@
+awtk-v1.2+rc.1+fix.1
+====================
+awtk-aworks-rt1052:1.0.0+sha.5d57685
+awtk-examples:1.0.0+sha.2f5d0c5
+awtk-linux-fb:1.0.0+sha.16568ef
+awtk:1.2+sha.43ff056

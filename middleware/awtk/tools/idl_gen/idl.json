@@ -97,6 +97,48 @@
         }
       },
       {
+        "params": [],
+        "annotation": {
+          "static": true,
+          "scriptable": true
+        },
+        "desc": " 获取全局指针的X坐标。\n\n\n",
+        "name": "tk_get_pointer_x",
+        "alias": "global_get_pointer_x",
+        "return": {
+          "type": "int32_t",
+          "desc": "返回全局指针的X坐标。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {
+          "static": true,
+          "scriptable": true
+        },
+        "desc": " 获取全局指针的Y坐标。\n\n\n",
+        "name": "tk_get_pointer_y",
+        "alias": "global_get_pointer_y",
+        "return": {
+          "type": "int32_t",
+          "desc": "返回全局指针的X坐标。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {
+          "static": true,
+          "scriptable": true
+        },
+        "desc": " 获取全局指针是否按下。\n\n\n",
+        "name": "tk_is_pointer_pressed",
+        "alias": "global_is_pointer_pressed",
+        "return": {
+          "type": "bool_t",
+          "desc": "返回全局指针是否按下。"
+        }
+      },
+      {
         "params": [
           {
             "type": "int",
@@ -7414,7 +7456,7 @@
             "desc": "text_edit对象。"
           },
           {
-            "type": "wchar_t*",
+            "type": "const wchar_t*",
             "name": "str",
             "desc": "文本。"
           },
@@ -11225,6 +11267,10 @@
         "name": "WIDGET_PROP_NAME"
       },
       {
+        "desc": " 类型。\n\n",
+        "name": "WIDGET_PROP_TYPE"
+      },
+      {
         "desc": " 是否可以关闭。\n\n",
         "name": "WIDGET_PROP_CLOSABLE"
       },
@@ -11517,6 +11563,10 @@
         "name": "WIDGET_PROP_COMPACT"
       },
       {
+        "desc": " 是否支持滚动。\n\n",
+        "name": "WIDGET_PROP_SCROLLABLE"
+      },
+      {
         "desc": " 图标名称。\n\n",
         "name": "WIDGET_PROP_ICON"
       },
@@ -11579,6 +11629,10 @@
       {
         "desc": " 是否支持焦点停留。\n\n",
         "name": "WIDGET_PROP_FOCUSABLE"
+      },
+      {
+        "desc": " 是否支持焦点状态(如果希望style支持焦点状态，但有不希望焦点停留，可用本属性)。\n\n",
+        "name": "WIDGET_PROP_WITH_FOCUS_STATE"
       },
       {
         "desc": " 将焦点移到下一个的键值。\n\n",
@@ -13229,6 +13283,29 @@
         },
         "desc": " 设置控件的可见性。\n\n\n",
         "name": "widget_set_visible",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "visible",
+            "desc": "是否可见。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置控件的可见性(不触发repaint和relayout)。\n\n\n",
+        "name": "widget_set_visible_only",
         "return": {
           "type": "ret_t",
           "desc": "返回RET_OK表示成功，否则表示失败。"
@@ -15179,6 +15256,34 @@
       {
         "name": "sensitive",
         "desc": " 是否接受用户事件。\n\n",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "writable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "focusable",
+        "desc": " 是否支持焦点停留。\n\n",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "writable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "with_focus_state",
+        "desc": " 是否支持焦点状态。\n > 如果希望style支持焦点状态，但有不希望焦点停留，可用本属性。\n\n",
         "type": "bool_t",
         "annotation": {
           "set_prop": true,
@@ -22141,6 +22246,377 @@
     "type": "class",
     "methods": [
       {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "parent",
+            "desc": "父控件"
+          },
+          {
+            "type": "xy_t",
+            "name": "x",
+            "desc": "x坐标"
+          },
+          {
+            "type": "xy_t",
+            "name": "y",
+            "desc": "y坐标"
+          },
+          {
+            "type": "wh_t",
+            "name": "w",
+            "desc": "宽度"
+          },
+          {
+            "type": "wh_t",
+            "name": "h",
+            "desc": "高度"
+          }
+        ],
+        "annotation": {
+          "constructor": true,
+          "scriptable": true
+        },
+        "desc": " 创建hscroll_label对象\n\n\n",
+        "name": "hscroll_label_create",
+        "return": {
+          "type": "widget_t*",
+          "desc": "对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "int32_t",
+            "name": "lull",
+            "desc": "间歇时间(ms)。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置lull。\n\n\n",
+        "name": "hscroll_label_set_lull",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "int32_t",
+            "name": "duration",
+            "desc": "滚动时间(ms)。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置duration。\n\n\n",
+        "name": "hscroll_label_set_duration",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "only_focus",
+            "desc": "是否只有处于focus时才滚动。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置only_focus。\n\n\n",
+        "name": "hscroll_label_set_only_focus",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "loop",
+            "desc": "是否循环滚动。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置loop。\n\n\n",
+        "name": "hscroll_label_set_loop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "yoyo",
+            "desc": "是否往返滚动。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置yoyo。\n\n\n",
+        "name": "hscroll_label_set_yoyo",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "ellipses",
+            "desc": "是否在文本超长时在行尾显示\"...\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置ellipses。\n\n\n",
+        "name": "hscroll_label_set_ellipses",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "int32_t",
+            "name": "xoffset",
+            "desc": "x偏移。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置x偏移(一般无需用户调用)。。\n\n\n",
+        "name": "hscroll_label_set_xoffset",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 启动(一般无需用户调用)。\n\n\n",
+        "name": "hscroll_label_start",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 停止(一般无需用户调用)。\n\n\n",
+        "name": "hscroll_label_stop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "hscroll_label对象。"
+          }
+        ],
+        "annotation": {
+          "cast": true,
+          "scriptable": true
+        },
+        "desc": " 转换为hscroll_label对象(供脚本语言使用)。\n\n\n",
+        "name": "hscroll_label_cast",
+        "return": {
+          "type": "widget_t*",
+          "desc": "hscroll_label对象。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "only_focus",
+        "desc": "\n 只有处于focus时才滚动(缺省否)。\n\n",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "loop",
+        "desc": "\n loop是否循环滚动(缺省FALSE)。\n\n",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "yoyo",
+        "desc": "\n 是否往返滚动(缺省FALSE)。\n\n",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "ellipses",
+        "desc": "\n 文本显示不下时，在行尾显示ellipses(缺省FALSE)。\n\n",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "lull",
+        "desc": "\n 滚动之间的间歇时间(ms)，缺省3000ms。\n\n",
+        "type": "int32_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "duration",
+        "desc": " 完整的滚动一次需要的时间(ms)，缺省5000ms。\n\n",
+        "type": "int32_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "xoffset",
+        "desc": " 偏移量。\n\n",
+        "type": "int32_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "text_w",
+        "desc": " 文本的宽度。\n\n",
+        "type": "int32_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "scriptable": true
+        }
+      }
+    ],
+    "header": "scroll_label/hscroll_label.h",
+    "desc": "\n 可水平滚动的文本控件，方便实现长文本滚动。\n\n\n hscroll\\_label\\_t是[widget\\_t](widget_t.md)的子类控件，widget\\_t的函数均适用于hscroll\\_label\\_t控件。\n\n 在xml中使用\"hscroll\\_label\"标签创建行号控件，一般配合mledit使用。如：\n\n ```xml\n ```\n\n > 更多用法请参考：[mledit.xml](\nhttps://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/mledit.xml)\n\n 可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：\n\n ```xml\n  <style name=\"default\" text_color=\"black\">\n    <normal   />\n    <focused  />\n  </style>\n ```\n\n > 更多用法请参考：\n [theme default](\nhttps://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml)\n\n\n",
+    "name": "hscroll_label_t",
+    "parent": "widget_t",
+    "annotation": {
+      "scriptable": true,
+      "design": true,
+      "widget": true
+    },
+    "level": 2
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
         "params": [],
         "annotation": {
           "constructor": true
@@ -23785,7 +24261,7 @@
             "desc": "slide_indicator对象。"
           },
           {
-            "type": "const char**",
+            "type": "const char*",
             "name": "indicated_target",
             "desc": "指示器指示的目标"
           }
@@ -24389,19 +24865,6 @@
         "name": "max_xoffset_ratio",
         "desc": " 当开关处于关闭时，图片偏移相对于图片宽度的比例(缺省为1/3)。\r\n",
         "type": "float_t",
-        "annotation": {
-          "set_prop": true,
-          "get_prop": true,
-          "readable": true,
-          "persitent": true,
-          "design": true,
-          "scriptable": true
-        }
-      },
-      {
-        "name": "round_radius",
-        "desc": " 图片的圆角半径。\r\n",
-        "type": "int32_t",
         "annotation": {
           "set_prop": true,
           "get_prop": true,
@@ -29363,6 +29826,52 @@
           {
             "type": "widget_t*",
             "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "compact",
+            "desc": "是否使用紧凑布局(缺省FALSE)。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置compact。\r\n\r\n",
+        "name": "tab_button_group_set_compact",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "scrollable",
+            "desc": "是否允许滚动(缺省FALSE)。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": " 设置scrollable。\r\n\r\n",
+        "name": "tab_button_group_set_scrollable",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
             "desc": "tab_button_group对象。"
           }
         ],
@@ -29382,7 +29891,20 @@
     "properties": [
       {
         "name": "compact",
-        "desc": " 紧凑型排版子控件。\r\n",
+        "desc": " 紧凑型排版子控件(缺省FALSE)。\r\n",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "scrollable",
+        "desc": " 是否支持滚动(缺省FALSE)。\r\n\r\n > 紧凑型排版子控件时才支持滚动。\r\n",
         "type": "bool_t",
         "annotation": {
           "set_prop": true,
@@ -30892,7 +31414,7 @@
     "events": [],
     "properties": [],
     "header": "mledit/line_number.h",
-    "desc": "\n 行号。多行编辑器的行号。\n\n line_number\\_t是[widget\\_t](widget_t.md)的子类控件，widget\\_t的函数均适用于line_number\\_t控件。\n\n 在xml中使用\"line_number\"标签创建行号控件，一般配合mledit使用。如：\n\n ```xml\n <mledit x=\"c\" y=\"10\" h=\"40%\" w=\"90%\" focus=\"true\" left_margin=\"36\" right_margin=\"16\"\n wrap_word=\"true\">\n  <line_number x=\"0\" y=\"0\" w=\"32\" h=\"100%\" value=\"0\"/>\n  <scroll_bar_d x=\"right\" y=\"0\" w=\"14\" h=\"100%\" value=\"0\"/>\n </mledit>\n ```\n\n > 更多用法请参考：[mledit.xml](\nhttps://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/mledit.xml)\n\n 可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：\n\n ```xml\n <line_number>\n <style name=\"default\">\n    <normal text_color=\"black\" bg_color=\"#d0d0d0\" text_align_h=\"right\"/>\n </style>\n </line_number>\n ```\n\n > 更多用法请参考：\n [theme default](\nhttps://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L556)\n\n\n",
+    "desc": "\n 行号。多行编辑器的行号。\n\n line\\_number\\_t是[widget\\_t](widget_t.md)的子类控件，widget\\_t的函数均适用于line\\_number\\_t控件。\n\n 在xml中使用\"lin\\e_number\"标签创建行号控件，一般配合mledit使用。如：\n\n ```xml\n <mledit x=\"c\" y=\"10\" h=\"40%\" w=\"90%\" focus=\"true\" left_margin=\"36\" right_margin=\"16\"\n wrap_word=\"true\">\n  <line_number x=\"0\" y=\"0\" w=\"32\" h=\"100%\" value=\"0\"/>\n  <scroll_bar_d x=\"right\" y=\"0\" w=\"14\" h=\"100%\" value=\"0\"/>\n </mledit>\n ```\n\n > 更多用法请参考：[mledit.xml](\nhttps://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/mledit.xml)\n\n 可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：\n\n ```xml\n <line_number>\n <style name=\"default\">\n    <normal text_color=\"black\" bg_color=\"#d0d0d0\" text_align_h=\"right\"/>\n </style>\n </line_number>\n ```\n\n > 更多用法请参考：\n [theme default](\nhttps://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L556)\n\n\n",
     "name": "line_number_t",
     "parent": "widget_t",
     "annotation": {
@@ -33903,7 +34425,7 @@
           {
             "type": "bool_t",
             "name": "focus",
-            "desc": "是否为焦点。。"
+            "desc": "是否为焦点。"
           }
         ],
         "annotation": {
@@ -33911,6 +34433,27 @@
         },
         "desc": " 设置为焦点。\r\n\r\n",
         "name": "edit_set_focus",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "edit_is_valid_char_t",
+            "name": "is_valid_char",
+            "desc": "检查输入字符是否有效的回调函数。"
+          }
+        ],
+        "annotation": {},
+        "desc": " 设置输入字符检查函数。\r\n> 如果内置检查函数不能满足需求时，可以设置自定义的检查函数。\r\n\r\n\r\n",
+        "name": "edit_set_is_valid_char",
         "return": {
           "type": "ret_t",
           "desc": "返回RET_OK表示成功，否则表示失败。"

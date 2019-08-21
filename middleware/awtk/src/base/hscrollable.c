@@ -1,4 +1,4 @@
-﻿/**
+/**
  * File:   hscrollable.c
  * Author: AWTK Develop Team
  * Brief:  hscrollable
@@ -59,13 +59,25 @@ static ret_t hscrollable_on_pointer_down(hscrollable_t* hscrollable, pointer_eve
 static ret_t hscrollable_on_pointer_move(hscrollable_t* hscrollable, pointer_event_t* e) {
   velocity_t* v = &(hscrollable->velocity);
   int32_t dx = e->x - hscrollable->down.x;
+
   velocity_update(v, e->e.time, e->x, e->y);
 
   hscrollable->xoffset = hscrollable->xoffset_save - dx;
 
+  if (!(hscrollable->always_scrollable)) {
+    widget_t* widget = hscrollable_get_widget(hscrollable);
+    if ((hscrollable->xoffset + widget->w) > hscrollable->virtual_w) {
+      hscrollable->xoffset = hscrollable->virtual_w - widget->w;
+    }
+    if (hscrollable->xoffset < 0) {
+      hscrollable->xoffset = 0;
+    }
+  }
+
   return RET_OK;
 }
 
+#ifndef WITHOUT_WIDGET_ANIMATOR
 static ret_t hscrollable_on_scroll_done(void* ctx, event_t* e) {
   hscrollable_t* hscrollable = (hscrollable_t*)(ctx);
   return_value_if_fail(hscrollable != NULL, RET_BAD_PARAMS);
@@ -75,6 +87,7 @@ static ret_t hscrollable_on_scroll_done(void* ctx, event_t* e) {
 
   return RET_REMOVE;
 }
+#endif /*WITHOUT_WIDGET_ANIMATOR*/
 
 static ret_t hscrollable_fix_end_offset_default(hscrollable_t* hscrollable) {
   int32_t xoffset_end = 0;
@@ -208,11 +221,11 @@ ret_t hscrollable_invalidate(hscrollable_t* hscrollable, rect_t* r) {
 
   r_self = rect_init(0, 0, widget->w, widget->h);
 
-  r->x += widget->x;
   r->x -= hscrollable->xoffset;
-
   *r = rect_intersect(r, &r_self);
 
+  r->x += widget->x;
+  r->y += widget->y;
   if (r->w <= 0 || r->h <= 0) {
     return RET_OK;
   }

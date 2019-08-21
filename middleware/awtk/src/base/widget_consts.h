@@ -138,6 +138,12 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_NAME "name"
 
 /**
+ * @const WIDGET_PROP_TYPE
+ * 类型。
+ */
+#define WIDGET_PROP_TYPE "type"
+
+/**
  * @const WIDGET_PROP_CLOSABLE
  * 是否可以关闭。
  */
@@ -576,6 +582,12 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_COMPACT "compact"
 
 /**
+ * @const WIDGET_PROP_SCROLLABLE
+ * 是否支持滚动。
+ */
+#define WIDGET_PROP_SCROLLABLE "scrollable"
+
+/**
  * @const WIDGET_PROP_ICON
  * 图标名称。
  */
@@ -670,6 +682,12 @@ BEGIN_C_DECLS
  * 是否支持焦点停留。
  */
 #define WIDGET_PROP_FOCUSABLE "focusable"
+
+/**
+ * @const WIDGET_PROP_WITH_FOCUS_STATE
+ * 是否支持焦点状态(如果希望style支持焦点状态，但有不希望焦点停留，可用本属性)。
+ */
+#define WIDGET_PROP_WITH_FOCUS_STATE "with_focus_state"
 
 /**
  * @const WIDGET_PROP_MOVE_FOCUS_NEXT_KEY
