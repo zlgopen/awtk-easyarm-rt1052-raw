@@ -373,7 +373,7 @@
               <MiscControls>--library_interface=armcc --diag_suppress=66,1296,186 --diag_suppress=1296,186 --gnu</MiscControls>
               <Define>XIP_EXTERNAL_FLASH=1, XIP_BOOT_HEADER_ENABLE=1, XIP_BOOT_HEADER_DCD_ENABLE=1, SKIP_SYSCLK_INIT, DEBUG, CPU_MIMXRT1052DVL6B, HAS_AWTK_CONFIG</Define>
               <Undefine></Undefine>
-              <IncludePath>..;../../..;../../../../../CMSIS/Include;../../../../../devices;../../../../../middleware/emwin/emWin_Config;../../../../../middleware/emwin/emWin_header;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../components/ft5406_rt;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052;../../../../../devices/MIMXRT1052/utilities/str;../../../../../devices/MIMXRT1052/utilities/debug_console;../../../../../components/uart;../../../../../components/serial_manager;../../../../../components/serial_manager;../../../../../devices/MIMXRT1052/drivers;../../../../../components/lists;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/xip;../../../xip;..\..\..\..\..\middleware\awtk\src;..\..\..\..\..\middleware\awtk\src\ext_widgets;..\awtk-port</IncludePath>
+              <IncludePath>..;../../..;../../../../../CMSIS/Include;../../../../../devices;../../../../../middleware/emwin/emWin_Config;../../../../../middleware/emwin/emWin_header;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../components/ft5406_rt;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052;../../../../../devices/MIMXRT1052/utilities/str;../../../../../devices/MIMXRT1052/utilities/debug_console;../../../../../components/uart;../../../../../components/serial_manager;../../../../../components/serial_manager;../../../../../devices/MIMXRT1052/drivers;../../../../../components/lists;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/xip;../../../xip;..\..\..\..\..\middleware\awtk\src;..\..\..\..\..\middleware\awtk\src\ext_widgets;..\..\..\..\..\middleware\awtk-port</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -869,24 +869,14 @@
           <GroupName>awtk-port</GroupName>
           <Files>
             <File>
-              <FileName>main_loop_easyarm_rt1052_raw.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\awtk-port\main_loop_easyarm_rt1052_raw.c</FilePath>
-            </File>
-            <File>
-              <FileName>platform.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\awtk-port\platform.c</FilePath>
-            </File>
-            <File>
-              <FileName>awtk_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\awtk-port\awtk_config.h</FilePath>
-            </File>
-            <File>
               <FileName>fs_os.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk-port\fs_os.c</FilePath>
+            </File>
+            <File>
+              <FileName>main_loop_easyarm_rt1052_raw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-port\main_loop_easyarm_rt1052_raw.c</FilePath>
             </File>
             <File>
               <FileName>mem.c</FileName>
@@ -897,6 +887,11 @@
               <FileName>mutex_null.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk-port\mutex_null.c</FilePath>
+            </File>
+            <File>
+              <FileName>platform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-port\platform.c</FilePath>
             </File>
             <File>
               <FileName>rt1052_g2d.c</FileName>

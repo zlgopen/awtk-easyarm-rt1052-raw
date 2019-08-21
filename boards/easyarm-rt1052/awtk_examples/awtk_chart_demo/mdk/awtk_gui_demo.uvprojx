@@ -373,7 +373,7 @@
               <MiscControls>--library_interface=armcc --diag_suppress=66,1296,186 --diag_suppress=1296,186 --gnu</MiscControls>
               <Define>XIP_EXTERNAL_FLASH=1, XIP_BOOT_HEADER_ENABLE=1, XIP_BOOT_HEADER_DCD_ENABLE=1, SKIP_SYSCLK_INIT, DEBUG, CPU_MIMXRT1052DVL6B, HAS_AWTK_CONFIG, LCD_W=480</Define>
               <Undefine></Undefine>
-              <IncludePath>..;../../..;../../../../../CMSIS/Include;../../../../../devices;../../../../../middleware/emwin/emWin_Config;../../../../../middleware/emwin/emWin_header;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../components/ft5406_rt;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052;../../../../../devices/MIMXRT1052/utilities/str;../../../../../devices/MIMXRT1052/utilities/debug_console;../../../../../components/uart;../../../../../components/serial_manager;../../../../../components/serial_manager;../../../../../devices/MIMXRT1052/drivers;../../../../../components/lists;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/xip;../../../xip;..\..\..\..\..\middleware\awtk\src;..\..\..\..\..\middleware\awtk\src\ext_widgets;..\awtk-port</IncludePath>
+              <IncludePath>..;../../..;../../../../../CMSIS/Include;../../../../../devices;../../../../../middleware/emwin/emWin_Config;../../../../../middleware/emwin/emWin_header;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../components/ft5406_rt;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052;../../../../../devices/MIMXRT1052/utilities/str;../../../../../devices/MIMXRT1052/utilities/debug_console;../../../../../components/uart;../../../../../components/serial_manager;../../../../../components/serial_manager;../../../../../devices/MIMXRT1052/drivers;../../../../../components/lists;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/xip;../../../xip;..\..\..\..\..\middleware\awtk\src;..\..\..\..\..\middleware\awtk\src\ext_widgets;..\..\..\..\..\middleware\awtk-port</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -869,24 +869,14 @@
           <GroupName>awtk-port</GroupName>
           <Files>
             <File>
-              <FileName>main_loop_easyarm_rt1052_raw.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\awtk-port\main_loop_easyarm_rt1052_raw.c</FilePath>
-            </File>
-            <File>
-              <FileName>platform.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\awtk-port\platform.c</FilePath>
-            </File>
-            <File>
-              <FileName>awtk_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\awtk-port\awtk_config.h</FilePath>
-            </File>
-            <File>
               <FileName>fs_os.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk-port\fs_os.c</FilePath>
+            </File>
+            <File>
+              <FileName>main_loop_easyarm_rt1052_raw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-port\main_loop_easyarm_rt1052_raw.c</FilePath>
             </File>
             <File>
               <FileName>mem.c</FileName>
@@ -899,124 +889,14 @@
               <FilePath>..\..\..\..\..\middleware\awtk-port\mutex_null.c</FilePath>
             </File>
             <File>
+              <FileName>platform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-port\platform.c</FilePath>
+            </File>
+            <File>
               <FileName>rt1052_g2d.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk-port\rt1052_g2d.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>awtk-demos</GroupName>
-          <Files>
-            <File>
-              <FileName>app_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\app_main.c</FilePath>
-            </File>
-            <File>
-              <FileName>window_bar_series.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\window_bar_series.c</FilePath>
-            </File>
-            <File>
-              <FileName>window_line_series.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\window_line_series.c</FilePath>
-            </File>
-            <File>
-              <FileName>window_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\window_main.c</FilePath>
-            </File>
-            <File>
-              <FileName>window_meter.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\window_meter.c</FilePath>
-            </File>
-            <File>
-              <FileName>window_pie.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\window_pie.c</FilePath>
-            </File>
-            <File>
-              <FileName>window_series_common.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\window_series_common.c</FilePath>
-            </File>
-            <File>
-              <FileName>fifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\base\fifo.c</FilePath>
-            </File>
-            <File>
-              <FileName>axis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\axis.c</FilePath>
-            </File>
-            <File>
-              <FileName>axis_p.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\axis_p.c</FilePath>
-            </File>
-            <File>
-              <FileName>bar_series.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\bar_series.c</FilePath>
-            </File>
-            <File>
-              <FileName>chart_animator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\chart_animator.c</FilePath>
-            </File>
-            <File>
-              <FileName>chart_utils.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\chart_utils.c</FilePath>
-            </File>
-            <File>
-              <FileName>chart_view.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\chart_view.c</FilePath>
-            </File>
-            <File>
-              <FileName>line_series.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\line_series.c</FilePath>
-            </File>
-            <File>
-              <FileName>series.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\series.c</FilePath>
-            </File>
-            <File>
-              <FileName>series_p.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\series_p.c</FilePath>
-            </File>
-            <File>
-              <FileName>tooltip.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\tooltip.c</FilePath>
-            </File>
-            <File>
-              <FileName>x_axis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\x_axis.c</FilePath>
-            </File>
-            <File>
-              <FileName>y_axis.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\chart\y_axis.c</FilePath>
-            </File>
-            <File>
-              <FileName>pie_slice.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\pie_slice\pie_slice.c</FilePath>
-            </File>
-            <File>
-              <FileName>custom_widgets.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Chart-Demo\src\custom_widgets\custom_widgets.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1027,6 +907,121 @@
               <FileName>awtk_imx1050.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\middleware\lib\awtk_imx1050.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Chart-Demo</GroupName>
+          <Files>
+            <File>
+              <FileName>app_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\app_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>window_bar_series.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\window_bar_series.c</FilePath>
+            </File>
+            <File>
+              <FileName>window_line_series.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\window_line_series.c</FilePath>
+            </File>
+            <File>
+              <FileName>window_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\window_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>window_meter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\window_meter.c</FilePath>
+            </File>
+            <File>
+              <FileName>window_pie.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\window_pie.c</FilePath>
+            </File>
+            <File>
+              <FileName>window_series_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\window_series_common.c</FilePath>
+            </File>
+            <File>
+              <FileName>custom_widgets.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\custom_widgets.c</FilePath>
+            </File>
+            <File>
+              <FileName>fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\base\fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>axis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\axis.c</FilePath>
+            </File>
+            <File>
+              <FileName>axis_p.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\axis_p.c</FilePath>
+            </File>
+            <File>
+              <FileName>bar_series.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\bar_series.c</FilePath>
+            </File>
+            <File>
+              <FileName>chart_animator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\chart_animator.c</FilePath>
+            </File>
+            <File>
+              <FileName>chart_utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\chart_utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>chart_view.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\chart_view.c</FilePath>
+            </File>
+            <File>
+              <FileName>line_series.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\line_series.c</FilePath>
+            </File>
+            <File>
+              <FileName>series.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\series.c</FilePath>
+            </File>
+            <File>
+              <FileName>series_p.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\series_p.c</FilePath>
+            </File>
+            <File>
+              <FileName>tooltip.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\tooltip.c</FilePath>
+            </File>
+            <File>
+              <FileName>x_axis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\x_axis.c</FilePath>
+            </File>
+            <File>
+              <FileName>y_axis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\chart\y_axis.c</FilePath>
+            </File>
+            <File>
+              <FileName>pie_slice.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\pie_slice\pie_slice.c</FilePath>
             </File>
           </Files>
         </Group>
