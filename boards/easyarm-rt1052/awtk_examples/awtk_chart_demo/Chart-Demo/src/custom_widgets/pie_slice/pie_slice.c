@@ -47,6 +47,7 @@ vgcanvas_restore(vg);
 */
 
 #include "pie_slice.h"
+#include <math.h>
 
 static pie_slice_t* pie_slice_get_clicked_pie(widget_t* widget, pie_slice_t* pie_slice, float_t r,
                                               int32_t* x_f, int32_t* y_f) {
@@ -61,7 +62,7 @@ static pie_slice_t* pie_slice_get_clicked_pie(widget_t* widget, pie_slice_t* pie
     *x_f += pie_slice->x_to;
     *y_f += pie_slice->y_to;
   }
-  float_t rad = atan(fabs(*y_f) / fabs(*x_f));
+  float_t rad = (float_t)atan((double)abs(*y_f) / (double)abs(*x_f));
   if (*x_f > 0 && *y_f > 0) {
     result = rad;
   }
@@ -275,7 +276,7 @@ static ret_t pie_slice_on_paint_self(widget_t* widget, canvas_t* c) {
 
     vgcanvas_save(vg);
     vgcanvas_translate(vg, c->ox, c->oy);
-    if (end_angle > start_angle) {
+    if (end_angle - start_angle > 0.0001f) {
       vgcanvas_set_fill_color(vg, color);
       vgcanvas_begin_path(vg);
       r = tk_min(cx, cy);
@@ -287,9 +288,11 @@ static ret_t pie_slice_on_paint_self(widget_t* widget, canvas_t* c) {
           end_angle = start_angle + angle / 2;
           cy = cy + r * 0.5;
           r += pie_slice->explode_distancefactor * 1.5;
-          vgcanvas_arc(vg, cx, cy, r, start_angle, end_angle, !ccw);
-          r -= pie_slice->inner_radius;
-          vgcanvas_arc(vg, cx, cy, r, end_angle, start_angle, ccw);
+          if (end_angle - start_angle > 0.0001f) {
+            vgcanvas_arc(vg, cx, cy, r, start_angle, end_angle, !ccw);
+            r -= pie_slice->inner_radius;
+            vgcanvas_arc(vg, cx, cy, r, end_angle, start_angle, ccw);
+          }
         }
       } else {
         vgcanvas_arc(vg, cx, cy, r, start_angle, end_angle, ccw);
