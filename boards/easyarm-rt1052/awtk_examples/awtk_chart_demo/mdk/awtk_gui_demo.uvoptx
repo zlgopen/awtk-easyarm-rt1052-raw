@@ -1211,7 +1211,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\middleware\awtk-port\fs_os.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\fs_os.c</PathWithFileName>
       <FilenameWithoutPath>fs_os.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1224,7 +1224,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\middleware\awtk-port\main_loop_easyarm_rt1052_raw.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\main_loop_easyarm_rt1052_raw.c</PathWithFileName>
       <FilenameWithoutPath>main_loop_easyarm_rt1052_raw.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1237,7 +1237,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\middleware\awtk-port\mem.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\mem.c</PathWithFileName>
       <FilenameWithoutPath>mem.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1250,7 +1250,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\middleware\awtk-port\mutex_null.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\mutex_null.c</PathWithFileName>
       <FilenameWithoutPath>mutex_null.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1263,7 +1263,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\middleware\awtk-port\platform.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\platform.c</PathWithFileName>
       <FilenameWithoutPath>platform.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1276,7 +1276,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\middleware\awtk-port\rt1052_g2d.c</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\rt1052_g2d.c</PathWithFileName>
       <FilenameWithoutPath>rt1052_g2d.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -1297,7 +1297,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\middleware\lib\awtk_imx1050.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\middleware\awtk-rt1052-raw\lib\awtk_imx1050.lib</PathWithFileName>
       <FilenameWithoutPath>awtk_imx1050.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
