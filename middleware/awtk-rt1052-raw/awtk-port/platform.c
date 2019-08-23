@@ -39,9 +39,9 @@ void sleep_ms(uint32_t ms) {
     while (g_systick_count < (old_ms + ms));
 }
 
-uint8_t awtk_mem[10 * 1024 * 1024];
+uint32_t awtk_mem[2 * 1024 * 1024];
 
-#define MEM2_MAX_SIZE		10 * 1024 * 1024 
+#define MEM2_MAX_SIZE       sizeof(awtk_mem) 
 #define MEM2_ADDR           awtk_mem
 
 ret_t platform_prepare(void) {
