@@ -879,11 +879,6 @@
               <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\main_loop_easyarm_rt1052_raw.c</FilePath>
             </File>
             <File>
-              <FileName>mem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\mem.c</FilePath>
-            </File>
-            <File>
               <FileName>mutex_null.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\mutex_null.c</FilePath>
@@ -892,11 +887,6 @@
               <FileName>platform.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\platform.c</FilePath>
-            </File>
-            <File>
-              <FileName>rt1052_g2d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\rt1052_g2d.c</FilePath>
             </File>
           </Files>
         </Group>
