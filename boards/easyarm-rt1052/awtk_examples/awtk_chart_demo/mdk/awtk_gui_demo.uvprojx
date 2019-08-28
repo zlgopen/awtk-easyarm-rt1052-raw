@@ -891,16 +891,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>LIBS</GroupName>
-          <Files>
-            <File>
-              <FileName>awtk_imx1050.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\lib\awtk_imx1050.lib</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>Chart-Demo</GroupName>
           <Files>
             <File>
@@ -1012,6 +1002,16 @@
               <FileName>pie_slice.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk-examples\Chart-Demo\src\custom_widgets\pie_slice\pie_slice.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LIBS</GroupName>
+          <Files>
+            <File>
+              <FileName>awtk_imx1050.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\lib\awtk_imx1050.lib</FilePath>
             </File>
           </Files>
         </Group>
