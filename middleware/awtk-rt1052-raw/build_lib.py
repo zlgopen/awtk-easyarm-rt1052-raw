@@ -20,6 +20,7 @@ def main():
 
     os.mkdir(OUTPUT)    
 
+    '''
     #arm-none-eabi-gcc
     os.environ['Path'] =GCC_PATH + os.environ['Path']
     scons_gcc_cmd = []
@@ -37,6 +38,7 @@ def main():
         p_clean.wait()
     else:
         sys.exit(1)
+    '''
 
     #ARMCC
     os.environ['Path'] = ARMCC_PATH + os.environ['Path']

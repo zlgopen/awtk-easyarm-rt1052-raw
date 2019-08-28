@@ -1,4 +1,4 @@
-
+﻿
 /**
  * File:   awtk_config.h
  * Author: AWTK Develop Team
@@ -17,7 +17,6 @@
  * History:
  * ================================================================
  * 2018-09-12 Li XianJing <xianjimli@hotmail.com> created
- *
  */
 
 #ifndef AWTK_CONFIG_H
@@ -60,21 +59,41 @@
 #define WITH_BITMAP_BGR565 1
 
 /**
+ * 如果有优化版本的memcpy函数，请定义本宏
+ *
+ */
+#define HAS_FAST_MEMCPY 1
+
+/**
+ * 如果系统有标准的malloc函数，请定义本宏
+ *
+ */
+//#define HAS_STD_MALLOC 1
+
+/**
+ * 如果启用NXP PXP硬件加速，请定义本宏
+ * 
+ */
+//#define WITH_PXP_G2D 1
+
+/**
+ * 如果启用三缓冲模式，请定义本宏，否则默认使用双缓冲模式
+ *
+ * 注意：如果使用 tk_set_lcd_orientation 旋转屏幕，则应该注释该行，
+ *       使用默认的双缓冲机制，否则窗口动画可能有花屏现象
+ */
+//#define WITH_THREE_FB 1
+
+/**
  * 如果FLASH空间较小，不足以放大字体文件时，请定义本宏
  *
  */
-#define WITH_MINI_FONT 1
+//#define WITH_MINI_FONT 1
 
 /**
  * 如果启用VGCANVAS，而且没有OpenGL硬件加速，请定义本宏
  *
  */
 #define WITH_NANOVG_AGGE 1
-
-/**
- * 如果启用VGCANVAS，请定义本宏
- *
- */
-#define WITH_VGCANVAS 1
 
 #endif/*AWTK_CONFIG_H*/
