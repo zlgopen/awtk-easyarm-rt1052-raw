@@ -142,6 +142,7 @@
     <disable    bg_color="gray" text_color="#d0d0d0" />
     <error      bg_color="#f0f0f0" text_color="red" />
     <empty      bg_color="#f0f0f0" text_color="#a0a0a0" />
+    <empty_focus bg_color="#f0f0f0" text_color="#a0a0a0" border_color="black"/>
   </style>
 </spin_box>
 
@@ -526,11 +527,11 @@
   </style>
 </progress_circle>
 
-<svg_image>
+<svg>
   <style name="default">
     <normal border_color="green" fg_color="red" />
   </style>
-</svg_image>
+</svg>
 
 <check_button>
   <style name="password_visible" >
@@ -576,6 +577,11 @@
   </style>
 
   <style name="green" text_color="green">
+    <normal   />
+    <focused  />
+  </style>
+  
+  <style name="right" text_color="green" text_align_h="right">
     <normal   />
     <focused  />
   </style>

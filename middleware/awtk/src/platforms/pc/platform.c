@@ -24,6 +24,7 @@
 #include "base/timer.h"
 #include "tkc/platform.h"
 #include "tkc/date_time.h"
+#include "tkc/mem.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -81,11 +82,11 @@ static ret_t date_time_get_now_impl(date_time_t* dt) {
 
 #endif
 
-uint32_t get_time_ms() {
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
+uint64_t stm_now_ms();
+void stm_time_init(void);
 
-  return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+uint64_t get_time_ms64() {
+  return stm_now_ms();
 }
 
 void sleep_ms(uint32_t ms) {
@@ -101,6 +102,8 @@ static uint32_t s_heap_mem[1024 * 1024];
 #endif /*HAS_STD_MALLOC*/
 
 ret_t platform_prepare(void) {
+  stm_time_init();
+
 #ifndef HAS_STD_MALLOC
   tk_mem_init(s_heap_mem, sizeof(s_heap_mem));
 #endif /*HAS_STD_MALLOC*/

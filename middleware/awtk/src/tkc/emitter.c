@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   emitter.c
  * Author: AWTK Develop Team
  * Brief:  emitter dispatcher
@@ -116,9 +116,14 @@ ret_t emitter_dispatch(emitter_t* emitter, event_t* e) {
 
     while (iter != NULL) {
       emitter->curr_iter = iter;
-      if (iter->type == e->type) {
+      if (iter != NULL && iter->type == e->type) {
         ret = iter->handler(iter->ctx, e);
         if (ret == RET_STOP) {
+          if (emitter->remove_curr_iter) {
+            emitter->curr_iter = NULL;
+            emitter->remove_curr_iter = FALSE;
+            emitter_remove_item(emitter, iter);
+          }
           return ret;
         } else if (ret == RET_REMOVE || emitter->remove_curr_iter) {
           emitter_item_t* next = iter->next;

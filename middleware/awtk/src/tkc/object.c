@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   object.c
  * Author: AWTK Develop Team
  * Brief:  reference count object
@@ -90,11 +90,10 @@ object_t* object_ref(object_t* obj) {
   return obj;
 }
 
-ret_t object_get_prop(object_t* obj, const char* name, value_t* v) {
+static ret_t object_get_prop_by_name(object_t* obj, const char* name, value_t* v) {
   ret_t ret = RET_NOT_FOUND;
+  return_value_if_fail(obj != NULL && obj->vt != NULL, RET_BAD_PARAMS);
   return_value_if_fail(name != NULL && v != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(obj != NULL && obj->vt != NULL && obj->ref_count >= 0, RET_BAD_PARAMS);
-  return_value_if_fail(!(obj->visiting), RET_BUSY);
 
   value_set_int(v, 0);
   if (obj->vt->get_prop != NULL) {
@@ -102,6 +101,51 @@ ret_t object_get_prop(object_t* obj, const char* name, value_t* v) {
   }
 
   return ret;
+}
+
+ret_t object_get_prop_by_path(object_t* obj, const char* name, value_t* v) {
+  char* p = NULL;
+  uint32_t len = 0;
+  char path[MAX_PATH + 1];
+  ret_t ret = RET_NOT_FOUND;
+  return_value_if_fail(obj != NULL && obj->vt != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(name != NULL && v != NULL, RET_BAD_PARAMS);
+
+  len = strlen(name);
+  return_value_if_fail(len <= MAX_PATH, RET_BAD_PARAMS);
+
+  memcpy(path, name, len + 1);
+
+  name = path;
+  do {
+    p = strchr(name, '.');
+    if (p != NULL) {
+      *p = '\0';
+    }
+
+    if (object_get_prop_by_name(obj, name, v) != RET_OK) {
+      break;
+    }
+
+    if (p == NULL) {
+      ret = RET_OK;
+      break;
+    }
+
+    if (v->type == VALUE_TYPE_OBJECT) {
+      obj = value_object(v);
+    } else {
+      break;
+    }
+
+    name = p + 1;
+  } while (p != NULL);
+
+  return ret;
+}
+
+ret_t object_get_prop(object_t* obj, const char* name, value_t* v) {
+  return object_get_prop_by_name(obj, name, v);
 }
 
 const char* object_get_prop_str(object_t* obj, const char* name) {
@@ -135,6 +179,15 @@ int32_t object_get_prop_int(object_t* obj, const char* name, int32_t defval) {
   value_t v;
   if (object_get_prop(obj, name, &v) == RET_OK) {
     return value_int(&v);
+  } else {
+    return defval;
+  }
+}
+
+bool_t object_get_prop_bool(object_t* obj, const char* name, bool_t defval) {
+  value_t v;
+  if (object_get_prop(obj, name, &v) == RET_OK) {
+    return value_bool(&v);
   } else {
     return defval;
   }
@@ -204,6 +257,13 @@ ret_t object_set_prop_object(object_t* obj, const char* name, object_t* value) {
 ret_t object_set_prop_int(object_t* obj, const char* name, int32_t value) {
   value_t v;
   value_set_int(&v, value);
+
+  return object_set_prop(obj, name, &v);
+}
+
+ret_t object_set_prop_bool(object_t* obj, const char* name, bool_t value) {
+  value_t v;
+  value_set_bool(&v, value);
 
   return object_set_prop(obj, name, &v);
 }
@@ -308,6 +368,7 @@ ret_t object_copy_prop(object_t* obj, object_t* src, const char* name) {
   return ret;
 }
 
+#ifndef AWTK_LITE
 static EvalFunc obj_get_func(const char* name, void* user_data) {
   const EvalHooks* hooks = eval_default_hooks();
 
@@ -369,6 +430,18 @@ ret_t object_eval(object_t* obj, const char* expr, value_t* v) {
     }
   }
 }
+#else
+ret_t object_eval(object_t* obj, const char* expr, value_t* v) {
+  return_value_if_fail(expr != NULL && v != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(obj != NULL && obj->vt != NULL && obj->ref_count >= 0, RET_BAD_PARAMS);
+
+  if (tk_is_valid_name(expr)) {
+    return object_get_prop(obj, expr, v);
+  } else {
+    return RET_FAIL;
+  }
+}
+#endif /*AWTK_LITE*/
 
 const char* object_get_type(object_t* obj) {
   return_value_if_fail(obj != NULL && obj->vt != NULL, NULL);
@@ -392,4 +465,58 @@ uint32_t object_get_size(object_t* obj) {
   return_value_if_fail(obj != NULL && obj->vt != NULL, 0);
 
   return obj->vt->size;
+}
+
+const char* object_get_prop_str_by_path(object_t* obj, const char* path) {
+  value_t v;
+  if (object_get_prop_by_path(obj, path, &v) == RET_OK) {
+    return value_str(&v);
+  } else {
+    return NULL;
+  }
+}
+
+void* object_get_prop_pointer_by_path(object_t* obj, const char* path) {
+  value_t v;
+  if (object_get_prop_by_path(obj, path, &v) == RET_OK) {
+    return value_pointer(&v);
+  } else {
+    return NULL;
+  }
+}
+
+object_t* object_get_prop_object_by_path(object_t* obj, const char* path) {
+  value_t v;
+  if (object_get_prop_by_path(obj, path, &v) == RET_OK) {
+    return value_object(&v);
+  } else {
+    return NULL;
+  }
+}
+
+int32_t object_get_prop_int_by_path(object_t* obj, const char* path, int32_t defval) {
+  value_t v;
+  if (object_get_prop_by_path(obj, path, &v) == RET_OK) {
+    return value_int(&v);
+  } else {
+    return defval;
+  }
+}
+
+bool_t object_get_prop_bool_by_path(object_t* obj, const char* path, bool_t defval) {
+  value_t v;
+  if (object_get_prop_by_path(obj, path, &v) == RET_OK) {
+    return value_bool(&v);
+  } else {
+    return defval;
+  }
+}
+
+float_t object_get_prop_float_by_path(object_t* obj, const char* path, float_t defval) {
+  value_t v;
+  if (object_get_prop_by_path(obj, path, &v) == RET_OK) {
+    return value_float(&v);
+  } else {
+    return defval;
+  }
 }

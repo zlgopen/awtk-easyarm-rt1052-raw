@@ -18,6 +18,7 @@
 
 | 函数名称 | 说明 | 
 | -------- | ------------ | 
+| <a href="#value_t_value_binary_data">value\_binary\_data</a> | 获取为binary_data的值。 |
 | <a href="#value_t_value_bool">value\_bool</a> | 获取类型为bool的值。 |
 | <a href="#value_t_value_cast">value\_cast</a> | 转换为value对象。 |
 | <a href="#value_t_value_copy">value\_copy</a> | 拷贝value的值。 |
@@ -38,6 +39,7 @@
 | <a href="#value_t_value_object">value\_object</a> | 转换为object的值。 |
 | <a href="#value_t_value_pointer">value\_pointer</a> | 获取类型为pointer的值。 |
 | <a href="#value_t_value_reset">value\_reset</a> | 重置value对象。 |
+| <a href="#value_t_value_set_binary_data">value\_set\_binary\_data</a> | 设置类型为binary_data的值。 |
 | <a href="#value_t_value_set_bool">value\_set\_bool</a> | 设置类型为bool的值。 |
 | <a href="#value_t_value_set_double">value\_set\_double</a> | 设置类型为double的值。 |
 | <a href="#value_t_value_set_float">value\_set\_float</a> | 设置类型为float\_t的值。 |
@@ -49,18 +51,45 @@
 | <a href="#value_t_value_set_int8">value\_set\_int8</a> | 设置类型为int8的值。 |
 | <a href="#value_t_value_set_object">value\_set\_object</a> | 设置类型为object的值。 |
 | <a href="#value_t_value_set_pointer">value\_set\_pointer</a> | 设置类型为pointer的值。 |
+| <a href="#value_t_value_set_sized_str">value\_set\_sized\_str</a> | 设置类型为带长度的字符串的值。 |
 | <a href="#value_t_value_set_str">value\_set\_str</a> | 设置类型为字符串的值。 |
+| <a href="#value_t_value_set_token">value\_set\_token</a> | 设置类型为token的值。 |
+| <a href="#value_t_value_set_ubjson">value\_set\_ubjson</a> | 设置类型为ubjson的值。 |
 | <a href="#value_t_value_set_uint16">value\_set\_uint16</a> | 设置类型为uint16的值。 |
 | <a href="#value_t_value_set_uint32">value\_set\_uint32</a> | 设置类型为uint32的值。 |
 | <a href="#value_t_value_set_uint64">value\_set\_uint64</a> | 设置类型为uint64的值。 |
 | <a href="#value_t_value_set_uint8">value\_set\_uint8</a> | 设置类型为uint8的值。 |
 | <a href="#value_t_value_set_wstr">value\_set\_wstr</a> | 设置类型为宽字符串的值。 |
+| <a href="#value_t_value_sized_str">value\_sized\_str</a> | 获取为sized_str的值。 |
 | <a href="#value_t_value_str">value\_str</a> | 获取类型为字符串的值。 |
+| <a href="#value_t_value_token">value\_token</a> | 获取token的值。 |
+| <a href="#value_t_value_ubjson">value\_ubjson</a> | 获取为ubjson的值。 |
 | <a href="#value_t_value_uint16">value\_uint16</a> | 获取类型为uint16的值。 |
 | <a href="#value_t_value_uint32">value\_uint32</a> | 获取类型为uint32的值。 |
 | <a href="#value_t_value_uint64">value\_uint64</a> | 获取类型为uint64的值。 |
 | <a href="#value_t_value_uint8">value\_uint8</a> | 获取类型为uint8的值。 |
 | <a href="#value_t_value_wstr">value\_wstr</a> | 获取类型为宽字符串的值。 |
+#### value\_binary\_data 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_binary_data"> 获取为binary_data的值。
+
+
+
+* 函数原型：
+
+```
+binary_data_t* value_binary_data (value_t* v);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | binary\_data\_t* | 值。 |
+| v | value\_t* | value对象。 |
 #### value\_bool 函数
 -----------------------
 
@@ -488,6 +517,29 @@ ret_t value_reset (value_t* v);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | v | value\_t* | value对象。 |
+#### value\_set\_binary\_data 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_set_binary_data"> 设置类型为binary_data的值。
+
+
+
+* 函数原型：
+
+```
+value_t* value_set_binary_data (value_t* v, void* value, uint32_t size);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | value\_t* | value对象本身。 |
+| v | value\_t* | value对象。 |
+| value | void* | 待设置的值。 |
+| size | uint32\_t | 长度。 |
 #### value\_set\_bool 函数
 -----------------------
 
@@ -730,6 +782,29 @@ value_t* value_set_pointer (value_t* v, pointer_t value);
 | 返回值 | value\_t* | value对象本身。 |
 | v | value\_t* | value对象。 |
 | value | pointer\_t | 待设置的值。 |
+#### value\_set\_sized\_str 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_set_sized_str"> 设置类型为带长度的字符串的值。
+
+
+
+* 函数原型：
+
+```
+value_t* value_set_sized_str (value_t* v, char* str, uint32_t size);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | value\_t* | value对象本身。 |
+| v | value\_t* | value对象。 |
+| str | char* | 待设置的值。 |
+| size | uint32\_t | 长度。 |
 #### value\_set\_str 函数
 -----------------------
 
@@ -752,6 +827,51 @@ value_t* value_set_str (value_t* v, const char* value);
 | 返回值 | value\_t* | value对象本身。 |
 | v | value\_t* | value对象。 |
 | value | const char* | 待设置的值。 |
+#### value\_set\_token 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_set_token"> 设置类型为token的值。
+
+
+
+* 函数原型：
+
+```
+value_t* value_set_token (value_t* v, uint32_t value);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | value\_t* | value对象本身。 |
+| v | value\_t* | value对象。 |
+| value | uint32\_t | 待设置的值。 |
+#### value\_set\_ubjson 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_set_ubjson"> 设置类型为ubjson的值。
+
+
+
+* 函数原型：
+
+```
+value_t* value_set_ubjson (value_t* v, void* value, uint32_t size);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | value\_t* | value对象本身。 |
+| v | value\_t* | value对象。 |
+| value | void* | 待设置的值。 |
+| size | uint32\_t | 长度。 |
 #### value\_set\_uint16 函数
 -----------------------
 
@@ -862,6 +982,27 @@ value_t* value_set_wstr (value_t* v, const wchar_t* value);
 | 返回值 | value\_t* | value对象本身。 |
 | v | value\_t* | value对象。 |
 | value | const wchar\_t* | 待设置的值。 |
+#### value\_sized\_str 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_sized_str"> 获取为sized_str的值。
+
+
+
+* 函数原型：
+
+```
+sized_str_t* value_sized_str (value_t* v);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | sized\_str\_t* | 值。 |
+| v | value\_t* | value对象。 |
 #### value\_str 函数
 -----------------------
 
@@ -882,6 +1023,48 @@ const char* value_str (value_t* v);
 | 参数 | 类型 | 说明 |
 | -------- | ----- | --------- |
 | 返回值 | const char* | 值。 |
+| v | value\_t* | value对象。 |
+#### value\_token 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_token"> 获取token的值。
+
+
+
+* 函数原型：
+
+```
+uint32_t value_token (value_t* v);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | uint32\_t | 值。 |
+| v | value\_t* | value对象。 |
+#### value\_ubjson 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="value_t_value_ubjson"> 获取为ubjson的值。
+
+
+
+* 函数原型：
+
+```
+binary_data_t* value_ubjson (value_t* v);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | binary\_data\_t* | 值。 |
 | v | value\_t* | value对象。 |
 #### value\_uint16 函数
 -----------------------

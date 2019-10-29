@@ -25,11 +25,13 @@
 #include <math.h>
 #include <ctype.h>
 #include <wchar.h>
+#include <errno.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #if defined(HAS_STDIO) || defined(AWTK_WEB)
 #include <stdio.h>
@@ -158,18 +160,49 @@ typedef enum _ret_t {
    * @const RET_BAD_PARAMS
    * 无效参数。
    */
-  RET_BAD_PARAMS
+  RET_BAD_PARAMS,
+  /**
+   * @const RET_TIMEOUT
+   * 超时。
+   */
+  RET_TIMEOUT,
+  /**
+   * @const RET_CRC
+   * CRC错误。
+   */
+  RET_CRC,
+  /**
+   * @const RET_IO
+   * IO错误。
+   */
+  RET_IO,
+  /**
+   * @const RET_EOS
+   * End of Stream
+   */
+  RET_EOS
 } ret_t;
 
-#ifdef WIN32
+#ifdef ANDROID
+#include "android/log.h"
+#define log_debug(...) __android_log_print(ANDROID_LOG_DEBUG, "AWTK", __VA_ARGS__)
+#define log_info(...) __android_log_print(ANDROID_LOG_INFO, "AWTK", __VA_ARGS__)
+#define log_warn(...) __android_log_print(ANDROID_LOG_WARN, "AWTK", __VA_ARGS__)
+#define log_error(...) __android_log_print(ANDROID_LOG_ERROR, "AWTK", __VA_ARGS__)
+#elif defined(WIN32)
 #include <windows.h>
-#define random rand
-#define srandom srand
 #define strcasecmp stricmp
+#if defined(__GNUC__)
+#define log_debug(format, args...) printf(format, ##args)
+#define log_info(format, args...) printf(format, ##args)
+#define log_warn(format, args...) printf(format, ##args)
+#define log_error(format, args...) printf(format, ##args)
+#else
 #define log_debug(format, ...) printf(format, __VA_ARGS__)
 #define log_info(format, ...) printf(format, __VA_ARGS__)
 #define log_warn(format, ...) printf(format, __VA_ARGS__)
 #define log_error(format, ...) printf(format, __VA_ARGS__)
+#endif
 #define snprintf _snprintf
 #elif defined(HAS_STDIO) || defined(AWTK_WEB)
 #define log_debug(format, args...) printf(format, ##args)
@@ -182,6 +215,11 @@ typedef enum _ret_t {
 #define log_warn(format, args...)
 #define log_error(format, args...)
 #endif
+
+#if defined(WIN32) || defined(__ARMCC_VERSION)
+#define random rand
+#define srandom srand
+#endif /*WIN32||__ARMCC_VERSION*/
 
 #if !defined(WIN32) && !defined(MAX_PATH)
 #define MAX_PATH 255
@@ -307,5 +345,34 @@ enum { TK_NAME_LEN = 31 };
 #else
 #define TK_CONST_DATA_ALIGN(v) v __attribute__((aligned(8)))
 #endif /*_MSC_VER*/
+
+typedef uint64_t (*tk_get_time_t)();
+typedef uint64_t (*tk_get_time_ms_t)();
+typedef void (*tk_sleep_ms_t)(uint32_t ms);
+
+#if defined(WIN32) && !defined(NDEBUG)
+#define TK_ENABLE_CONSOLE()                   \
+  {                                           \
+    AllocConsole();                           \
+    FILE* fp = NULL;                          \
+    freopen_s(&fp, "CONOUT$", "w+t", stdout); \
+  }
+#else
+#define TK_ENABLE_CONSOLE()
+#endif /*WIN32 && !NDEBUG*/
+
+#if defined(WIN32) || defined(LINUX) || defined(MACOS)
+#define WITH_SOCKET 1
+#endif
+
+struct _event_source_t;
+typedef struct _event_source_t event_source_t;
+
+struct _event_source_manager_t;
+typedef struct _event_source_manager_t event_source_manager_t;
+
+#ifndef EAGAIN
+#define EAGAIN 11
+#endif /*EAGAIN*/
 
 #endif /*TYPES_DEF_H*/

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   self_layouter.c
  * Author: AWTK Develop Team
  * Brief:  self layouter
@@ -98,3 +98,9 @@ ret_t self_layouter_destroy(self_layouter_t* layouter) {
 
   return layouter->vt->destroy(layouter);
 }
+
+#ifdef WITHOUT_LAYOUTER
+self_layouter_t* self_layouter_create(const char* params) {
+  return NULL;
+}
+#endif /*WITHOUT_LAYOUTER*/

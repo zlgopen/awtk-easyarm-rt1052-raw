@@ -13,8 +13,7 @@
  */
 
 /**
- * History:
- * ================================================================
+ * History:aod
  * 2018-04-02 Li XianJing <xianjimli@hotmail.com> created
  *
  */
@@ -27,59 +26,69 @@
 #include "base/widget_vtable.h"
 #include "base/image_manager.h"
 
-static ret_t slider_get_dragger_rect(widget_t* widget, rect_t* r) {
-  uint16_t value = 0;
-  uint16_t range = 0;
-  float fvalue = 0;
+static ret_t slider_load_icon(widget_t* widget, bitmap_t* img) {
+  style_t* style = widget->astyle;
+  const char* image_name = style_get_str(style, STYLE_ID_ICON, NULL);
+  if (image_name && widget_load_image(widget, image_name, img) == RET_OK) {
+    return RET_OK;
+  } else {
+    return RET_FAIL;
+  }
+}
+
+static ret_t slider_update_dragger_rect(widget_t* widget, canvas_t* c) {
+  bitmap_t img;
+  double fvalue = 0;
+  double value = 0;
+  double range = 0;
+  float_t ratio = c->lcd->ratio;
   slider_t* slider = SLIDER(widget);
+  rect_t* r = &(slider->dragger_rect);
   return_value_if_fail(slider != NULL && r != NULL, RET_BAD_PARAMS);
 
   value = slider->value - slider->min;
   range = slider->max - slider->min;
-  fvalue = (float)value / (float)range;
+  fvalue = (double)value / (double)range;
 
-  if (r->w == 0) {
+  if (slider_load_icon(widget, &img) == RET_OK) {
+    r->w = img.w / ratio;
+    r->h = img.h / ratio;
+  } else {
     r->w = tk_min(widget->w, widget->h);
-  }
-
-  if (r->h == 0) {
     r->h = r->w;
   }
 
   if (slider->vertical) {
     r->x = (widget->w - r->w) / 2;
-    r->y = (widget->h - r->h) * (1 - fvalue);
+    r->y = tk_roundi((widget->h - r->h) * (1 - fvalue));
   } else {
     r->y = (widget->h - r->h) / 2;
-    r->x = (widget->w - r->w) * fvalue;
+    r->x = tk_roundi((widget->w - r->w) * fvalue);
   }
 
   return RET_OK;
 }
 
 static ret_t slider_paint_dragger(widget_t* widget, canvas_t* c) {
-  rect_t r;
   bitmap_t img;
   color_t color;
-  float_t ratio = c->lcd->ratio;
-  const char* image_name = NULL;
   style_t* style = widget->astyle;
+  slider_t* slider = SLIDER(widget);
+  rect_t* r = &(slider->dragger_rect);
   color_t trans = color_init(0, 0, 0, 0);
 
-  r = rect_init(0, 0, 0, 0);
-  slider_get_dragger_rect(widget, &r);
+  slider_update_dragger_rect(widget, c);
   color = style_get_color(style, STYLE_ID_BORDER_COLOR, trans);
   if (color.rgba.a) {
     canvas_set_fill_color(c, color);
-    canvas_fill_rect(c, r.x, r.y, r.w, r.h);
+    canvas_fill_rect(c, r->x, r->y, r->w, r->h);
   } else {
-    image_name = style_get_str(style, STYLE_ID_ICON, NULL);
-    if (image_name && image_manager_get_bitmap(image_manager(), image_name, &img) == RET_OK) {
-      r = rect_init(0, 0, img.w / ratio, img.h / ratio);
-      slider_get_dragger_rect(widget, &r);
-      canvas_draw_image_ex(c, &img, IMAGE_DRAW_ICON, &r);
+    if (slider_load_icon(widget, &img) == RET_OK) {
+      canvas_draw_image_ex(c, &img, IMAGE_DRAW_ICON, r);
     }
   }
+
+  slider->dragger_size = slider->vertical ? r->h : r->w;
 
   return RET_OK;
 }
@@ -98,8 +107,8 @@ static uint32_t slider_get_bar_size(widget_t* widget) {
 static ret_t slider_on_paint_self(widget_t* widget, canvas_t* c) {
   rect_t r;
   style_t* style = NULL;
-  uint16_t range = 0;
-  uint16_t value = 0;
+  double range = 0;
+  double value = 0;
   float_t fvalue = 0;
   uint32_t radius = 0;
   const char* bg_image = 0;
@@ -175,8 +184,8 @@ static ret_t slider_pointer_up_cleanup(widget_t* widget) {
   return RET_OK;
 }
 
-static ret_t slider_add_value(widget_t* widget, int16_t delta) {
-  int32_t new_value = 0;
+static ret_t slider_add_value(widget_t* widget, double delta) {
+  double new_value = 0;
   slider_t* slider = SLIDER(widget);
   return_value_if_fail(widget != NULL && slider != NULL, RET_BAD_PARAMS);
 
@@ -222,7 +231,6 @@ ret_t slider_dec(widget_t* widget) {
 }
 
 static ret_t slider_on_event(widget_t* widget, event_t* e) {
-  rect_t r;
   ret_t ret = RET_OK;
   uint16_t type = e->type;
   slider_t* slider = SLIDER(widget);
@@ -233,16 +241,17 @@ static ret_t slider_on_event(widget_t* widget, event_t* e) {
     case EVT_POINTER_DOWN: {
       pointer_event_t* evt = (pointer_event_t*)e;
       point_t p = {evt->x, evt->y};
+      rect_t* r = &(slider->dragger_rect);
 
-      r = rect_init(0, 0, 0, 0);
-      slider_get_dragger_rect(widget, &r);
       widget_to_local(widget, &p);
-      if (rect_contains(&r, p.x, p.y)) {
+      if (rect_contains(r, p.x, p.y)) {
         slider->dragging = TRUE;
         widget_set_state(widget, WIDGET_STATE_PRESSED);
         widget_grab(widget->parent, widget);
         widget_invalidate(widget, NULL);
       }
+      slider->down = p;
+      slider->saved_value = slider->value;
       ret = slider->dragging ? RET_STOP : RET_OK;
       break;
     }
@@ -253,24 +262,21 @@ static ret_t slider_on_event(widget_t* widget, event_t* e) {
     case EVT_POINTER_MOVE: {
       pointer_event_t* evt = (pointer_event_t*)e;
       point_t p = {evt->x, evt->y};
-      uint16_t value = 0;
+      double value = 0;
       if (slider->dragging) {
-        float fvalue = 0;
+        double delta = 0;
         widget_to_local(widget, &p);
+        double range = slider->max - slider->min;
 
         if (slider->vertical) {
-          fvalue = 1 - (float)(p.y) / widget->h;
+          delta = range * (slider->down.y - p.y) / (widget->h - slider->dragger_size);
         } else {
-          fvalue = (float)(p.x) / widget->w;
+          delta = range * (p.x - slider->down.x) / (widget->w - slider->dragger_size);
         }
-        if (fvalue < 0) {
-          fvalue = 0;
-        }
-        if (fvalue > 1) {
-          fvalue = 1;
-        }
-        value = fvalue * (slider->max - slider->min) + slider->min;
-        slider_set_value_internal(widget, value, EVT_VALUE_CHANGING, FALSE);
+
+        value = slider->saved_value + delta;
+        value = tk_clampi(value, slider->min, slider->max);
+        slider_set_value_internal(widget, (double)value, EVT_VALUE_CHANGING, FALSE);
       }
 
       break;
@@ -314,19 +320,19 @@ static ret_t slider_on_event(widget_t* widget, event_t* e) {
   return ret;
 }
 
-ret_t slider_set_value_internal(widget_t* widget, uint16_t value, event_type_t etype,
-                                bool_t force) {
-  uint16_t step = 0;
-  uint16_t offset = 0;
+ret_t slider_set_value_internal(widget_t* widget, double value, event_type_t etype, bool_t force) {
+  double step = 0;
+  double offset = 0;
   slider_t* slider = SLIDER(widget);
   return_value_if_fail(slider != NULL, RET_BAD_PARAMS);
 
   step = slider->step;
-  value = tk_max(tk_min(value, slider->max), slider->min);
+  value = tk_clampi(value, slider->min, slider->max);
 
-  if (step > 1) {
+  if (step > 0) {
     offset = value - slider->min;
-    value = slider->min + ((offset + (step >> 1) - 1) / step) * step;
+    offset = tk_roundi(offset / step) * step;
+    value = slider->min + offset;
   }
 
   if (slider->value != value || force) {
@@ -341,7 +347,7 @@ ret_t slider_set_value_internal(widget_t* widget, uint16_t value, event_type_t e
   return RET_OK;
 }
 
-ret_t slider_set_value(widget_t* widget, uint16_t value) {
+ret_t slider_set_value(widget_t* widget, double value) {
   slider_t* slider = SLIDER(widget);
   return_value_if_fail(slider != NULL, RET_BAD_PARAMS);
 
@@ -355,7 +361,7 @@ ret_t slider_set_value(widget_t* widget, uint16_t value) {
   return RET_OK;
 }
 
-ret_t slider_set_min(widget_t* widget, uint16_t min) {
+ret_t slider_set_min(widget_t* widget, double min) {
   slider_t* slider = SLIDER(widget);
   return_value_if_fail(slider != NULL, RET_BAD_PARAMS);
 
@@ -364,7 +370,7 @@ ret_t slider_set_min(widget_t* widget, uint16_t min) {
   return widget_invalidate(widget, NULL);
 }
 
-ret_t slider_set_max(widget_t* widget, uint16_t max) {
+ret_t slider_set_max(widget_t* widget, double max) {
   slider_t* slider = SLIDER(widget);
   return_value_if_fail(slider != NULL, RET_BAD_PARAMS);
 
@@ -373,9 +379,9 @@ ret_t slider_set_max(widget_t* widget, uint16_t max) {
   return widget_invalidate(widget, NULL);
 }
 
-ret_t slider_set_step(widget_t* widget, uint16_t step) {
+ret_t slider_set_step(widget_t* widget, double step) {
   slider_t* slider = SLIDER(widget);
-  return_value_if_fail(slider != NULL && step > 0, RET_BAD_PARAMS);
+  return_value_if_fail(slider != NULL && step >= 0, RET_BAD_PARAMS);
 
   slider->step = step;
 
@@ -405,19 +411,19 @@ static ret_t slider_get_prop(widget_t* widget, const char* name, value_t* v) {
   return_value_if_fail(slider != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
   if (tk_str_eq(name, WIDGET_PROP_VALUE)) {
-    value_set_int(v, slider->value);
+    value_set_double(v, slider->value);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_VERTICAL)) {
     value_set_bool(v, slider->vertical);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MIN)) {
-    value_set_int(v, slider->min);
+    value_set_double(v, slider->min);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MAX)) {
-    value_set_int(v, slider->max);
+    value_set_double(v, slider->max);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_STEP)) {
-    value_set_int(v, slider->step);
+    value_set_double(v, slider->step);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_BAR_SIZE)) {
     value_set_int(v, slider->bar_size);
@@ -431,15 +437,15 @@ static ret_t slider_set_prop(widget_t* widget, const char* name, const value_t* 
   return_value_if_fail(widget != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
   if (tk_str_eq(name, WIDGET_PROP_VALUE)) {
-    return slider_set_value(widget, value_int(v));
+    return slider_set_value(widget, value_double(v));
   } else if (tk_str_eq(name, WIDGET_PROP_VERTICAL)) {
     return slider_set_vertical(widget, value_bool(v));
   } else if (tk_str_eq(name, WIDGET_PROP_MIN)) {
-    return slider_set_min(widget, value_int(v));
+    return slider_set_min(widget, value_double(v));
   } else if (tk_str_eq(name, WIDGET_PROP_MAX)) {
-    return slider_set_max(widget, value_int(v));
+    return slider_set_max(widget, value_double(v));
   } else if (tk_str_eq(name, WIDGET_PROP_STEP)) {
-    return slider_set_step(widget, value_int(v));
+    return slider_set_step(widget, value_double(v));
   } else if (tk_str_eq(name, WIDGET_PROP_BAR_SIZE)) {
     return slider_set_bar_size(widget, value_int(v));
   }

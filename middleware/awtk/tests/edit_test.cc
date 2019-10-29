@@ -5,8 +5,9 @@
 #include "gtest/gtest.h"
 #include <stdlib.h>
 #include "widgets/edit.h"
-#include "widgets/window.h"
+#include "base/window.h"
 #include "widgets/group_box.h"
+#include "common.h"
 
 TEST(Edit, int) {
   value_t v1;
@@ -51,6 +52,14 @@ TEST(Edit, set_text) {
 
   ASSERT_EQ(text_edit_get_state(EDIT(b)->model, &state), RET_OK);
   ASSERT_EQ(state.cursor, 5);
+
+  widget_destroy(b);
+}
+
+TEST(Edit, set_int) {
+  widget_t* b = edit_create(NULL, 10, 20, 30, 40);
+  ASSERT_EQ(edit_set_int(b, -10), RET_OK);
+  ASSERT_EQ(edit_get_int(b), -10);
 
   widget_destroy(b);
 }
@@ -401,4 +410,34 @@ TEST(Edit, is_valid_chr_4_custom) {
   ASSERT_EQ(edit_input_char(e, L'a'), RET_OK);
 
   widget_destroy(e);
+}
+
+TEST(Edit, events) {
+  string event_log;
+  widget_t* b = edit_create(NULL, 10, 20, 30, 40);
+
+  widget_on(b, EVT_VALUE_CHANGING, widget_log_events, &event_log);
+  widget_on(b, EVT_VALUE_CHANGED, widget_log_events, &event_log);
+
+  event_log = "";
+  widget_set_text(b, L"a");
+  ASSERT_EQ(event_log, "value_changed");
+  ASSERT_EQ(wcscmp(b->text.str, L"a"), 0);
+
+  event_log = "";
+  widget_set_text(b, L"a");
+  ASSERT_EQ(event_log, "");
+  ASSERT_EQ(wcscmp(b->text.str, L"a"), 0);
+
+  event_log = "";
+  widget_set_text(b, L"1");
+  ASSERT_EQ(event_log, "value_changed");
+  ASSERT_EQ(wcscmp(b->text.str, L"1"), 0);
+
+  event_log = "";
+  edit_input_char(b, 'a');
+  ASSERT_EQ(event_log, "value_changing");
+  ASSERT_EQ(wcscmp(b->text.str, L"1a"), 0);
+
+  widget_destroy(b);
 }

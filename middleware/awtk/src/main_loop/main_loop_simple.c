@@ -118,8 +118,10 @@ ret_t main_loop_post_key_event(main_loop_t* l, bool_t pressed, uint8_t key) {
 static ret_t main_loop_dispatch_events(main_loop_simple_t* loop) {
   event_queue_req_t r;
   widget_t* widget = loop->base.wm;
+  int time_in = time_now_ms();
+  int time_out = time_in;
 
-  while (main_loop_simple_recv_event(loop, &r) == RET_OK) {
+  while (main_loop_simple_recv_event(loop, &r) == RET_OK && time_out - time_in < 20) {
     switch (r.event.type) {
       case EVT_POINTER_DOWN:
       case EVT_POINTER_MOVE:
@@ -136,9 +138,15 @@ static ret_t main_loop_dispatch_events(main_loop_simple_t* loop) {
       case REQ_ADD_TIMER:
         timer_add(r.add_timer.func, r.add_timer.e.target, r.add_timer.duration);
         break;
-      default:
+      default: {
+        if(r.event.target != NULL) {
+          widget = WIDGET(r.event.target);
+        }
+        widget_dispatch(widget, &(r.event));
         break;
+      }
     }
+    time_out = time_now_ms();
     /*HANDLE OTHER EVENT*/
   }
 
@@ -161,7 +169,7 @@ static ret_t main_loop_simple_step(main_loop_t* l) {
   main_loop_dispatch_events(loop);
   idle_dispatch();
 
-  window_manager_paint(loop->base.wm, &(loop->base.canvas));
+  window_manager_paint(loop->base.wm);
 
   return RET_OK;
 }
@@ -199,7 +207,7 @@ main_loop_simple_t* main_loop_simple_init(int w, int h) {
   loop->base.step = main_loop_simple_step;
   loop->base.queue_event = main_loop_simple_queue_event;
 
-  window_manager_resize(loop->base.wm, w, h);
+  window_manager_post_init(loop->base.wm, w, h);
   main_loop_set((main_loop_t*)loop);
 
   return loop;
@@ -209,9 +217,7 @@ ret_t main_loop_simple_reset(main_loop_simple_t* loop) {
   return_value_if_fail(loop != NULL, RET_BAD_PARAMS);
   event_queue_destroy(loop->queue);
   tk_mutex_destroy(loop->mutex);
-  lcd_destroy(loop->base.lcd);
 
-  canvas_reset(&(loop->base.canvas));
   memset(loop, 0x00, sizeof(main_loop_simple_t));
 
   return RET_OK;

@@ -22,7 +22,7 @@
 #ifndef TK_TIMER_H
 #define TK_TIMER_H
 
-#include "base/timer_manager.h"
+#include "tkc/timer_manager.h"
 
 BEGIN_C_DECLS
 
@@ -162,15 +162,6 @@ uint32_t timer_count(void);
  * @return {uint32_t} 返回最近的timer到期时间。
  */
 uint32_t timer_next_time(void);
-
-/**
- * @method timer_now
- * 获取当前时间(ms)。
- * @annotation ["static"]
- *
- * @return {uint32_t} 返回获取当前时间(ms)。
- */
-uint32_t timer_now(void);
 
 END_C_DECLS
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   value.h
  * Author: AWTK Develop Team
  * Brief:  generic value type
@@ -381,6 +381,19 @@ ret_t value_deep_copy(value_t* dst, const value_t* src) {
       dst->free_handle = dst->value.str != NULL;
       break;
     }
+    case VALUE_TYPE_BINARY:
+    case VALUE_TYPE_UBJSON: {
+      if (src->value.binary_data.data != NULL) {
+        dst->value.binary_data.data = TKMEM_ALLOC(src->value.binary_data.size);
+        return_value_if_fail(dst->value.binary_data.data != NULL, RET_OOM);
+        memcpy(dst->value.binary_data.data, src->value.binary_data.data,
+               src->value.binary_data.size);
+        dst->free_handle = TRUE;
+      } else {
+        dst->free_handle = FALSE;
+      }
+      break;
+    }
     case VALUE_TYPE_WSTRING: {
       dst->value.wstr = tk_wstrdup(src->value.wstr);
       dst->free_handle = dst->value.wstr != NULL;
@@ -529,6 +542,14 @@ ret_t value_reset(value_t* v) {
 
   if (v->free_handle) {
     switch (v->type) {
+      case VALUE_TYPE_SIZED_STRING: {
+        TKMEM_FREE(v->value.sized_str.str);
+        break;
+      }
+      case VALUE_TYPE_BINARY: {
+        TKMEM_FREE(v->value.binary_data.data);
+        break;
+      }
       case VALUE_TYPE_STRING: {
         TKMEM_FREE(v->value.str);
         break;
@@ -579,4 +600,67 @@ value_t* value_cast(value_t* value) {
   return_value_if_fail(value != NULL, NULL);
 
   return value;
+}
+
+value_t* value_set_token(value_t* v, uint32_t value) {
+  return_value_if_fail(v != NULL, NULL);
+
+  v->value.token = value;
+
+  return value_init(v, VALUE_TYPE_TOKEN);
+}
+
+uint32_t value_token(const value_t* v) {
+  return_value_if_fail(v != NULL, 0);
+  return_value_if_fail(v->type == VALUE_TYPE_TOKEN, 0);
+
+  return v->value.token;
+}
+
+value_t* value_set_sized_str(value_t* v, char* str, uint32_t size) {
+  return_value_if_fail(v != NULL, NULL);
+
+  v->value.sized_str.str = str;
+  v->value.sized_str.size = size;
+
+  return value_init(v, VALUE_TYPE_SIZED_STRING);
+}
+
+sized_str_t* value_sized_str(const value_t* v) {
+  return_value_if_fail(v != NULL, NULL);
+  return_value_if_fail(v->type == VALUE_TYPE_SIZED_STRING, NULL);
+
+  return (sized_str_t*)&(v->value.sized_str);
+}
+
+value_t* value_set_binary_data(value_t* v, void* data, uint32_t size) {
+  return_value_if_fail(v != NULL, NULL);
+
+  v->value.binary_data.data = data;
+  v->value.binary_data.size = size;
+
+  return value_init(v, VALUE_TYPE_BINARY);
+}
+
+binary_data_t* value_binary_data(const value_t* v) {
+  return_value_if_fail(v != NULL, NULL);
+  return_value_if_fail(v->type == VALUE_TYPE_BINARY, NULL);
+
+  return (binary_data_t*)&(v->value.binary_data);
+}
+
+value_t* value_set_ubjson(value_t* v, void* data, uint32_t size) {
+  return_value_if_fail(v != NULL, NULL);
+
+  v->value.binary_data.data = data;
+  v->value.binary_data.size = size;
+
+  return value_init(v, VALUE_TYPE_UBJSON);
+}
+
+binary_data_t* value_ubjson(const value_t* v) {
+  return_value_if_fail(v != NULL, NULL);
+  return_value_if_fail(v->type == VALUE_TYPE_UBJSON, NULL);
+
+  return (binary_data_t*)&(v->value.binary_data);
 }

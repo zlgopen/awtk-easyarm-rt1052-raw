@@ -1,7 +1,7 @@
 /**
  * File:   demo1_app.c
  * Author: AWTK Develop Team
- * Brief:  basic class of all widget
+ * Brief:  demoui
  *
  * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
@@ -34,7 +34,7 @@ uint32_t tk_mem_speed_test(void* buffer, uint32_t length, uint32_t* pmemcpy_spee
   uint32_t memcpy_speed;
   uint32_t memset_speed;
   uint32_t max_size = 100 * 1024 * 1024;
-  uint32_t start = time_now_ms();
+  uint64_t start = time_now_ms();
   uint32_t nr = max_size / length;
 
   for (i = 0; i < nr; i++) {
@@ -281,6 +281,21 @@ static ret_t on_open_window(void* ctx, event_t* e) {
 #else
   return RET_OK;
 #endif
+}
+
+static ret_t on_fullscreen(void* ctx, event_t* e) {
+  widget_t* btn = WIDGET(ctx);
+  window_t* win = WINDOW(widget_get_window(btn));
+
+  if (win->fullscreen) {
+    window_set_fullscreen(WIDGET(win), FALSE);
+    widget_set_text_utf8(btn, "Fullscreen");
+  } else {
+    window_set_fullscreen(WIDGET(win), TRUE);
+    widget_set_text_utf8(btn, "Unfullscreen");
+  }
+
+  return RET_OK;
 }
 
 static ret_t on_close(void* ctx, event_t* e) {
@@ -538,6 +553,8 @@ static ret_t install_one(void* ctx, const void* iter) {
       widget_on(widget, EVT_CLICK, on_dec, win);
     } else if (tk_str_eq(name, "close")) {
       widget_on(widget, EVT_CLICK, on_close, win);
+    } else if (tk_str_eq(name, "fullscreen")) {
+      widget_on(widget, EVT_CLICK, on_fullscreen, widget);
     } else if (tk_str_eq(name, "start")) {
       widget_on(widget, EVT_CLICK, on_start, win);
     } else if (tk_str_eq(name, "pause")) {
@@ -594,7 +611,10 @@ static ret_t timer_preload(const timer_info_t* timer) {
   widget_t* status = widget_lookup(win, "status", TRUE);
 
   if (s_preload_nr == total) {
+#if !defined(MOBILE_APP)
     window_open("system_bar");
+#endif /*MOBILE_APP*/
+
     open_window("main", win);
 
     return RET_REMOVE;
@@ -682,6 +702,16 @@ static ret_t wm_on_out_of_memory(void* ctx, event_t* evt) {
   return RET_OK;
 }
 
+static ret_t wm_on_request_quit(void* ctx, event_t* evt) {
+  /*
+   * do some cleanup work here
+   * return RET_STOP to ignore the request
+   */
+  /*return RET_STOP;*/
+
+  return RET_OK;
+}
+
 ret_t application_init() {
   widget_t* wm = window_manager();
 
@@ -696,6 +726,7 @@ ret_t application_init() {
   widget_on(wm, EVT_AFTER_PAINT, wm_on_after_paint, wm);
   widget_on(wm, EVT_LOW_MEMORY, wm_on_low_memory, wm);
   widget_on(wm, EVT_OUT_OF_MEMORY, wm_on_out_of_memory, wm);
+  widget_on(wm, EVT_REQUEST_QUIT_APP, wm_on_request_quit, wm);
 
   return show_preload_res_window();
 }

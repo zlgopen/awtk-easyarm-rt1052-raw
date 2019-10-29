@@ -32,6 +32,8 @@ typedef struct _combo_box_option_t {
   struct _combo_box_option_t* next;
 } combo_box_option_t;
 
+typedef widget_t* (*combo_box_custom_open_popup_t)(widget_t* combobox);
+
 /**
  * @class combo_box_t
  * @parent widget_t
@@ -134,15 +136,30 @@ typedef struct _combo_box_t {
   int32_t value;
 
   /**
+   * @property {bool_t} localize_options
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否本地化(翻译)选项(缺省为TRUE)。
+   */
+  bool_t localize_options;
+
+  /**
    * @property {char*} options
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * 设置可选项(冒号分隔值和文本，分号分隔选项，如:1:red;2:green;3:blue)。
    */
   char* options;
 
+  /**
+   * @property {int32_t} item_height
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 下拉选项的高度。如果open_window为空，则使用缺省高度。
+   */
+  int32_t item_height;
+
   /*private*/
   str_t text;
   combo_box_option_t* option_items;
+  combo_box_custom_open_popup_t open_popup;
 } combo_box_t;
 
 /**
@@ -222,6 +239,17 @@ int32_t combo_box_count_options(widget_t* widget);
 ret_t combo_box_set_selected_index(widget_t* widget, uint32_t index);
 
 /**
+ * @method combo_box_set_localize_options
+ * 设置是否本地化(翻译)选项。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget combo_box对象。
+ * @param {bool_t} localize_options 是否本地化(翻译)选项。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t combo_box_set_localize_options(widget_t* widget, bool_t localize_options);
+
+/**
  * @method combo_box_set_value
  * 设置值。
  * @annotation ["scriptable"]
@@ -231,6 +259,17 @@ ret_t combo_box_set_selected_index(widget_t* widget, uint32_t index);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t combo_box_set_value(widget_t* widget, int32_t value);
+
+/**
+ * @method combo_box_set_item_height
+ * 设置item高度。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget combo_box对象。
+ * @param {uint32_t} item_height item的高度。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t combo_box_set_item_height(widget_t* widget, uint32_t item_height);
 
 /**
  * @method combo_box_append_option
@@ -254,6 +293,16 @@ ret_t combo_box_append_option(widget_t* widget, int32_t value, const char* text)
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t combo_box_set_options(widget_t* widget, const char* options);
+
+/**
+ * @method combo_box_set_custom_open_popup
+ * 设置自定义的打开弹出窗口的函数。
+ * @param {widget_t*} widget combo_box对象。
+ * @param {combo_box_custom_open_popup_t} open_popup 回调函数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t combo_box_set_custom_open_popup(widget_t* widget, combo_box_custom_open_popup_t open_popup);
 
 /**
  * @method combo_box_get_option

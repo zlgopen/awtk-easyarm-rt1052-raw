@@ -25,7 +25,7 @@
 #include "base/enums.h"
 #include "tkc/utils.h"
 #include "base/layout.h"
-#include "widgets/window.h"
+#include "base/window.h"
 #include "widgets/system_bar.h"
 #include "base/window_manager.h"
 
@@ -88,7 +88,7 @@ ret_t system_bar_on_event(widget_t* widget, event_t* e) {
 static ret_t system_bar_on_destroy(widget_t* widget) {
   widget_t* wm = window_manager();
 
-  if (wm != NULL) {
+  if (wm != NULL && wm->emitter != NULL) {
     emitter_off_by_ctx(wm->emitter, widget);
   }
 

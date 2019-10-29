@@ -26,6 +26,30 @@
 
 BEGIN_C_DECLS
 
+/**
+ * @enum glyph_format_t
+ * @prefix GLYPH_FMT_
+ * @annotation ["scriptable"]
+ * 字模格式常量定义。
+ */
+typedef enum _glyph_format_t {
+  /**
+   * @const GLYPH_FMT_ALPHA
+   * 每个像素占用1个字节(缺省)。
+   */
+  GLYPH_FMT_ALPHA,
+  /**
+   * @const GLYPH_FMT_MONO
+   * 每个像素占用1个比特。
+   */
+  GLYPH_FMT_MONO,
+  /**
+   * @const GLYPH_FMT_RGBA
+   * 每个像素占用4个字节。
+   */
+  GLYPH_FMT_RGBA
+} glyph_format_t;
+
 struct _font_t;
 typedef struct _font_t font_t;
 
@@ -37,35 +61,47 @@ typedef struct _font_t font_t;
 #pragma pack(push, 1)
 typedef struct _glyph_t {
   /**
-   * @property {int8_t} x
+   * @property {int16_t} x
    * @annotation ["readable"]
    * x坐标。
    */
-  int8_t x;
+  int16_t x;
   /**
-   * @property {int8_t} y
+   * @property {int16_t} y
    * @annotation ["readable"]
    * y坐标。
    */
-  int8_t y;
+  int16_t y;
   /**
-   * @property {uint8_t} w
+   * @property {uint16_t} w
    * @annotation ["readable"]
    * 宽度。
    */
-  uint8_t w;
+  uint16_t w;
   /**
-   * @property {uint8_t} h
+   * @property {uint16_t} h
    * @annotation ["readable"]
    * 高度。
    */
-  uint8_t h;
+  uint16_t h;
   /**
-   * @property {int32_t} advance
+   * @property {uint16_t} advance
    * @annotation ["readable"]
    * 占位宽度。
    */
-  uint32_t advance;
+  uint16_t advance : 16;
+  /**
+   * @property {uint8_t} format
+   * @annotation ["readable"]
+   * 格式。
+   */
+  uint8_t format : 8;
+  /**
+   * @property {uint8_t} pitch
+   * @annotation ["readable"]
+   * pitch。
+   */
+  uint8_t pitch : 8;
   /**
    * @property {const uint8_t*} data
    * @annotation ["readable"]

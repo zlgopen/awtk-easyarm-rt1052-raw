@@ -280,6 +280,12 @@ struct _widget_t {
    */
   uint8_t enable : 1;
   /**
+   * @property {bool_t} feedback
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否启用按键音、触屏音和震动等反馈。
+   */
+  uint8_t feedback : 1;
+  /**
    * @property {bool_t} visible
    * @annotation ["set_prop","get_prop","readable","writable","persitent","design","scriptable"]
    * 是否可见。
@@ -336,6 +342,12 @@ struct _widget_t {
    * 标识控件是否需要重新layout子控件。
    */
   uint8_t need_relayout_children : 1;
+  /**
+   * @property {bool_t} need_update_style
+   * @annotation ["readable"]
+   * 标识控件是否需要update style。
+   */
+  uint8_t need_update_style : 1;
   /**
    * @property {uint16_t} can_not_destroy
    * @annotation ["readable"]
@@ -919,6 +931,17 @@ ret_t widget_destroy_animator(widget_t* widget, const char* name);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t widget_set_enable(widget_t* widget, bool_t enable);
+
+/**
+ * @method widget_set_feedback
+ * 设置控件是否启用反馈。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t} feedback 是否启用反馈。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t widget_set_feedback(widget_t* widget, bool_t feedback);
 
 /**
  * @method widget_set_floating
@@ -1845,16 +1868,6 @@ ret_t widget_focus_prev(widget_t* widget);
 const char* widget_get_state_for_style(widget_t* widget, bool_t active, bool_t checked);
 
 /**
- * @method widget_update_style_recursive
- * 让控件及其全部子控件根据自己当前状态更新style。
- * @annotation ["private"]
- * @param {widget_t*} widget widget对象。
- *
- * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
- */
-ret_t widget_update_style_recursive(widget_t* widget);
-
-/**
  * @method widget_layout
  * 布局当前控件及子控件。
  * @annotation ["scriptable"]
@@ -1946,6 +1959,18 @@ ret_t widget_set_style_str(widget_t* widget, const char* state_and_name, const c
  */
 ret_t widget_set_style_color(widget_t* widget, const char* state_and_name, uint32_t value);
 
+/**
+ * @method widget_get_canvas
+ * 获取canvas对象。
+ *
+ * @return {canvas_t*} 返回canvas对象。
+ */
+canvas_t* widget_get_canvas(widget_t* widget);
+
+/*for designer only*/
+/*调用者需要unload全部图片*/
+ret_t widget_reset_canvas(widget_t* widget);
+
 /*虚函数的包装*/
 ret_t widget_on_paint(widget_t* widget, canvas_t* c);
 ret_t widget_on_keydown(widget_t* widget, key_event_t* e);
@@ -1967,11 +1992,20 @@ const char** widget_get_persistent_props(void);
 bool_t widget_is_instance_of(widget_t* widget, const widget_vtable_t* vt);
 #define WIDGET_IS_INSTANCE_OF(widget, name) widget_is_instance_of(widget, TK_REF_VTABLE(name))
 
+bool_t widget_is_system_bar(widget_t* widget);
+
+bool_t widget_is_normal_window(widget_t* widget);
+
+bool_t widget_is_dialog(widget_t* widget);
+
+bool_t widget_is_popup(widget_t* widget);
+
 /*public for subclass*/
 TK_EXTERN_VTABLE(widget);
 
 ret_t widget_set_need_relayout_children(widget_t* widget);
 ret_t widget_ensure_visible_in_viewport(widget_t* widget);
+ret_t widget_set_need_update_style(widget_t* widget);
 
 /*public for test*/
 ret_t widget_focus_first(widget_t* widget);

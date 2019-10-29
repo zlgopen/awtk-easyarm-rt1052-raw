@@ -250,6 +250,19 @@ object_t* object_get_prop_object(object_t* obj, const char* name);
 int32_t object_get_prop_int(object_t* obj, const char* name, int32_t defval);
 
 /**
+ * @method object_get_prop_bool
+ * 获取指定属性的bool类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} name 属性的名称。
+ * @param {bool_t} defval 缺省值。
+ *
+ * @return {bool_t} 返回指定属性的bool类型的值。
+ */
+bool_t object_get_prop_bool(object_t* obj, const char* name, bool_t defval);
+
+/**
  * @method object_get_prop_float
  * 获取指定属性的浮点数类型的值。
  *
@@ -340,6 +353,19 @@ ret_t object_set_prop_object(object_t* obj, const char* name, object_t* value);
 ret_t object_set_prop_int(object_t* obj, const char* name, int32_t value);
 
 /**
+ * @method object_set_prop_bool
+ * 设置指定属性的bool类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} name 属性的名称。
+ * @param {bool_t} value 属性的值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t object_set_prop_bool(object_t* obj, const char* name, bool_t value);
+
+/**
  * @method object_set_prop_float
  * 设置指定属性的浮点数类型的值。
  *
@@ -369,7 +395,7 @@ ret_t object_copy_prop(object_t* obj, object_t* src, const char* name);
  * @method object_foreach_prop
  * 遍历所有属性。
  *
- * @annotation ["scriptable:sync_callback"]
+ * @annotation ["scriptable:custom"]
  * @param {object_t*} obj object对象。
  * @param {tk_visit_t} on_prop 回调函数。
  * @param {void*} ctx 回调函数上下文。
@@ -439,7 +465,102 @@ ret_t object_exec(object_t* obj, const char* name, const char* args);
  */
 ret_t object_notify_changed(object_t* obj);
 
+/**
+ * @method object_get_prop_by_path
+ * 获取指定path属性的值。
+ *
+ * @param {object_t*} obj object对象。
+ * @param {const char*} path 属性的path，各级之间用.分隔。
+ * @param {value_t*} v 返回属性的值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t object_get_prop_by_path(object_t* obj, const char* path, value_t* v);
+
+/**
+ * @method object_get_prop_str_by_path
+ * 获取指定属性的字符串类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} path 属性的path。
+ *
+ * @return {const char*} 返回指定属性的字符串类型的值。
+ */
+const char* object_get_prop_str_by_path(object_t* obj, const char* path);
+
+/**
+ * @method object_get_prop_pointer_by_path
+ * 获取指定属性的指针类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} path 属性的path。
+ *
+ * @return {void*} 返回指定属性的指针类型的值。
+ */
+void* object_get_prop_pointer_by_path(object_t* obj, const char* path);
+
+/**
+ * @method object_get_prop_object_by_path
+ * 获取指定属性的object类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} path 属性的path。
+ *
+ * @return {object_t*} 返回指定属性的object类型的值。
+ */
+object_t* object_get_prop_object_by_path(object_t* obj, const char* path);
+
+/**
+ * @method object_get_prop_int_by_path
+ * 获取指定属性的整数类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} path 属性的path。
+ * @param {int32_t} defval 缺省值。
+ *
+ * @return {int32_t} 返回指定属性的整数类型的值。
+ */
+int32_t object_get_prop_int_by_path(object_t* obj, const char* path, int32_t defval);
+
+/**
+ * @method object_get_prop_bool_by_path
+ * 获取指定属性的bool类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} path 属性的path。
+ * @param {bool_t} defval 缺省值。
+ *
+ * @return {bool_t} 返回指定属性的bool类型的值。
+ */
+bool_t object_get_prop_bool_by_path(object_t* obj, const char* path, bool_t defval);
+
+/**
+ * @method object_get_prop_float_by_path
+ * 获取指定属性的浮点数类型的值。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj object对象。
+ * @param {const char*} path 属性的path。
+ * @param {float_t} defval 缺省值。
+ *
+ * @return {float_t} 返回指定属性的浮点数类型的值。
+ */
+float_t object_get_prop_float_by_path(object_t* obj, const char* path, float_t defval);
+
 #define OBJECT(obj) ((object_t*)(obj))
+
+#define OBJECT_REF(obj) object_ref((object_t*)(obj))
+
+#define OBJECT_UNREF(obj)           \
+  if ((obj) != NULL) {              \
+    object_unref((object_t*)(obj)); \
+    (obj) = NULL;                   \
+  }
 
 END_C_DECLS
 

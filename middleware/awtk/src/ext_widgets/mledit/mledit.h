@@ -67,25 +67,25 @@ typedef struct _mledit_t {
   bool_t readonly;
   /**
    * @property {uint8_t} top_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * @annotation ["set_prop","get_prop","readable"]
    * 上边距。
    */
   uint8_t top_margin;
   /**
    * @property {uint8_t} bottom_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * @annotation ["set_prop","get_prop","readable"]
    * 下边距。
    */
   uint8_t bottom_margin;
   /**
    * @property {uint8_t} left_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * @annotation ["set_prop","get_prop","readable"]
    * 左边距。
    */
   uint8_t left_margin;
   /**
    * @property {uint8_t} right_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * @annotation ["set_prop","get_prop","readable"]
    * 右边距。
    */
   uint8_t right_margin;
@@ -95,12 +95,6 @@ typedef struct _mledit_t {
    * 输入提示。
    */
   char* tips;
-  /**
-   * @property {bool_t} focus
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 设置为焦点(通常用于在XML中缺省设置为焦点控件)。
-   */
-  bool_t focus;
 
   /**
    * @property {bool_t} wrap_word
@@ -122,6 +116,16 @@ typedef struct _mledit_t {
 
   wstr_t temp;
 } mledit_t;
+
+/**
+ * @event {event_t} EVT_VALUE_CHANGING
+ * 文本正在改变事件(编辑中)。
+ */
+
+/**
+ * @event {event_t} EVT_VALUE_CHANGED
+ * 文本改变事件。
+ */
 
 /**
  * @method mledit_create
@@ -147,6 +151,17 @@ widget_t* mledit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t mledit_set_readonly(widget_t* widget, bool_t readonly);
+
+/**
+ * @method mledit_set_focus
+ * 设置为焦点。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} focus 是否为焦点。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t mledit_set_focus(widget_t* widget, bool_t focus);
 
 /**
  * @method mledit_set_wrap_word

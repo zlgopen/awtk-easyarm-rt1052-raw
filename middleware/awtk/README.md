@@ -7,6 +7,8 @@
 
 [AWTK](https://github.com/zlgopen/awtk) 全称 Toolkit AnyWhere，是 [ZLG](http://www.zlg.cn/) 开发的开源 GUI 引擎，旨在为嵌入式系统、WEB、各种小程序、手机和 PC 打造的通用 GUI 引擎，为用户提供一个功能强大、高效可靠、简单易用、可轻松做出炫酷效果的 GUI 引擎。
 
+> 欢迎广大开发者一起参与开发：[生态共建计划](docs/AWTK_ecology.md)。
+
 #### [AWTK](https://github.com/zlgopen/awtk) 寓意有两个方面：
 
 * Toolkit AnyWhere。 
@@ -47,7 +49,7 @@
 
 [AWTK](https://github.com/zlgopen/awtk) 是跨平台的，这有两个方面的意思：
 
-* AWTK 本身是跨平台的。目前支持的平台有 ZLG AWorks、Windows、Linux、MacOS、嵌入式 Linux 和嵌入式裸系统，可以轻松的移植到各种 RTOS 上。AWTK 以后也可以运行在浏览器 （即将公测）、各种小程序、Android 和 iOS 等平台上运行。
+* AWTK 本身是跨平台的。目前支持的平台有 ZLG AWorks、Windows、Linux、MacOS、嵌入式 Linux、Android、Web 和嵌入式裸系统，可以轻松的移植到各种 RTOS 上。AWTK 以后也可以运行在各种小程序和 iOS 等平台上运行。
 
 * AWTK 同时还提供了一套跨平台的基础工具库。其中包括链表、数组、字符串 (UTF8 和 widechar)，事件发射器、值、对象、文件系统、互斥锁和线程、表达式和字符串解析等等，让你用 AWTK 开发的应用程序可以真正跨平台运行。
 
@@ -172,6 +174,12 @@ scons
 
 （请先安装 python，scons 和 Visual Studio C++（版本 >=2017)
 
+> 如果没有安装 pywin32，请 pip 安装：
+
+```
+pip install pywin32
+```
+
 编译运行 （在命令行模式下，进入 awtk 所在的目录，并运行下列命令）：
 
 ```
@@ -179,15 +187,33 @@ scons
 bin\demoui
 ```
 
+> 如果没有安装 PIL，请用 pip 安装。
+
+```
+pip install Pillow
+```
+
 ## 五、在线演示
 
-* [基本控件在线演示](http://zlgawtk.bceapp.com/awtk/demos/demoui/index.html)
+* [图表演示](http://zlgawtk.bceapp.com/awtk/demos/Chart-Demo/index.html)
 
-> 目前 AWTK-WEB 还处于测试阶段，部分功能不能正常工作。如有兴趣请在 PC 上自行编译运行。
+* [仪表演示](http://zlgawtk.bceapp.com/awtk/demos/Meter-Demo/index.html)
+
+* [智能手表演示](http://zlgawtk.bceapp.com/awtk/demos/SmartWatch-Demo/index.html)
+
+* [清风系统演示](http://zlgawtk.bceapp.com/awtk/demos/CleanAir-Demo/index.html)
+
+* [音乐播放器演示](http://zlgawtk.bceapp.com/awtk/demos/MusicPlayer-Demo/index.html)
+
+* [基本控件在线演示](http://zlgawtk.bceapp.com/awtk/demos/demoui/index.html)
 
 ## 六、各个平台的移植
 
 #### 官方支持平台 
+
+* [awtk-web](https://github.com/zlgopen/awtk-web)
+
+* [awtk-android](https://github.com/zlgopen/awtk-android)
 
 * [awtk-aworks-rt1052](https://github.com/zlgopen/awtk-aworks-rt1052)
 
@@ -203,11 +229,19 @@ bin\demoui
 
 * [linux-framebuffer （嵌入式 Linux 请用本项目）](https://github.com/zlgopen/awtk-linux-fb)
 
+#### 芯片原厂移植
+
+* [君正](https://github.com/zlgopen/awtk-port-ingenic`)
+
 ## 七、各语言的绑定
 
-* [awtk-lua](https://github.com/zlgopen/awtk-lua)
+* [AWTK 绑定代码生成器](https://github.com/zlgopen/awtk-binding)
 
-* [awtk-js](https://github.com/zlgopen/awtk-js)
+* [LUA 绑定](https://github.com/zlgopen/awtk-lua)
+
+* [JS 绑定之 QuickJS](https://github.com/zlgopen/awtk-quickjs)
+
+* [JS 绑定之 JerryScript](https://github.com/zlgopen/awtk-jerryscript)
 
 ## 八、相关工程
 
@@ -217,8 +251,6 @@ bin\demoui
 
 * [精彩示例](https://github.com/zlgopen/awtk-examples)
 
-* [AWTK-WEB](https://github.com/zlgopen/awtk-web)
-
 * [AWTK-MVVM](https://github.com/zlgopen/awtk-mvvm)
 
 * [扩展控件实例：二维码](https://github.com/CUITzhaoqi/awtk-qr)
@@ -227,12 +259,12 @@ bin\demoui
 
 ## 九、文档
 
-[文档](docs/README.md)
+* [开发文档](docs/README.md)
 
-## 十、任务完成情况
+* [最新动态](docs/changes.md)
 
-[任务完成情况](TODO.md)
+* [任务完成情况](TODO.md)
 
-## 十一、最新动态
+## 十、生态共建计划
 
-[最新动态](docs/changes.md)
+* [生态共建计划](docs/AWTK_ecology.md)

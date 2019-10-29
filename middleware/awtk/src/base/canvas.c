@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   canvas.c
  * Author: AWTK Develop Team
  * Brief:  canvas provides basic drawings functions.
@@ -26,7 +26,6 @@
 #include "base/canvas.h"
 #include "tkc/time_now.h"
 #include "tkc/color_parser.h"
-#include "base/wuxiaolin.inc"
 #include "base/system_info.h"
 
 #include "base/lcd_profile.h"
@@ -96,6 +95,19 @@ ret_t canvas_set_font_manager(canvas_t* c, font_manager_t* font_manager) {
   return_value_if_fail(c != NULL && font_manager != NULL, RET_BAD_PARAMS);
 
   c->font_manager = font_manager;
+
+  return RET_OK;
+}
+
+ret_t canvas_set_assets_manager(canvas_t* c, assets_manager_t* assets_manager) {
+  vgcanvas_t* vgcanvas = NULL;
+  return_value_if_fail(c != NULL && assets_manager != NULL, RET_BAD_PARAMS);
+
+  vgcanvas = lcd_get_vgcanvas(c->lcd);
+  c->assets_manager = assets_manager;
+  if (vgcanvas != NULL) {
+    vgcanvas_set_assets_manager(vgcanvas, assets_manager);
+  }
 
   return RET_OK;
 }
@@ -285,6 +297,11 @@ float_t canvas_measure_utf8(canvas_t* c, const char* str) {
 ret_t canvas_begin_frame(canvas_t* c, rect_t* dirty_rect, lcd_draw_mode_t draw_mode) {
   ret_t ret = RET_OK;
   return_value_if_fail(c != NULL, RET_BAD_PARAMS);
+  if (c->began_frame) {
+    return RET_OK;
+  } else {
+    c->began_frame = TRUE;
+  }
 
   c->ox = 0;
   c->oy = 0;
@@ -526,7 +543,7 @@ static ret_t canvas_draw_text_impl(canvas_t* c, const wchar_t* str, uint32_t nr,
   glyph_t g;
   uint32_t i = 0;
   xy_t left = x;
-  uint32_t start_time = time_now_ms();
+  uint64_t start_time = time_now_ms();
   font_size_t font_size = c->font_size;
 
   y -= font_size * 1 / 3;
@@ -659,10 +676,10 @@ ret_t canvas_draw_image_repeat(canvas_t* c, bitmap_t* img, rect_t* dst_in) {
       s.w = w;
       s.h = h;
 
-      d.x = x + dst->x;
-      d.y = y + dst->y;
       d.w = w;
       d.h = h;
+      d.x = x + dst->x;
+      d.y = y + dst->y;
       canvas_draw_image(c, img, &s, &d);
       x += w;
     }
@@ -692,8 +709,8 @@ ret_t canvas_draw_image_repeat_x(canvas_t* c, bitmap_t* img, rect_t* dst_in) {
   while (x < dst->w) {
     w = tk_min(img->w, dst->w - x);
     s.w = w;
-    d.x = x;
     d.w = w;
+    d.x = dst->x + x;
     canvas_draw_image(c, img, &s, &d);
     x += w;
   }
@@ -720,10 +737,45 @@ ret_t canvas_draw_image_repeat_y(canvas_t* c, bitmap_t* img, rect_t* dst_in) {
   while (y < dst->h) {
     h = tk_min(img->h, dst->h - y);
     s.h = h;
-    d.y = y;
     d.h = h;
+    d.y = dst->y + y;
     canvas_draw_image(c, img, &s, &d);
     y += h;
+  }
+
+  return RET_OK;
+}
+
+ret_t canvas_draw_image_repeat_y_inverse(canvas_t* c, bitmap_t* img, rect_t* dst_in) {
+  rect_t s;
+  rect_t d;
+  xy_t y = 0;
+  wh_t h = 0;
+  rect_t r_fix;
+  rect_t* dst = canvas_fix_rect(dst_in, &r_fix);
+  return_value_if_fail(c != NULL && img != NULL && dst != NULL, RET_BAD_PARAMS);
+
+  s.x = 0;
+  s.y = 0;
+  s.w = img->w;
+  s.h = img->h;
+
+  d = *dst;
+
+  while (y < dst->h) {
+    h = tk_min(img->h, dst->h - y);
+    s.h = h;
+    d.h = h;
+    y += h;
+    d.y = dst->y + (dst->h - y);
+
+    if (s.h < img->h) {
+      s.y = img->h - s.h;
+      canvas_draw_image(c, img, &s, &d);
+    } else {
+      s.y = 0;
+      canvas_draw_image(c, img, &s, &d);
+    }
   }
 
   return RET_OK;
@@ -1004,6 +1056,12 @@ ret_t canvas_draw_image_patch9(canvas_t* c, bitmap_t* img, rect_t* dst_in) {
 
 ret_t canvas_end_frame(canvas_t* c) {
   return_value_if_fail(c != NULL, RET_BAD_PARAMS);
+  if (c->began_frame) {
+    c->began_frame = FALSE;
+  } else {
+    return RET_OK;
+  }
+
   canvas_draw_fps(c);
   canvas_set_global_alpha(c, 0xff);
 
@@ -1167,6 +1225,8 @@ ret_t canvas_draw_image_ex(canvas_t* c, bitmap_t* img, image_draw_type_t draw_ty
       return canvas_draw_image_repeat_x(c, img, dst);
     case IMAGE_DRAW_REPEAT_Y:
       return canvas_draw_image_repeat_y(c, img, dst);
+    case IMAGE_DRAW_REPEAT_Y_INVERSE:
+      return canvas_draw_image_repeat_y_inverse(c, img, dst);
     case IMAGE_DRAW_PATCH9:
       return canvas_draw_image_patch9(c, img, dst);
     case IMAGE_DRAW_PATCH3_X:

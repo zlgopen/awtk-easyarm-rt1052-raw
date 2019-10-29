@@ -14,8 +14,10 @@
 
 | 函数名称 | 说明 | 
 | -------- | ------------ | 
+| <a href="#object_default_t_object_default_clear_props">object\_default\_clear\_props</a> |  |
 | <a href="#object_default_t_object_default_create">object\_default\_create</a> |  |
 | <a href="#object_default_t_object_default_create">object\_default\_create</a> |  |
+| <a href="#object_default_t_object_default_find_prop">object\_default\_find\_prop</a> |  |
 | <a href="#object_default_t_object_default_unref">object\_default\_unref</a> |  |
 ### 属性
 <p id="object_default_t_properties">
@@ -25,6 +27,30 @@
 | <a href="#object_default_t_props">props</a> | named\_value\_t | 属性数组。 |
 | <a href="#object_default_t_props_capacity">props\_capacity</a> | uint32\_t | 属性数组的容量。 |
 | <a href="#object_default_t_props_size">props\_size</a> | uint32\_t | 属性个数。 |
+#### object\_default\_clear\_props 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_default_t_object_default_clear_props">
+ 清除全部属性。
+
+
+
+
+
+* 函数原型：
+
+```
+ret_t object_default_clear_props (object_t* obj);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| obj | object\_t* | 对象。 |
 #### object\_default\_create 函数
 -----------------------
 
@@ -72,6 +98,32 @@ object_t* object_default_create (object_default_t* o);
 | -------- | ----- | --------- |
 | 返回值 | object\_t* | 返回object对象。 |
 | o | object\_default\_t* | 被克隆的对象。 |
+#### object\_default\_find\_prop 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_default_t_object_default_find_prop">
+ 查找满足条件的属性，并返回它的值。
+
+
+
+
+
+* 函数原型：
+
+```
+value_t* object_default_find_prop (object_t* obj, tk_compare_t cmp, const void* data);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | value\_t* | 返回属性的值。 |
+| obj | object\_t* | 对象。 |
+| cmp | tk\_compare\_t | 比较函数。 |
+| data | const void* | 要比较的数据。 |
 #### object\_default\_unref 函数
 -----------------------
 

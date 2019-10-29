@@ -17,7 +17,7 @@
 
 | 属性名称 | 类型 | 说明 | 
 | -------- | ----- | ------------ | 
-| <a href="#key_event_t_alt">alt</a> | bool\_t | 键值。 |
+| <a href="#key_event_t_alt">alt</a> | bool\_t | alt键是否按下。 |
 | <a href="#key_event_t_capslock">capslock</a> | bool\_t | capslock键是否按下。 |
 | <a href="#key_event_t_cmd">cmd</a> | bool\_t | left shift键是否按下。 |
 | <a href="#key_event_t_ctrl">ctrl</a> | bool\_t | right alt键是否按下。 |
@@ -77,8 +77,7 @@ event_t* key_event_init (key_event_t* event, void* target, uint32_t type, int32_
 | key | int32\_t | key的值。 |
 #### alt 属性
 -----------------------
-> <p id="key_event_t_alt"> 键值。
- alt键是否按下。
+> <p id="key_event_t_alt"> alt键是否按下。
 
 
 * 类型：bool\_t

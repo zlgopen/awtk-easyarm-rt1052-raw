@@ -60,6 +60,24 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_H "h"
 
 /**
+ * @const WIDGET_PROP_CANVAS
+ * Canvas。
+ */
+#define WIDGET_PROP_CANVAS "canvas"
+
+/**
+ * @const WIDGET_PROP_LOCALIZE_OPTIONS
+ * Canvas。
+ */
+#define WIDGET_PROP_LOCALIZE_OPTIONS "localize_options"
+
+/**
+ * @const WIDGET_PROP_NATIVE_WINDOW
+ * Native Window。
+ */
+#define WIDGET_PROP_NATIVE_WINDOW "native_window"
+
+/**
  * @const WIDGET_PROP_HIGHLIGHT
  * dialog highlight。
  */
@@ -190,6 +208,12 @@ BEGIN_C_DECLS
  * 是否启用。
  */
 #define WIDGET_PROP_ENABLE "enable"
+
+/**
+ * @const WIDGET_PROP_FEEDBACK
+ * 是否启用按键音等反馈。
+ */
+#define WIDGET_PROP_FEEDBACK "feedback"
 
 /**
  * @const WIDGET_PROP_FLOATING
@@ -672,8 +696,14 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_IS_KEYBOARD "is_keyboard"
 
 /**
+ * @const WIDGET_PROP_FOCUSED
+ * 是否为焦点控件。
+ */
+#define WIDGET_PROP_FOCUSED "focused"
+
+/**
  * @const WIDGET_PROP_FOCUS
- * 设置为输入焦点。
+ * (过时请用focused)。
  */
 #define WIDGET_PROP_FOCUS "focus"
 

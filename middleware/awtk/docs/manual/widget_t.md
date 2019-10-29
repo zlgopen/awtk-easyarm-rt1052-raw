@@ -69,6 +69,7 @@
 | <a href="#widget_t_widget_equal">widget\_equal</a> | 判断两个widget是否相同。 |
 | <a href="#widget_t_widget_find_animator">widget\_find\_animator</a> | 查找指定名称的动画。 |
 | <a href="#widget_t_widget_foreach">widget\_foreach</a> | 遍历当前控件及子控件。 |
+| <a href="#widget_t_widget_get_canvas">widget\_get\_canvas</a> | 获取canvas对象。 |
 | <a href="#widget_t_widget_get_child">widget\_get\_child</a> | 获取指定索引的子控件。 |
 | <a href="#widget_t_widget_get_prop">widget\_get\_prop</a> | 获取控件指定属性的值。 |
 | <a href="#widget_t_widget_get_prop_bool">widget\_get\_prop\_bool</a> | 获取布尔格式的属性。 |
@@ -110,6 +111,7 @@
 | <a href="#widget_t_widget_set_children_layout">widget\_set\_children\_layout</a> | 设置子控件的布局参数。 |
 | <a href="#widget_t_widget_set_cursor">widget\_set\_cursor</a> | 设置鼠标指针的图片名。 |
 | <a href="#widget_t_widget_set_enable">widget\_set\_enable</a> | 设置控件的可用性。 |
+| <a href="#widget_t_widget_set_feedback">widget\_set\_feedback</a> | 设置控件是否启用反馈。 |
 | <a href="#widget_t_widget_set_floating">widget\_set\_floating</a> | 设置控件的floating标志。 |
 | <a href="#widget_t_widget_set_focused">widget\_set\_focused</a> | 设置控件的是否聚焦。 |
 | <a href="#widget_t_widget_set_name">widget\_set\_name</a> | 设置控件的名称。 |
@@ -157,12 +159,15 @@
 | <a href="#widget_t_dirty">dirty</a> | bool\_t | 标识控件是否需要重绘。 |
 | <a href="#widget_t_emitter">emitter</a> | emitter\_t* | 事件发射器。 |
 | <a href="#widget_t_enable">enable</a> | bool\_t | 启用/禁用状态。 |
+| <a href="#widget_t_feedback">feedback</a> | bool\_t | 是否启用按键音、触屏音和震动等反馈。 |
 | <a href="#widget_t_floating">floating</a> | bool\_t | 标识控件是否启用浮动布局，不受父控件的children_layout的控制。 |
+| <a href="#widget_t_focusable">focusable</a> | bool\_t | 是否支持焦点停留。 |
 | <a href="#widget_t_focused">focused</a> | bool\_t | 是否得到焦点。 |
 | <a href="#widget_t_h">h</a> | wh\_t | 高度。 |
 | <a href="#widget_t_initializing">initializing</a> | bool\_t | 标识控件正在初始化。 |
 | <a href="#widget_t_name">name</a> | char* | 控件名字。 |
 | <a href="#widget_t_need_relayout_children">need\_relayout\_children</a> | bool\_t | 标识控件是否需要重新layout子控件。 |
+| <a href="#widget_t_need_update_style">need\_update\_style</a> | bool\_t | 标识控件是否需要update style。 |
 | <a href="#widget_t_opacity">opacity</a> | uint8\_t | 不透明度(0-255)，0完全透明，255完全不透明。 |
 | <a href="#widget_t_parent">parent</a> | widget\_t* | 父控件 |
 | <a href="#widget_t_self_layout">self\_layout</a> | self\_layouter\_t* | 控件布局器。请参考[控件布局参数](https://github.com/zlgopen/awtk/blob/master/docs/layout.md) |
@@ -174,6 +179,7 @@
 | <a href="#widget_t_visible">visible</a> | bool\_t | 是否可见。 |
 | <a href="#widget_t_vt">vt</a> | widget\_vtable\_t | 虚函数表。 |
 | <a href="#widget_t_w">w</a> | wh\_t | 宽度。 |
+| <a href="#widget_t_with_focus_state">with\_focus\_state</a> | bool\_t | 是否支持焦点状态。 |
 | <a href="#widget_t_x">x</a> | xy\_t | x坐标(相对于父控件的x坐标)。 |
 | <a href="#widget_t_y">y</a> | xy\_t | y坐标(相对于父控件的y坐标)。 |
 ### 事件
@@ -634,6 +640,26 @@ ret_t widget_foreach (widget_t* widget, tk_visit_t visit, void* ctx);
 | widget | widget\_t* | 控件对象。 |
 | visit | tk\_visit\_t | 遍历的回调函数。 |
 | ctx | void* | 回调函数的上下文。 |
+#### widget\_get\_canvas 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_get_canvas"> 获取canvas对象。
+
+
+
+* 函数原型：
+
+```
+canvas_t* widget_get_canvas ();
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | canvas\_t* | 返回canvas对象。 |
 #### widget\_get\_child 函数
 -----------------------
 
@@ -1586,6 +1612,28 @@ ret_t widget_set_enable (widget_t* widget, bool_t enable);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | enable | bool\_t | 是否可用性。 |
+#### widget\_set\_feedback 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_set_feedback"> 设置控件是否启用反馈。
+
+
+
+* 函数原型：
+
+```
+ret_t widget_set_feedback (widget_t* widget, bool_t feedback);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| feedback | bool\_t | 是否启用反馈。 |
 #### widget\_set\_floating 函数
 -----------------------
 
@@ -2445,6 +2493,23 @@ ret_t widget_use_style (widget_t* widget, char* style);
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
+#### feedback 属性
+-----------------------
+> <p id="widget_t_feedback"> 是否启用按键音、触屏音和震动等反馈。
+
+
+* 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
 #### floating 属性
 -----------------------
 > <p id="widget_t_floating"> 标识控件是否启用浮动布局，不受父控件的children_layout的控制。
@@ -2456,6 +2521,23 @@ ret_t widget_use_style (widget_t* widget, char* style);
 | -------- | ----- |
 | 可直接读取 | 是 |
 | 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
+#### focusable 属性
+-----------------------
+> <p id="widget_t_focusable"> 是否支持焦点停留。
+
+
+* 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 是 |
 | 可持久化   | 是 |
 | 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |
@@ -2521,6 +2603,17 @@ ret_t widget_use_style (widget_t* widget, char* style);
 #### need\_relayout\_children 属性
 -----------------------
 > <p id="widget_t_need_relayout_children"> 标识控件是否需要重新layout子控件。
+
+
+* 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 否 |
+#### need\_update\_style 属性
+-----------------------
+> <p id="widget_t_need_update_style"> 标识控件是否需要update style。
 
 
 * 类型：bool\_t
@@ -2677,6 +2770,24 @@ ret_t widget_use_style (widget_t* widget, char* style);
 | -------- | ----- |
 | 可直接读取 | 是 |
 | 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
+#### with\_focus\_state 属性
+-----------------------
+> <p id="widget_t_with_focus_state"> 是否支持焦点状态。
+ > 如果希望style支持焦点状态，但有不希望焦点停留，可用本属性。
+
+
+* 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 是 |
 | 可持久化   | 是 |
 | 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |

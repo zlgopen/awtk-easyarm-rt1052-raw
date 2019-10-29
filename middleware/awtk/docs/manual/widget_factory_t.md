@@ -1,5 +1,7 @@
 ## widget\_factory\_t
 ### 概述
+![image](images/widget_factory_t_0.png)
+
  控件工厂对象。
 
  提供通过类型创建控件的能力。

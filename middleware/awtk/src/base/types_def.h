@@ -220,7 +220,11 @@ typedef enum _app_type_t {
 #endif /*TK_DEFAULT_FONT_SIZE*/
 
 #ifndef TK_MAX_FPS
+#if defined(LINUX) || defined(MACOS) || defined(WIN32)
+#define TK_MAX_FPS 60
+#else
 #define TK_MAX_FPS 100
+#endif
 #endif /*TK_MAX_FPS*/
 
 #define TK_OPACITY_ALPHA 0xfa
@@ -269,7 +273,7 @@ typedef struct _widget_animator_t widget_animator_t;
 #define TK_EXTERN_VTABLE(vt)
 #endif /*WITH_WIDGET_TYPE_CHECK*/
 
-#ifdef WITH_VGCANVAS
+#if defined(WITH_VGCANVAS)
 #define WITH_WINDOW_ANIMATORS 1
 #endif /*WITH_VGCANVAS*/
 
@@ -310,5 +314,29 @@ typedef struct _system_info_t system_info_t;
 #endif /*WITH_SDL*/
 
 #endif /*TK_GLYPH_CACHE_NR*/
+
+#if defined(WITH_STB_FONT) || defined(WITH_FT_FONT)
+#define WITH_TRUETYPE_FONT 1
+#endif /*WITH_STB_FONT or WITH_FT_FONT*/
+
+#if defined(WITH_LCD_MONO)
+#undef WITH_FS_RES
+#undef WITH_VGCANVAS
+#undef WITH_STB_IMAGE
+#undef WITH_TRUETYPE_FONT
+#undef WITH_WINDOW_ANIMATORS
+#define WITH_BITMAP_FONT 1
+#endif /*WITH_LCD_MONO*/
+
+#ifdef AWTK_LITE
+#define WITH_NULL_IM 1
+#define WITHOUT_LAYOUT 1
+#define WITHOUT_CLIPBOARD 1
+#define WITHOUT_EXT_WIDGETS 1
+#define WITHOUT_INPUT_METHOD 1
+#define WITHOUT_WINDOW_ANIMATORS
+#define WITHOUT_WIDGET_ANIMATORS 1
+#define WITHOUT_DIALOG_HIGHLIGHTER 1
+#endif /*AWTK_LITE*/
 
 #endif /*TK_TYPES_DEF_H*/

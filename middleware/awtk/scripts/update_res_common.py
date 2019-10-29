@@ -15,6 +15,7 @@ ASSETS_ROOT = ''
 AWTK_ROOT = ''
 INPUT_DIR = ''
 OUTPUT_DIR = ''
+FONT_OPTIONS = ''
 IMAGEGEN_OPTIONS = ''
 ###########################
 
@@ -113,7 +114,8 @@ def resgen(raw, inc):
 
 def fontgen(raw, text, inc, size):
     execCmd(toExe('fontgen') + ' ' + joinPath(INPUT_DIR, raw) + ' ' +
-            joinPath(INPUT_DIR, text) + ' ' + joinPath(OUTPUT_DIR, inc) + ' ' + str(size))
+            joinPath(INPUT_DIR, text) + ' ' + joinPath(OUTPUT_DIR, inc) + ' ' + 
+            str(size) + ' ' + FONT_OPTIONS)
 
 
 def imagegen(raw, inc):
@@ -297,9 +299,9 @@ def gen_add_assets(files):
         basename = basename.replace('.data', '')
         basename = basename.replace('.bsvg', '')
         if basename == 'font_default':
-            result += '  assets_manager_add(rm, font_default);\n'
+            result += '  assets_manager_add(am, font_default);\n'
         else:
-            result += '  assets_manager_add(rm, '+basename+');\n'
+            result += '  assets_manager_add(am, '+basename+');\n'
     return result
 
 
@@ -329,24 +331,24 @@ def gen_res_c():
     result += genIncludes(files)
     result += '#endif/*WITH_VGCANVAS*/\n'
 
-    result += "#if defined(WITH_STB_FONT) || defined(WITH_FT_FONT)\n"
+    result += "#if defined(WITH_TRUETYPE_FONT)\n"
     files = glob.glob(joinPath(OUTPUT_DIR, 'fonts/default.res'))
     result += genIncludes(files)
-    result += "#else/*WITH_STB_FONT or WITH_FT_FONT*/\n"
+    result += "#else/*WITH_TRUETYPE_FONT*/\n"
     files = glob.glob(joinPath(OUTPUT_DIR, 'fonts/*.data'))
     result += genIncludes(files)
-    result += '#endif/*WITH_STB_FONT or WITH_FT_FONT*/\n'
+    result += '#endif/*WITH_TRUETYPE_FONT*/\n'
 
     result += '#endif/*WITH_FS_RES*/\n'
 
     result += '\n'
     result += 'ret_t assets_init(void) {\n'
-    result += '  assets_manager_t* rm = assets_manager();\n\n'
+    result += '  assets_manager_t* am = assets_manager();\n\n'
     result += ''
 
     result += '#ifdef WITH_FS_RES\n'
-    result += '  assets_manager_preload(rm, ASSET_TYPE_FONT, "default");\n'
-    result += '  assets_manager_preload(rm, ASSET_TYPE_STYLE, "default");\n'
+    result += '  assets_manager_preload(am, ASSET_TYPE_FONT, "default");\n'
+    result += '  assets_manager_preload(am, ASSET_TYPE_STYLE, "default");\n'
     result += '#else\n'
 
     files = glob.glob(joinPath(OUTPUT_DIR, '**/*.data'))
@@ -381,7 +383,7 @@ def gen_res_web_c():
 
     result += '\n'
     result += 'ret_t assets_init(void) {\n'
-    result += '  assets_manager_t* rm = assets_manager();\n\n'
+    result += '  assets_manager_t* am = assets_manager();\n\n'
     result += ''
 
     result += gen_add_assets(files)
@@ -536,7 +538,8 @@ def showUsage():
     global DPI
     global ACTION
     global IMAGEGEN_OPTIONS
-    args = ' action[clean|web|json|all|font|image|ui|style|string|script|data|xml] dpi[x1|x2] image_options[rgba|bgra+bgr565]'
+    global FONT_OPTIONS
+    args = ' action[clean|web|json|all|font|image|ui|style|string|script|data|xml] dpi[x1|x2] image_options[rgba|bgra+bgr565|mono]'
     if len(sys.argv) == 1:
         print('=========================================================')
         print('Usage: '+sys.argv[0] + args)
@@ -559,5 +562,7 @@ def showUsage():
         else:
             IMAGEGEN_OPTIONS = 'bgra+bgr565'
 
+        if IMAGEGEN_OPTIONS == 'mono':
+            FONT_OPTIONS = 'mono'
 
 showUsage()

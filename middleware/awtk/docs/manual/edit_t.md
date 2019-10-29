@@ -87,15 +87,14 @@ default](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/def
 | -------- | ----- | ------------ | 
 | <a href="#edit_t_auto_fix">auto\_fix</a> | bool\_t | 输入无效时，是否自动改正。 |
 | <a href="#edit_t_bottom_margin">bottom\_margin</a> | uint8\_t | 下边距。 |
-| <a href="#edit_t_focus">focus</a> | bool\_t | 设置为焦点(通常用于在XML中缺省设置为焦点控件)。 |
 | <a href="#edit_t_input_type">input\_type</a> | input\_type\_t | 输入类型。 |
 | <a href="#edit_t_left_margin">left\_margin</a> | uint8\_t | 左边距。 |
-| <a href="#edit_t_max">max</a> | float\_t | 最大值或最大长度。 |
-| <a href="#edit_t_min">min</a> | float\_t | 最小值或最小长度。 |
+| <a href="#edit_t_max">max</a> | double | 最大值或最大长度。 |
+| <a href="#edit_t_min">min</a> | double | 最小值或最小长度。 |
 | <a href="#edit_t_password_visible">password\_visible</a> | bool\_t | 密码是否可见。 |
 | <a href="#edit_t_readonly">readonly</a> | bool\_t | 编辑器是否为只读。 |
 | <a href="#edit_t_right_margin">right\_margin</a> | uint8\_t | 右边距。 |
-| <a href="#edit_t_step">step</a> | float\_t | 步长。 |
+| <a href="#edit_t_step">step</a> | double | 步长。 |
 | <a href="#edit_t_tips">tips</a> | char* | 输入提示。 |
 | <a href="#edit_t_top_margin">top\_margin</a> | uint8\_t | 上边距。 |
 ### 事件
@@ -492,18 +491,15 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
 | -------- | ----- |
 | 可直接读取 | 是 |
 | 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
-#### focus 属性
+#### input\_type 属性
 -----------------------
-> <p id="edit_t_focus"> 设置为焦点(通常用于在XML中缺省设置为焦点控件)。
+> <p id="edit_t_input_type"> 输入类型。
 
 
-* 类型：bool\_t
+* 类型：input\_type\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -511,23 +507,6 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
 | 可直接修改 | 否 |
 | 可持久化   | 是 |
 | 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
-| 可在XML中设置 | 是 |
-| 可通过widget\_get\_prop读取 | 是 |
-| 可通过widget\_set\_prop修改 | 是 |
-#### input\_type 属性
------------------------
-> <p id="edit_t_input_type"> 输入类型。
- XXX：需要在min/max/step之前设置。
-
-
-* 类型：input\_type\_t
-
-| 特性 | 是否支持 |
-| -------- | ----- |
-| 可直接读取 | 否 |
-| 可直接修改 | 否 |
-| 可持久化   | 是 |
 | 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
@@ -543,9 +522,6 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
 | -------- | ----- |
 | 可直接读取 | 是 |
 | 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
@@ -554,13 +530,14 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
 > <p id="edit_t_max"> 最大值或最大长度。
 
 
-* 类型：float\_t
+* 类型：double
 
 | 特性 | 是否支持 |
 | -------- | ----- |
-| 可直接读取 | 否 |
+| 可直接读取 | 是 |
 | 可直接修改 | 否 |
 | 可持久化   | 是 |
+| 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
@@ -570,13 +547,14 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
 > <p id="edit_t_min"> 最小值或最小长度。
 
 
-* 类型：float\_t
+* 类型：double
 
 | 特性 | 是否支持 |
 | -------- | ----- |
-| 可直接读取 | 否 |
+| 可直接读取 | 是 |
 | 可直接修改 | 否 |
 | 可持久化   | 是 |
+| 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
@@ -626,9 +604,6 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
 | -------- | ----- |
 | 可直接读取 | 是 |
 | 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
@@ -638,13 +613,14 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
  作为数值型编辑器时，一次增加和减少时的数值。
 
 
-* 类型：float\_t
+* 类型：double
 
 | 特性 | 是否支持 |
 | -------- | ----- |
-| 可直接读取 | 否 |
+| 可直接读取 | 是 |
 | 可直接修改 | 否 |
 | 可持久化   | 是 |
+| 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
@@ -677,9 +653,6 @@ ret_t edit_set_text_limit (widget_t* widget, uint32_t min, uint32_t max);
 | -------- | ----- |
 | 可直接读取 | 是 |
 | 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |

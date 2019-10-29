@@ -1,7 +1,7 @@
 /**
  * File:   demo1_app.c
  * Author: AWTK Develop Team
- * Brief:  basic class of all widget
+ * Brief:  basic demo
  *
  * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
@@ -22,13 +22,13 @@
 #include "base/timer.h"
 #include "base/enums.h"
 #include "widgets/button.h"
-#include "widgets/dialog.h"
+#include "base/dialog.h"
 #include "widgets/image.h"
 #include "widgets/label.h"
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "tkc/utf8.h"
-#include "widgets/window.h"
+#include "base/window.h"
 #include "widgets/slider.h"
 #include "widgets/group_box.h"
 #include "widgets/check_button.h"

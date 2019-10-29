@@ -83,7 +83,17 @@ typedef enum _bitmap_format_t {
    * @const BITMAP_FMT_BGR888
    * 一个像素占用3个字节，RGB占一个字节，按内存地址递增。
    */
-  BITMAP_FMT_BGR888
+  BITMAP_FMT_BGR888,
+  /**
+   * @const BITMAP_FMT_GRAY
+   * 一个像素占用1个字节。
+   */
+  BITMAP_FMT_GRAY,
+  /**
+   * @const BITMAP_FMT_MONO
+   * 一个像素占用1比特。
+   */
+  BITMAP_FMT_MONO,
 } bitmap_format_t;
 
 /**
@@ -376,6 +386,11 @@ typedef enum _image_draw_type_t {
    * 垂直方向平铺显示，水平方向缩放。
    */
   IMAGE_DRAW_REPEAT_Y,
+  /**
+   * @const IMAGE_DRAW_REPEAT_Y_INVERSE
+   * 垂直方向平铺显示，水平方向缩放(从底部到顶部)。
+   */
+  IMAGE_DRAW_REPEAT_Y_INVERSE,
 
   /**
    * @const IMAGE_DRAW_PATCH9
@@ -430,6 +445,13 @@ ret_t bitmap_premulti_alpha(bitmap_t* bitmap);
 bool_t bitmap_save_png(bitmap_t* bitmap, const char* filename);
 #endif /*defined(WITH_SDL) || defined(LINUX)*/
 
+#define TK_BITMAP_MONO_LINE_LENGTH(w) (((w + 15) >> 4) << 1)
+
+uint8_t* bitmap_mono_create_data(uint32_t w, uint32_t h);
+bool_t bitmap_mono_get_pixel(const uint8_t* buff, uint32_t w, uint32_t h, uint32_t x, uint32_t y);
+ret_t bitmap_mono_set_pixel(uint8_t* buff, uint32_t w, uint32_t h, uint32_t x, uint32_t y,
+                            bool_t pixel);
+ret_t bitmap_mono_dump(const uint8_t* buff, uint32_t w, uint32_t h);
 END_C_DECLS
 
 #endif /*TK_BITMAP_H*/

@@ -82,7 +82,7 @@ static bool_t edit_is_valid_char_default(widget_t* widget, wchar_t c) {
   return_value_if_fail(widget != NULL && edit != NULL, FALSE);
 
   text = &(widget->text);
-  input_type = edit->limit.type;
+  input_type = edit->input_type;
 
   switch (input_type) {
     case INPUT_INT:
@@ -121,7 +121,7 @@ static bool_t edit_is_valid_char_default(widget_t* widget, wchar_t c) {
     }
     case INPUT_EMAIL: {
       if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' ||
-          c == '.' || c == '_') {
+          c == '.' || c == '_' || c == ' ') {
         ret = TRUE;
       } else if (c == '@') {
         if (cursor_pos > 0 && wcs_chr(text->str, c) == NULL) {
@@ -154,7 +154,7 @@ static bool_t edit_is_valid_char_default(widget_t* widget, wchar_t c) {
       break;
     }
     default: {
-      if (widget->text.size < edit->limit.u.t.max) {
+      if (widget->text.size < edit->max) {
         ret = TRUE;
       }
     }
@@ -204,7 +204,7 @@ static bool_t edit_is_number(widget_t* widget) {
   input_type_t input_type = (input_type_t)0;
   return_value_if_fail(widget != NULL && edit != NULL, FALSE);
 
-  input_type = edit->limit.type;
+  input_type = edit->input_type;
 
   return input_type == INPUT_UINT || input_type == INPUT_INT || input_type == INPUT_FLOAT ||
          input_type == INPUT_UFLOAT || input_type == INPUT_HEX;
@@ -217,11 +217,11 @@ bool_t edit_is_valid_value(widget_t* widget) {
 
   text = &(widget->text);
 
-  switch (edit->limit.type) {
+  switch (edit->input_type) {
     case INPUT_TEXT: {
       uint32_t size = text->size;
-      uint32_t min = edit->limit.u.t.min;
-      uint32_t max = edit->limit.u.t.max;
+      uint32_t min = (uint32_t)(edit->min);
+      uint32_t max = (uint32_t)(edit->max);
 
       if (min == max && min == 0) {
         return TRUE;
@@ -232,8 +232,8 @@ bool_t edit_is_valid_value(widget_t* widget) {
     case INPUT_INT:
     case INPUT_UINT: {
       int32_t v = 0;
-      int32_t min = edit->limit.u.i.min;
-      int32_t max = edit->limit.u.i.max;
+      int32_t min = (int32_t)(edit->min);
+      int32_t max = (int32_t)(edit->max);
 
       if (text->size == 0) {
         return FALSE;
@@ -249,8 +249,8 @@ bool_t edit_is_valid_value(widget_t* widget) {
     case INPUT_FLOAT:
     case INPUT_UFLOAT: {
       double v = 0;
-      double min = edit->limit.u.f.min;
-      double max = edit->limit.u.f.max;
+      double min = edit->min;
+      double max = edit->max;
 
       if (text->size == 0) {
         return FALSE;
@@ -285,10 +285,10 @@ static ret_t edit_auto_fix(widget_t* widget) {
 
   text = &(widget->text);
 
-  switch (edit->limit.type) {
+  switch (edit->input_type) {
     case INPUT_TEXT: {
       uint32_t size = text->size;
-      uint32_t max = edit->limit.u.t.max;
+      uint32_t max = edit->max;
 
       if (size > max) {
         text->size = max;
@@ -299,8 +299,8 @@ static ret_t edit_auto_fix(widget_t* widget) {
     case INPUT_INT:
     case INPUT_UINT: {
       int32_t v = 0;
-      int32_t min = edit->limit.u.i.min;
-      int32_t max = edit->limit.u.i.max;
+      int32_t min = (int32_t)(edit->min);
+      int32_t max = (int32_t)(edit->max);
 
       wstr_to_int(text, &v);
       if (v < min) {
@@ -316,8 +316,8 @@ static ret_t edit_auto_fix(widget_t* widget) {
     case INPUT_FLOAT:
     case INPUT_UFLOAT: {
       double v = 0;
-      double min = edit->limit.u.f.min;
-      double max = edit->limit.u.f.max;
+      double min = edit->min;
+      double max = edit->max;
 
       wstr_to_float(text, &v);
       if (v < min) {
@@ -379,7 +379,6 @@ static ret_t edit_pointer_up_cleanup(widget_t* widget) {
   edit_t* edit = EDIT(widget);
   return_value_if_fail(edit != NULL && widget != NULL, RET_BAD_PARAMS);
 
-  edit->focus = FALSE;
   widget->focused = FALSE;
   widget_ungrab(widget->parent, widget);
   widget_set_state(widget, WIDGET_STATE_NORMAL);
@@ -421,7 +420,7 @@ static ret_t edit_on_key_down(widget_t* widget, key_event_t* e) {
     } else {
       edit_dec(edit);
     }
-    return RET_OK;
+    return RET_STOP;
   } else if (key == TK_KEY_UP) {
     if (!edit_is_number(widget)) {
       widget_focus_prev(widget);
@@ -429,7 +428,7 @@ static ret_t edit_on_key_down(widget_t* widget, key_event_t* e) {
     } else {
       edit_inc(edit);
     }
-    return RET_OK;
+    return RET_STOP;
   }
 
   if (key == TK_KEY_BACKSPACE || key == TK_KEY_DELETE || key == TK_KEY_LEFT ||
@@ -445,14 +444,25 @@ static ret_t edit_on_key_down(widget_t* widget, key_event_t* e) {
     if (key != TK_KEY_LEFT && key != TK_KEY_RIGHT && key != TK_KEY_HOME && key != TK_KEY_END) {
       edit_dispatch_event(widget, EVT_VALUE_CHANGING);
     }
-  } else if (system_info()->app_type != APP_DESKTOP && key < 128 && isprint(key)) {
-    edit_input_char(widget, (wchar_t)key);
+  } else if (key < 128 && isprint(key)) {
+    app_type_t app_type = system_info()->app_type;
+    if (app_type != APP_DESKTOP && app_type != APP_MOBILE) {
+      edit_input_char(widget, (wchar_t)key);
+    }
   }
 
-  return RET_OK;
+  return RET_STOP;
+}
+
+static ret_t edit_select_all_async(const idle_info_t* info) {
+  edit_t* edit = EDIT(info->ctx);
+  text_edit_select_all(edit->model);
+
+  return RET_REMOVE;
 }
 
 ret_t edit_on_event(widget_t* widget, event_t* e) {
+  ret_t ret = RET_OK;
   uint32_t type = e->type;
   edit_t* edit = EDIT(widget);
   return_value_if_fail(widget != NULL && edit != NULL, RET_BAD_PARAMS);
@@ -495,7 +505,7 @@ ret_t edit_on_event(widget_t* widget, event_t* e) {
       break;
     }
     case EVT_KEY_DOWN: {
-      edit_on_key_down(widget, (key_event_t*)e);
+      ret = edit_on_key_down(widget, (key_event_t*)e);
       edit_update_status(widget);
       break;
     }
@@ -520,6 +530,7 @@ ret_t edit_on_event(widget_t* widget, event_t* e) {
           widget_set_state(widget, WIDGET_STATE_ERROR);
         }
       }
+      text_edit_unselect(edit->model);
       edit_dispatch_event(widget, EVT_VALUE_CHANGED);
       break;
     }
@@ -530,6 +541,7 @@ ret_t edit_on_event(widget_t* widget, event_t* e) {
 
       if (widget->target == NULL) {
         edit_request_input_method(widget);
+        idle_add(edit_select_all_async, edit);
       }
       break;
     }
@@ -543,12 +555,9 @@ ret_t edit_on_event(widget_t* widget, event_t* e) {
       }
       break;
     }
-    case EVT_PROP_CHANGED: {
-      prop_change_event_t* evt = (prop_change_event_t*)e;
-      if (tk_str_eq(evt->name, WIDGET_PROP_TEXT) || tk_str_eq(evt->name, WIDGET_PROP_VALUE)) {
-        edit_update_status(widget);
-        text_edit_set_cursor(edit->model, 0xffffffff);
-      }
+    case EVT_RESIZE:
+    case EVT_MOVE_RESIZE: {
+      text_edit_layout(edit->model);
       break;
     }
     case EVT_VALUE_CHANGING: {
@@ -559,16 +568,16 @@ ret_t edit_on_event(widget_t* widget, event_t* e) {
       break;
   }
 
-  return RET_OK;
+  return ret;
 }
 
 ret_t edit_set_text_limit(widget_t* widget, uint32_t min, uint32_t max) {
   edit_t* edit = EDIT(widget);
   return_value_if_fail(edit != NULL, RET_BAD_PARAMS);
 
-  edit->limit.u.t.min = min;
-  edit->limit.u.t.max = max;
-  edit->limit.type = INPUT_TEXT;
+  edit->min = min;
+  edit->max = max;
+  edit->input_type = INPUT_TEXT;
 
   return RET_OK;
 }
@@ -577,11 +586,11 @@ ret_t edit_set_int_limit(widget_t* widget, int32_t min, int32_t max, uint32_t st
   edit_t* edit = EDIT(widget);
   return_value_if_fail(edit != NULL, RET_BAD_PARAMS);
 
-  edit->limit.u.i.min = min;
-  edit->limit.u.i.max = max;
-  edit->limit.u.i.step = step;
-  if (edit->limit.type != INPUT_UINT) {
-    edit->limit.type = INPUT_INT;
+  edit->min = min;
+  edit->max = max;
+  edit->step = step;
+  if (edit->input_type != INPUT_UINT) {
+    edit->input_type = INPUT_INT;
   }
 
   return RET_OK;
@@ -591,12 +600,12 @@ ret_t edit_set_float_limit(widget_t* widget, double min, double max, double step
   edit_t* edit = EDIT(widget);
   return_value_if_fail(edit != NULL, RET_BAD_PARAMS);
 
-  edit->limit.u.f.min = min;
-  edit->limit.u.f.max = max;
-  edit->limit.u.f.step = step;
+  edit->min = min;
+  edit->max = max;
+  edit->step = step;
 
-  if (edit->limit.type != INPUT_UFLOAT) {
-    edit->limit.type = INPUT_FLOAT;
+  if (edit->input_type != INPUT_UFLOAT) {
+    edit->input_type = INPUT_FLOAT;
   }
 
   return RET_OK;
@@ -624,11 +633,11 @@ ret_t edit_set_input_type(widget_t* widget, input_type_t type) {
   edit_t* edit = EDIT(widget);
   return_value_if_fail(edit != NULL, RET_BAD_PARAMS);
 
-  edit->limit.type = type;
+  edit->input_type = type;
   if (type == INPUT_INT || type == INPUT_UINT) {
-    edit->limit.u.i.step = 1;
+    edit->step = 1;
   } else if (type == INPUT_FLOAT || type == INPUT_UFLOAT) {
-    edit->limit.u.f.step = 1.0f;
+    edit->step = 1.0f;
   }
 
   return RET_OK;
@@ -649,35 +658,35 @@ ret_t edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   input_type_t input_type = INPUT_TEXT;
   return_value_if_fail(edit != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
-  input_type = edit->limit.type;
+  input_type = edit->input_type;
   if (tk_str_eq(name, WIDGET_PROP_MIN)) {
     if (input_type == INPUT_INT || input_type == INPUT_UINT) {
-      value_set_int(v, edit->limit.u.i.min);
+      value_set_int(v, edit->min);
     } else if (input_type == INPUT_TEXT) {
-      value_set_uint32(v, edit->limit.u.t.min);
+      value_set_uint32(v, edit->min);
     } else if (input_type == INPUT_FLOAT || input_type == INPUT_UFLOAT) {
-      value_set_float(v, edit->limit.u.f.min);
+      value_set_double(v, edit->min);
     } else {
       return RET_NOT_FOUND;
     }
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MAX)) {
     if (input_type == INPUT_INT || input_type == INPUT_UINT) {
-      value_set_int(v, edit->limit.u.i.max);
+      value_set_int(v, edit->max);
     } else if (input_type == INPUT_TEXT) {
-      value_set_uint32(v, edit->limit.u.t.max);
+      value_set_uint32(v, edit->max);
     } else if (input_type == INPUT_FLOAT || input_type == INPUT_UFLOAT) {
-      value_set_float(v, edit->limit.u.f.max);
+      value_set_double(v, edit->max);
     } else {
       return RET_NOT_FOUND;
     }
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_STEP)) {
     if (input_type == INPUT_FLOAT || input_type == INPUT_UFLOAT) {
-      value_set_float(v, edit->limit.u.f.step);
+      value_set_float(v, edit->step);
       return RET_OK;
     } else if (input_type == INPUT_INT || input_type == INPUT_UINT) {
-      value_set_float(v, edit->limit.u.i.step);
+      value_set_double(v, edit->step);
       return RET_OK;
     } else {
       return RET_NOT_FOUND;
@@ -706,9 +715,6 @@ ret_t edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   } else if (tk_str_eq(name, WIDGET_PROP_PASSWORD_VISIBLE)) {
     value_set_bool(v, edit->password_visible);
     return RET_OK;
-  } else if (tk_str_eq(name, WIDGET_PROP_FOCUS)) {
-    value_set_bool(v, edit->focus);
-    return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_TIPS)) {
     value_set_str(v, edit->tips);
     return RET_OK;
@@ -723,40 +729,59 @@ ret_t edit_get_prop(widget_t* widget, const char* name, value_t* v) {
   return RET_NOT_FOUND;
 }
 
+static ret_t edit_set_text(widget_t* widget, const value_t* v) {
+  wstr_t str;
+  wstr_init(&str, 0);
+  edit_t* edit = EDIT(widget);
+  return_value_if_fail(wstr_from_value(&str, v) == RET_OK, RET_BAD_PARAMS);
+
+  if (!wstr_equal(&(widget->text), &str)) {
+    wstr_set(&(widget->text), str.str);
+
+    text_edit_set_cursor(edit->model, widget->text.size);
+    edit_dispatch_event(widget, EVT_VALUE_CHANGED);
+    edit_update_status(widget);
+  }
+
+  wstr_reset(&str);
+
+  return RET_OK;
+}
+
 ret_t edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
   edit_t* edit = EDIT(widget);
   input_type_t input_type = INPUT_TEXT;
   return_value_if_fail(edit != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
-  input_type = edit->limit.type;
+  input_type = edit->input_type;
   if (tk_str_eq(name, WIDGET_PROP_MIN)) {
     if (input_type == INPUT_INT || input_type == INPUT_UINT) {
-      edit->limit.u.i.min = value_int(v);
+      edit->min = value_int(v);
     } else if (input_type == INPUT_TEXT) {
-      edit->limit.u.t.min = value_int(v);
+      edit->min = value_int(v);
     } else if (input_type == INPUT_FLOAT || input_type == INPUT_UFLOAT) {
-      edit->limit.u.f.min = value_float(v);
+      edit->min = value_double(v);
     } else {
       return RET_NOT_FOUND;
     }
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MAX)) {
     if (input_type == INPUT_INT || input_type == INPUT_UINT) {
-      edit->limit.u.i.max = value_int(v);
+      edit->max = value_int(v);
     } else if (input_type == INPUT_TEXT) {
-      edit->limit.u.t.max = value_int(v);
+      edit->max = value_int(v);
     } else if (input_type == INPUT_FLOAT || input_type == INPUT_UFLOAT) {
-      edit->limit.u.f.max = value_float(v);
+      edit->max = value_double(v);
     } else {
       return RET_NOT_FOUND;
     }
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_STEP)) {
     if (input_type == INPUT_FLOAT || input_type == INPUT_UFLOAT) {
-      edit->limit.u.f.step = value_float(v);
+      edit->step = value_double(v);
       return RET_OK;
     } else if (input_type == INPUT_INT || input_type == INPUT_UINT) {
-      edit->limit.u.i.step = value_int(v);
+      edit->step = value_int(v);
       return RET_OK;
     } else {
       return RET_NOT_FOUND;
@@ -770,7 +795,7 @@ ret_t edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
     } else {
       input_type = (input_type_t)value_int(v);
     }
-    edit->limit.type = input_type;
+    edit->input_type = input_type;
 
     if (input_type == INPUT_PASSWORD) {
       edit_set_password_visible(widget, FALSE);
@@ -804,18 +829,14 @@ ret_t edit_set_prop(widget_t* widget, const char* name, const value_t* v) {
   } else if (tk_str_eq(name, WIDGET_PROP_PASSWORD_VISIBLE)) {
     edit_set_password_visible(widget, value_bool(v));
     return RET_OK;
-  } else if (tk_str_eq(name, WIDGET_PROP_FOCUS)) {
+  } else if (tk_str_eq(name, WIDGET_PROP_FOCUS) || tk_str_eq(name, WIDGET_PROP_FOCUSED)) {
     edit_set_focus(widget, value_bool(v));
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_TIPS)) {
     edit_set_input_tips(widget, value_str(v));
     return RET_OK;
-  } else if (tk_str_eq(name, WIDGET_PROP_TEXT)) {
-    edit_update_status(widget);
-    return RET_OK;
-  } else if (tk_str_eq(name, WIDGET_PROP_VALUE)) {
-    wstr_from_value(&(widget->text), v);
-    edit_update_status(widget);
+  } else if (tk_str_eq(name, WIDGET_PROP_VALUE) || tk_str_eq(name, WIDGET_PROP_TEXT)) {
+    edit_set_text(widget, v);
     return RET_OK;
   }
 
@@ -828,13 +849,11 @@ ret_t edit_set_password_visible(widget_t* widget, bool_t password_visible) {
   edit_t* edit = EDIT(widget);
   return_value_if_fail(edit != NULL, RET_BAD_PARAMS);
 
-  if (edit->password_visible != password_visible) {
-    edit->password_visible = password_visible;
-    text_edit_set_mask(edit->model, !password_visible);
-    text_edit_set_mask_char(edit->model, PASSWORD_MASK_CHAR);
-    text_edit_set_cursor(edit->model, 0xffffffff);
-    widget_invalidate(widget, NULL);
-  }
+  edit->password_visible = password_visible;
+  text_edit_set_mask(edit->model, !password_visible);
+  text_edit_set_mask_char(edit->model, PASSWORD_MASK_CHAR);
+  text_edit_set_cursor(edit->model, 0xffffffff);
+  widget_invalidate(widget, NULL);
 
   return RET_OK;
 }
@@ -843,7 +862,6 @@ ret_t edit_set_focus(widget_t* widget, bool_t focus) {
   edit_t* edit = EDIT(widget);
   return_value_if_fail(edit != NULL, RET_BAD_PARAMS);
 
-  edit->focus = focus;
   widget_set_focused(widget, focus);
   edit_update_status(widget);
 
@@ -860,11 +878,11 @@ static ret_t edit_add_float(edit_t* edit, double delta) {
   return_value_if_fail(wstr_to_float(text, &v) == RET_OK, RET_FAIL);
 
   v += delta;
-  if (edit->limit.u.f.min < edit->limit.u.f.max) {
-    if (v < edit->limit.u.f.min) {
-      wstr_from_float(text, edit->limit.u.f.min);
-    } else if (v > edit->limit.u.f.max) {
-      wstr_from_float(text, edit->limit.u.f.max);
+  if (edit->min < edit->max) {
+    if (v < edit->min) {
+      wstr_from_float(text, edit->min);
+    } else if (v > edit->max) {
+      wstr_from_float(text, edit->max);
     } else {
       wstr_add_float(text, delta);
     }
@@ -888,13 +906,13 @@ static ret_t edit_add_int(edit_t* edit, int delta) {
   return_value_if_fail(wstr_to_int(text, &v) == RET_OK, RET_FAIL);
 
   v += delta;
-  if (edit->auto_fix && (edit->limit.u.i.min < edit->limit.u.i.max)) {
-    if (v < edit->limit.u.i.min) {
-      v = edit->limit.u.i.min;
+  if (edit->auto_fix && (edit->min < edit->max)) {
+    if (v < edit->min) {
+      v = (int32_t)(edit->min);
     }
 
-    if (v > edit->limit.u.i.max) {
-      v = edit->limit.u.i.max;
+    if (v > edit->max) {
+      v = (int32_t)(edit->max);
     }
   }
 
@@ -923,16 +941,22 @@ double edit_get_double(widget_t* widget) {
 }
 
 ret_t edit_set_int(widget_t* widget, int32_t value) {
+  value_t v;
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
-  wstr_from_int(&(widget->text), value);
+  value_set_int32(&v, value);
+  edit_set_text(widget, &v);
+
   return RET_OK;
 }
 
 ret_t edit_set_double(widget_t* widget, double value) {
+  value_t v;
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
-  wstr_from_float(&(widget->text), value);
+  value_set_double(&v, value);
+  edit_set_text(widget, &v);
+
   return RET_OK;
 }
 
@@ -943,14 +967,14 @@ ret_t edit_inc(edit_t* edit) {
   return_value_if_fail(widget != NULL && edit != NULL, RET_BAD_PARAMS);
 
   text = &(widget->text);
-  input_type = edit->limit.type;
+  input_type = edit->input_type;
 
   switch (input_type) {
     case INPUT_FLOAT:
     case INPUT_UFLOAT: {
-      float_t step = edit->limit.u.f.step ? edit->limit.u.f.step : 0.1;
+      float_t step = edit->step ? edit->step : 0.1;
       if (text->size == 0) {
-        wstr_from_float(text, edit->limit.u.f.min);
+        wstr_from_float(text, edit->min);
         wstr_trim_float_zero(text);
       }
       edit_add_float(edit, step);
@@ -958,9 +982,9 @@ ret_t edit_inc(edit_t* edit) {
     }
     case INPUT_INT:
     case INPUT_UINT: {
-      int32_t step = edit->limit.u.i.step ? edit->limit.u.i.step : 1;
+      int32_t step = edit->step ? edit->step : 1;
       if (text->size == 0) {
-        wstr_from_int(text, edit->limit.u.i.min);
+        wstr_from_int(text, edit->min);
       }
       edit_add_int(edit, step);
       break;
@@ -980,14 +1004,14 @@ ret_t edit_dec(edit_t* edit) {
   return_value_if_fail(widget != NULL && edit != NULL, RET_BAD_PARAMS);
 
   text = &(widget->text);
-  input_type = edit->limit.type;
+  input_type = edit->input_type;
 
   switch (input_type) {
     case INPUT_FLOAT:
     case INPUT_UFLOAT: {
-      float_t step = edit->limit.u.f.step ? edit->limit.u.f.step : 0.1;
+      float_t step = edit->step ? edit->step : 0.1;
       if (text->size == 0) {
-        wstr_from_float(text, edit->limit.u.f.max);
+        wstr_from_float(text, edit->max);
         wstr_trim_float_zero(text);
       }
       edit_add_float(edit, -step);
@@ -995,9 +1019,9 @@ ret_t edit_dec(edit_t* edit) {
     }
     case INPUT_INT:
     case INPUT_UINT: {
-      int32_t step = edit->limit.u.i.step ? edit->limit.u.i.step : 1;
+      int32_t step = edit->step ? edit->step : 1;
       if (text->size == 0) {
-        wstr_from_int(text, edit->limit.u.i.max);
+        wstr_from_int(text, edit->max);
       }
       edit_add_int(edit, -step);
       break;
@@ -1111,7 +1135,6 @@ const char* s_edit_properties[] = {WIDGET_PROP_MIN,
                                    WIDGET_PROP_TOP_MARGIN,
                                    WIDGET_PROP_BOTTOM_MARGIN,
                                    WIDGET_PROP_TIPS,
-                                   WIDGET_PROP_FOCUS,
                                    WIDGET_PROP_PASSWORD_VISIBLE,
                                    NULL};
 TK_DECL_VTABLE(edit) = {.size = sizeof(edit_t),

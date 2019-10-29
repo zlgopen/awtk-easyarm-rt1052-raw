@@ -13,7 +13,6 @@
 #include "assets/inc/styles/calibration.data"
 #include "assets/inc/styles/tab_list.data"
 #include "assets/inc/styles/default.data"
-#include "assets/inc/styles/big_font.data"
 #include "assets/inc/styles/tab_top_compact.data"
 #include "assets/inc/styles/dialog_info.data"
 #include "assets/inc/styles/guage.data"
@@ -26,7 +25,6 @@
 #include "assets/inc/styles/dialog_warn.data"
 #include "assets/inc/ui/kb_ascii.data"
 #include "assets/inc/ui/vgcanvas.data"
-#include "assets/inc/ui/rich_text1.data"
 #include "assets/inc/ui/slide_menu.data"
 #include "assets/inc/ui/radial_gradient.data"
 #include "assets/inc/ui/auto_play_landscape.data"
@@ -82,11 +80,9 @@
 #include "assets/inc/ui/gif_image.data"
 #include "assets/inc/ui/auto_play_portrait.data"
 #include "assets/inc/ui/text_selector.data"
-#include "assets/inc/ui/big_font.data"
 #include "assets/inc/ui/tab_top_compact.data"
 #include "assets/inc/ui/slide_view_h.data"
 #include "assets/inc/ui/dialogs.data"
-#include "assets/inc/ui/selectm.data"
 #include "assets/inc/ui/list_view.data"
 #include "assets/inc/ui/stroke_gradient.data"
 #include "assets/inc/ui/slide_view_h1.data"
@@ -121,20 +117,13 @@
 #include "assets/inc/ui/kb_uint.data"
 #include "assets/inc/ui/scroll_view_v.data"
 #include "assets/inc/xml/test.data"
-#include "assets/inc/data/com_zlg_app_json.data"
-#include "assets/inc/data/test_dat.data"
-#include "assets/inc/data/test_json.data"
-#include "assets/inc/data/a_b_c_any.data"
 #ifdef WITH_STB_IMAGE
-#include "assets/inc/images/ani6.res"
 #include "assets/inc/images/checked.res"
 #include "assets/inc/images/num_7.res"
 #include "assets/inc/images/close_p.res"
 #include "assets/inc/images/num_6.res"
 #include "assets/inc/images/shift.res"
-#include "assets/inc/images/ani7.res"
 #include "assets/inc/images/earth.res"
-#include "assets/inc/images/ani5.res"
 #include "assets/inc/images/bee.res"
 #include "assets/inc/images/contact.res"
 #include "assets/inc/images/battery_4.res"
@@ -145,7 +134,6 @@
 #include "assets/inc/images/dialog_title.res"
 #include "assets/inc/images/battery_5.res"
 #include "assets/inc/images/num_5.res"
-#include "assets/inc/images/ani4.res"
 #include "assets/inc/images/me_active.res"
 #include "assets/inc/images/arrow_up_n.res"
 #include "assets/inc/images/left_on.res"
@@ -285,8 +273,6 @@
 #include "assets/inc/images/arrow_up_o.data"
 #include "assets/inc/images/clock.data"
 #include "assets/inc/images/empty.data"
-#include "assets/inc/images/ani5.data"
-#include "assets/inc/images/ani4.data"
 #include "assets/inc/images/left_off.data"
 #include "assets/inc/images/radio_unchecked.data"
 #include "assets/inc/images/rgba.data"
@@ -307,7 +293,6 @@
 #include "assets/inc/images/contact.data"
 #include "assets/inc/images/bricks.data"
 #include "assets/inc/images/dialog_title.data"
-#include "assets/inc/images/ani7.data"
 #include "assets/inc/images/play_p.data"
 #include "assets/inc/images/battery_5.data"
 #include "assets/inc/images/green_btn_p.data"
@@ -320,7 +305,6 @@
 #include "assets/inc/images/contact_active.data"
 #include "assets/inc/images/slider_drag_o.data"
 #include "assets/inc/images/battery_4.data"
-#include "assets/inc/images/ani6.data"
 #include "assets/inc/images/message.data"
 #include "assets/inc/images/edit_clear_o.data"
 #include "assets/inc/images/ani1.data"
@@ -367,255 +351,243 @@
 #endif /*WITH_FS_RES*/
 
 ret_t assets_init(void) {
-  assets_manager_t* rm = assets_manager();
+  assets_manager_t* am = assets_manager();
 
 #ifdef WITH_FS_RES
-  assets_manager_load(rm, ASSET_TYPE_FONT, "default");
-  assets_manager_load(rm, ASSET_TYPE_STYLE, "default");
+  assets_manager_load(am, ASSET_TYPE_FONT, "default");
+  assets_manager_load(am, ASSET_TYPE_STYLE, "default");
 #else
-  assets_manager_add(rm, ui_kb_ascii);
-  assets_manager_add(rm, ui_vgcanvas);
-  assets_manager_add(rm, ui_rich_text1);
-  assets_manager_add(rm, ui_slide_menu);
-  assets_manager_add(rm, ui_radial_gradient);
-  assets_manager_add(rm, ui_auto_play_landscape);
-  assets_manager_add(rm, ui_color_picker_simple);
-  assets_manager_add(rm, ui_progress_circle);
-  assets_manager_add(rm, ui_combo_box);
-  assets_manager_add(rm, ui_kb_phone);
-  assets_manager_add(rm, ui_main);
-  assets_manager_add(rm, ui_digit_clock);
-  assets_manager_add(rm, ui_scroll_bar);
-  assets_manager_add(rm, ui_lua);
-  assets_manager_add(rm, ui_linear_gradient);
-  assets_manager_add(rm, ui_preload);
-  assets_manager_add(rm, ui_images);
-  assets_manager_add(rm, ui_soft_keyboard);
-  assets_manager_add(rm, ui_edit);
-  assets_manager_add(rm, ui_locale);
-  assets_manager_add(rm, ui_kb_int);
-  assets_manager_add(rm, ui_tab_control);
-  assets_manager_add(rm, ui_slide_view_v2);
-  assets_manager_add(rm, ui_animation);
-  assets_manager_add(rm, ui_keyboard);
-  assets_manager_add(rm, ui_kb_hex);
-  assets_manager_add(rm, ui_popdown);
-  assets_manager_add(rm, ui_color);
-  assets_manager_add(rm, ui_color_picker);
-  assets_manager_add(rm, ui_switch);
-  assets_manager_add(rm, ui_dragger);
-  assets_manager_add(rm, ui_dialog2);
-  assets_manager_add(rm, ui_color_picker_hsv);
-  assets_manager_add(rm, ui_tab_bottom);
-  assets_manager_add(rm, ui_list_view_m);
-  assets_manager_add(rm, ui_slide_view_h_loop);
-  assets_manager_add(rm, ui_calibration_win);
-  assets_manager_add(rm, ui_memtest);
-  assets_manager_add(rm, ui_slide_view_h2);
-  assets_manager_add(rm, ui_slide_view_v_loop);
-  assets_manager_add(rm, ui_language);
-  assets_manager_add(rm, ui_kb_float);
-  assets_manager_add(rm, ui_htranslate);
-  assets_manager_add(rm, ui_list_view_vh);
-  assets_manager_add(rm, ui_rich_text);
-  assets_manager_add(rm, ui_scroll_view);
-  assets_manager_add(rm, ui_svg_image);
-  assets_manager_add(rm, ui_tab_list);
-  assets_manager_add(rm, ui_animator);
-  assets_manager_add(rm, ui_slide_down);
-  assets_manager_add(rm, ui_scroll_view_h);
-  assets_manager_add(rm, ui_slide_right);
-  assets_manager_add(rm, ui_scroll_bar_h);
-  assets_manager_add(rm, ui_spinbox);
-  assets_manager_add(rm, ui_label);
-  assets_manager_add(rm, ui_gif_image);
-  assets_manager_add(rm, ui_auto_play_portrait);
-  assets_manager_add(rm, ui_text_selector);
-  assets_manager_add(rm, ui_big_font);
-  assets_manager_add(rm, ui_tab_top_compact);
-  assets_manager_add(rm, ui_slide_view_h);
-  assets_manager_add(rm, ui_dialogs);
-  assets_manager_add(rm, ui_selectm);
-  assets_manager_add(rm, ui_list_view);
-  assets_manager_add(rm, ui_stroke_gradient);
-  assets_manager_add(rm, ui_slide_view_h1);
-  assets_manager_add(rm, ui_basic);
-  assets_manager_add(rm, ui_auto_play);
-  assets_manager_add(rm, ui_guage);
-  assets_manager_add(rm, ui_color_picker_full);
-  assets_manager_add(rm, ui_dialog1);
-  assets_manager_add(rm, ui_fade);
-  assets_manager_add(rm, ui_image_list);
-  assets_manager_add(rm, ui_slide_view_v1);
-  assets_manager_add(rm, ui_select1);
-  assets_manager_add(rm, ui_slide_left);
-  assets_manager_add(rm, ui_image_animation);
-  assets_manager_add(rm, ui_image_value);
-  assets_manager_add(rm, ui_slide_view);
-  assets_manager_add(rm, ui_time_clock);
-  assets_manager_add(rm, ui_tab_top);
-  assets_manager_add(rm, ui_slide_view_v);
-  assets_manager_add(rm, ui_button);
-  assets_manager_add(rm, ui_system_bar);
-  assets_manager_add(rm, ui_list_view_d);
-  assets_manager_add(rm, ui_vtranslate);
-  assets_manager_add(rm, ui_kb_ufloat);
-  assets_manager_add(rm, ui_kb_default);
-  assets_manager_add(rm, ui_slide_up);
-  assets_manager_add(rm, ui_rich_text2);
-  assets_manager_add(rm, ui_list_view_h);
-  assets_manager_add(rm, ui_color_picker_rgb);
-  assets_manager_add(rm, ui_tab_bottom_compact);
-  assets_manager_add(rm, ui_popup);
-  assets_manager_add(rm, ui_kb_uint);
-  assets_manager_add(rm, ui_scroll_view_v);
-  assets_manager_add(rm, strings_zh_CN);
-  assets_manager_add(rm, strings_en_US);
-  assets_manager_add(rm, image_arrow_right_o);
-  assets_manager_add(rm, image_num_4);
-  assets_manager_add(rm, image_close_o);
-  assets_manager_add(rm, image_battery_1);
-  assets_manager_add(rm, image_slider_bg);
-  assets_manager_add(rm, image_ani3);
-  assets_manager_add(rm, image_progress_circle);
-  assets_manager_add(rm, image_muted);
-  assets_manager_add(rm, image_num_8);
-  assets_manager_add(rm, image_earth);
-  assets_manager_add(rm, image_shift);
-  assets_manager_add(rm, image_arrow_up_p);
-  assets_manager_add(rm, image_discovery_active);
-  assets_manager_add(rm, image_en);
-  assets_manager_add(rm, image_right_on);
-  assets_manager_add(rm, image_discovery);
-  assets_manager_add(rm, image_rgb);
-  assets_manager_add(rm, image_num_9);
-  assets_manager_add(rm, image_dot);
-  assets_manager_add(rm, image_ani2);
-  assets_manager_add(rm, image_battery_0);
-  assets_manager_add(rm, image_find);
-  assets_manager_add(rm, image_slider_fg);
-  assets_manager_add(rm, image_close_n);
-  assets_manager_add(rm, image_left_on);
-  assets_manager_add(rm, image_question);
-  assets_manager_add(rm, image_invisible);
-  assets_manager_add(rm, image_guage_bg);
-  assets_manager_add(rm, image_num_5);
-  assets_manager_add(rm, image_num_dot);
-  assets_manager_add(rm, image_arrow_right_n);
-  assets_manager_add(rm, image_bee);
-  assets_manager_add(rm, image_visible);
-  assets_manager_add(rm, image_me_active);
-  assets_manager_add(rm, image_cursor);
-  assets_manager_add(rm, image_clock_minute);
-  assets_manager_add(rm, image_switch);
-  assets_manager_add(rm, image_checked);
-  assets_manager_add(rm, image_middle_off);
-  assets_manager_add(rm, image_close_p);
-  assets_manager_add(rm, image_zh);
-  assets_manager_add(rm, image_arrow_right_p);
-  assets_manager_add(rm, image_num_2);
-  assets_manager_add(rm, image_arrow_up_o);
-  assets_manager_add(rm, image_clock);
-  assets_manager_add(rm, image_empty);
-  assets_manager_add(rm, image_ani5);
-  assets_manager_add(rm, image_ani4);
-  assets_manager_add(rm, image_left_off);
-  assets_manager_add(rm, image_radio_unchecked);
-  assets_manager_add(rm, image_rgba);
-  assets_manager_add(rm, image_shifton);
-  assets_manager_add(rm, image_arrow_up_n);
-  assets_manager_add(rm, image_num_3);
-  assets_manager_add(rm, image_msg_active);
-  assets_manager_add(rm, image_active_dot);
-  assets_manager_add(rm, image_guage_pointer);
-  assets_manager_add(rm, image_close_d);
-  assets_manager_add(rm, image_right_off);
-  assets_manager_add(rm, image_unmuted);
-  assets_manager_add(rm, image_cross);
-  assets_manager_add(rm, image_backspace);
-  assets_manager_add(rm, image_arrow_left_p);
-  assets_manager_add(rm, image_edit_clear_n);
-  assets_manager_add(rm, image_clock_second);
-  assets_manager_add(rm, image_contact);
-  assets_manager_add(rm, image_bricks);
-  assets_manager_add(rm, image_dialog_title);
-  assets_manager_add(rm, image_ani7);
-  assets_manager_add(rm, image_play_p);
-  assets_manager_add(rm, image_battery_5);
-  assets_manager_add(rm, image_green_btn_p);
-  assets_manager_add(rm, image_red_btn_p);
-  assets_manager_add(rm, image_me);
-  assets_manager_add(rm, image_num_0);
-  assets_manager_add(rm, image_arrow_down_p);
-  assets_manager_add(rm, image_num_1);
-  assets_manager_add(rm, image_warn);
-  assets_manager_add(rm, image_contact_active);
-  assets_manager_add(rm, image_slider_drag_o);
-  assets_manager_add(rm, image_battery_4);
-  assets_manager_add(rm, image_ani6);
-  assets_manager_add(rm, image_message);
-  assets_manager_add(rm, image_edit_clear_o);
-  assets_manager_add(rm, image_ani1);
-  assets_manager_add(rm, image_battery_3);
-  assets_manager_add(rm, image_logo);
-  assets_manager_add(rm, image_arrow_left_o);
-  assets_manager_add(rm, image_num_6);
-  assets_manager_add(rm, image_check);
-  assets_manager_add(rm, image_middle_on);
-  assets_manager_add(rm, image_arrow_down_o);
-  assets_manager_add(rm, image_radio_checked);
-  assets_manager_add(rm, image_red_btn_o);
-  assets_manager_add(rm, image_green_btn_o);
-  assets_manager_add(rm, image_slider_v_bg);
-  assets_manager_add(rm, image_clock_hour);
-  assets_manager_add(rm, image_play_o);
-  assets_manager_add(rm, image_play_n);
-  assets_manager_add(rm, image_slider_drag);
-  assets_manager_add(rm, image_unchecked);
-  assets_manager_add(rm, image_green_btn_n);
-  assets_manager_add(rm, image_red_btn_n);
-  assets_manager_add(rm, image_slider_drag_p);
-  assets_manager_add(rm, image_slider_v_fg);
-  assets_manager_add(rm, image_arrow_down_n);
-  assets_manager_add(rm, image_info);
-  assets_manager_add(rm, image_msg);
-  assets_manager_add(rm, image_num_7);
-  assets_manager_add(rm, image_arrow_left_n);
-  assets_manager_add(rm, image_edit_clear_p);
-  assets_manager_add(rm, image_battery_2);
-  assets_manager_add(rm, xml_test);
-  assets_manager_add(rm, style_slide_menu);
-  assets_manager_add(rm, style_digit_clock);
-  assets_manager_add(rm, style_dialog_toast);
-  assets_manager_add(rm, style_edit);
-  assets_manager_add(rm, style_keyboard);
-  assets_manager_add(rm, style_color);
-  assets_manager_add(rm, style_tab_bottom);
-  assets_manager_add(rm, style_calibration);
-  assets_manager_add(rm, style_tab_list);
-  assets_manager_add(rm, style_default);
-  assets_manager_add(rm, style_big_font);
-  assets_manager_add(rm, style_tab_top_compact);
-  assets_manager_add(rm, style_dialog_info);
-  assets_manager_add(rm, style_guage);
-  assets_manager_add(rm, style_dialog_confirm);
-  assets_manager_add(rm, style_dialog);
-  assets_manager_add(rm, style_tab_top);
-  assets_manager_add(rm, style_button);
-  assets_manager_add(rm, style_system_bar);
-  assets_manager_add(rm, style_tab_bottom_compact);
-  assets_manager_add(rm, style_dialog_warn);
-  assets_manager_add(rm, font_default);
-  assets_manager_add(rm, data_com_zlg_app_json);
-  assets_manager_add(rm, data_test_dat);
-  assets_manager_add(rm, data_test_json);
-  assets_manager_add(rm, data_a_b_c_any);
+  assets_manager_add(am, ui_kb_ascii);
+  assets_manager_add(am, ui_vgcanvas);
+  assets_manager_add(am, ui_slide_menu);
+  assets_manager_add(am, ui_radial_gradient);
+  assets_manager_add(am, ui_auto_play_landscape);
+  assets_manager_add(am, ui_color_picker_simple);
+  assets_manager_add(am, ui_progress_circle);
+  assets_manager_add(am, ui_combo_box);
+  assets_manager_add(am, ui_kb_phone);
+  assets_manager_add(am, ui_main);
+  assets_manager_add(am, ui_digit_clock);
+  assets_manager_add(am, ui_scroll_bar);
+  assets_manager_add(am, ui_lua);
+  assets_manager_add(am, ui_linear_gradient);
+  assets_manager_add(am, ui_preload);
+  assets_manager_add(am, ui_images);
+  assets_manager_add(am, ui_soft_keyboard);
+  assets_manager_add(am, ui_edit);
+  assets_manager_add(am, ui_locale);
+  assets_manager_add(am, ui_kb_int);
+  assets_manager_add(am, ui_tab_control);
+  assets_manager_add(am, ui_slide_view_v2);
+  assets_manager_add(am, ui_animation);
+  assets_manager_add(am, ui_keyboard);
+  assets_manager_add(am, ui_kb_hex);
+  assets_manager_add(am, ui_popdown);
+  assets_manager_add(am, ui_color);
+  assets_manager_add(am, ui_color_picker);
+  assets_manager_add(am, ui_switch);
+  assets_manager_add(am, ui_dragger);
+  assets_manager_add(am, ui_dialog2);
+  assets_manager_add(am, ui_color_picker_hsv);
+  assets_manager_add(am, ui_tab_bottom);
+  assets_manager_add(am, ui_list_view_m);
+  assets_manager_add(am, ui_slide_view_h_loop);
+  assets_manager_add(am, ui_calibration_win);
+  assets_manager_add(am, ui_memtest);
+  assets_manager_add(am, ui_slide_view_h2);
+  assets_manager_add(am, ui_slide_view_v_loop);
+  assets_manager_add(am, ui_language);
+  assets_manager_add(am, ui_kb_float);
+  assets_manager_add(am, ui_htranslate);
+  assets_manager_add(am, ui_list_view_vh);
+  assets_manager_add(am, ui_rich_text);
+  assets_manager_add(am, ui_scroll_view);
+  assets_manager_add(am, ui_svg_image);
+  assets_manager_add(am, ui_tab_list);
+  assets_manager_add(am, ui_animator);
+  assets_manager_add(am, ui_slide_down);
+  assets_manager_add(am, ui_scroll_view_h);
+  assets_manager_add(am, ui_slide_right);
+  assets_manager_add(am, ui_scroll_bar_h);
+  assets_manager_add(am, ui_spinbox);
+  assets_manager_add(am, ui_label);
+  assets_manager_add(am, ui_gif_image);
+  assets_manager_add(am, ui_auto_play_portrait);
+  assets_manager_add(am, ui_text_selector);
+  assets_manager_add(am, ui_tab_top_compact);
+  assets_manager_add(am, ui_slide_view_h);
+  assets_manager_add(am, ui_dialogs);
+  assets_manager_add(am, ui_list_view);
+  assets_manager_add(am, ui_stroke_gradient);
+  assets_manager_add(am, ui_slide_view_h1);
+  assets_manager_add(am, ui_basic);
+  assets_manager_add(am, ui_auto_play);
+  assets_manager_add(am, ui_guage);
+  assets_manager_add(am, ui_color_picker_full);
+  assets_manager_add(am, ui_dialog1);
+  assets_manager_add(am, ui_fade);
+  assets_manager_add(am, ui_image_list);
+  assets_manager_add(am, ui_slide_view_v1);
+  assets_manager_add(am, ui_select1);
+  assets_manager_add(am, ui_slide_left);
+  assets_manager_add(am, ui_image_animation);
+  assets_manager_add(am, ui_image_value);
+  assets_manager_add(am, ui_slide_view);
+  assets_manager_add(am, ui_time_clock);
+  assets_manager_add(am, ui_tab_top);
+  assets_manager_add(am, ui_slide_view_v);
+  assets_manager_add(am, ui_button);
+  assets_manager_add(am, ui_system_bar);
+  assets_manager_add(am, ui_list_view_d);
+  assets_manager_add(am, ui_vtranslate);
+  assets_manager_add(am, ui_kb_ufloat);
+  assets_manager_add(am, ui_kb_default);
+  assets_manager_add(am, ui_slide_up);
+  assets_manager_add(am, ui_rich_text2);
+  assets_manager_add(am, ui_list_view_h);
+  assets_manager_add(am, ui_color_picker_rgb);
+  assets_manager_add(am, ui_tab_bottom_compact);
+  assets_manager_add(am, ui_popup);
+  assets_manager_add(am, ui_kb_uint);
+  assets_manager_add(am, ui_scroll_view_v);
+  assets_manager_add(am, strings_zh_CN);
+  assets_manager_add(am, strings_en_US);
+  assets_manager_add(am, image_arrow_right_o);
+  assets_manager_add(am, image_num_4);
+  assets_manager_add(am, image_close_o);
+  assets_manager_add(am, image_battery_1);
+  assets_manager_add(am, image_slider_bg);
+  assets_manager_add(am, image_ani3);
+  assets_manager_add(am, image_progress_circle);
+  assets_manager_add(am, image_muted);
+  assets_manager_add(am, image_num_8);
+  assets_manager_add(am, image_earth);
+  assets_manager_add(am, image_shift);
+  assets_manager_add(am, image_arrow_up_p);
+  assets_manager_add(am, image_discovery_active);
+  assets_manager_add(am, image_en);
+  assets_manager_add(am, image_right_on);
+  assets_manager_add(am, image_discovery);
+  assets_manager_add(am, image_rgb);
+  assets_manager_add(am, image_num_9);
+  assets_manager_add(am, image_dot);
+  assets_manager_add(am, image_ani2);
+  assets_manager_add(am, image_battery_0);
+  assets_manager_add(am, image_find);
+  assets_manager_add(am, image_slider_fg);
+  assets_manager_add(am, image_close_n);
+  assets_manager_add(am, image_left_on);
+  assets_manager_add(am, image_question);
+  assets_manager_add(am, image_invisible);
+  assets_manager_add(am, image_guage_bg);
+  assets_manager_add(am, image_num_5);
+  assets_manager_add(am, image_num_dot);
+  assets_manager_add(am, image_arrow_right_n);
+  assets_manager_add(am, image_bee);
+  assets_manager_add(am, image_visible);
+  assets_manager_add(am, image_me_active);
+  assets_manager_add(am, image_cursor);
+  assets_manager_add(am, image_clock_minute);
+  assets_manager_add(am, image_switch);
+  assets_manager_add(am, image_checked);
+  assets_manager_add(am, image_middle_off);
+  assets_manager_add(am, image_close_p);
+  assets_manager_add(am, image_zh);
+  assets_manager_add(am, image_arrow_right_p);
+  assets_manager_add(am, image_num_2);
+  assets_manager_add(am, image_arrow_up_o);
+  assets_manager_add(am, image_clock);
+  assets_manager_add(am, image_empty);
+  assets_manager_add(am, image_left_off);
+  assets_manager_add(am, image_radio_unchecked);
+  assets_manager_add(am, image_rgba);
+  assets_manager_add(am, image_shifton);
+  assets_manager_add(am, image_arrow_up_n);
+  assets_manager_add(am, image_num_3);
+  assets_manager_add(am, image_msg_active);
+  assets_manager_add(am, image_active_dot);
+  assets_manager_add(am, image_guage_pointer);
+  assets_manager_add(am, image_close_d);
+  assets_manager_add(am, image_right_off);
+  assets_manager_add(am, image_unmuted);
+  assets_manager_add(am, image_cross);
+  assets_manager_add(am, image_backspace);
+  assets_manager_add(am, image_arrow_left_p);
+  assets_manager_add(am, image_edit_clear_n);
+  assets_manager_add(am, image_clock_second);
+  assets_manager_add(am, image_contact);
+  assets_manager_add(am, image_bricks);
+  assets_manager_add(am, image_dialog_title);
+  assets_manager_add(am, image_play_p);
+  assets_manager_add(am, image_battery_5);
+  assets_manager_add(am, image_green_btn_p);
+  assets_manager_add(am, image_red_btn_p);
+  assets_manager_add(am, image_me);
+  assets_manager_add(am, image_num_0);
+  assets_manager_add(am, image_arrow_down_p);
+  assets_manager_add(am, image_num_1);
+  assets_manager_add(am, image_warn);
+  assets_manager_add(am, image_contact_active);
+  assets_manager_add(am, image_slider_drag_o);
+  assets_manager_add(am, image_battery_4);
+  assets_manager_add(am, image_message);
+  assets_manager_add(am, image_edit_clear_o);
+  assets_manager_add(am, image_ani1);
+  assets_manager_add(am, image_battery_3);
+  assets_manager_add(am, image_logo);
+  assets_manager_add(am, image_arrow_left_o);
+  assets_manager_add(am, image_num_6);
+  assets_manager_add(am, image_check);
+  assets_manager_add(am, image_middle_on);
+  assets_manager_add(am, image_arrow_down_o);
+  assets_manager_add(am, image_radio_checked);
+  assets_manager_add(am, image_red_btn_o);
+  assets_manager_add(am, image_green_btn_o);
+  assets_manager_add(am, image_slider_v_bg);
+  assets_manager_add(am, image_clock_hour);
+  assets_manager_add(am, image_play_o);
+  assets_manager_add(am, image_play_n);
+  assets_manager_add(am, image_slider_drag);
+  assets_manager_add(am, image_unchecked);
+  assets_manager_add(am, image_green_btn_n);
+  assets_manager_add(am, image_red_btn_n);
+  assets_manager_add(am, image_slider_drag_p);
+  assets_manager_add(am, image_slider_v_fg);
+  assets_manager_add(am, image_arrow_down_n);
+  assets_manager_add(am, image_info);
+  assets_manager_add(am, image_msg);
+  assets_manager_add(am, image_num_7);
+  assets_manager_add(am, image_arrow_left_n);
+  assets_manager_add(am, image_edit_clear_p);
+  assets_manager_add(am, image_battery_2);
+  assets_manager_add(am, xml_test);
+  assets_manager_add(am, style_slide_menu);
+  assets_manager_add(am, style_digit_clock);
+  assets_manager_add(am, style_dialog_toast);
+  assets_manager_add(am, style_edit);
+  assets_manager_add(am, style_keyboard);
+  assets_manager_add(am, style_color);
+  assets_manager_add(am, style_tab_bottom);
+  assets_manager_add(am, style_calibration);
+  assets_manager_add(am, style_tab_list);
+  assets_manager_add(am, style_default);
+  assets_manager_add(am, style_tab_top_compact);
+  assets_manager_add(am, style_dialog_info);
+  assets_manager_add(am, style_guage);
+  assets_manager_add(am, style_dialog_confirm);
+  assets_manager_add(am, style_dialog);
+  assets_manager_add(am, style_tab_top);
+  assets_manager_add(am, style_button);
+  assets_manager_add(am, style_system_bar);
+  assets_manager_add(am, style_tab_bottom_compact);
+  assets_manager_add(am, style_dialog_warn);
+  assets_manager_add(am, font_default);
 #ifdef WITH_VGCANVAS
-  assets_manager_add(rm, image_pointer_4);
-  assets_manager_add(rm, image_china);
-  assets_manager_add(rm, image_pointer_1);
-  assets_manager_add(rm, image_pointer);
-  assets_manager_add(rm, image_girl);
+  assets_manager_add(am, image_pointer_4);
+  assets_manager_add(am, image_china);
+  assets_manager_add(am, image_pointer_1);
+  assets_manager_add(am, image_pointer);
+  assets_manager_add(am, image_girl);
 #endif /*WITH_VGCANVAS*/
 #endif
 

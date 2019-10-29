@@ -20,6 +20,7 @@
  */
 
 #include "base/lcd.h"
+#include "tkc/mem.h"
 #include "tkc/utf8.h"
 #include "base/vgcanvas.h"
 #include "base/system_info.h"
@@ -94,10 +95,24 @@ static ret_t lcd_vgcanvas_draw_hline(lcd_t* lcd, xy_t x, xy_t y, wh_t w) {
 }
 
 static ret_t lcd_vgcanvas_fill_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
+  float_t rect_w = 0;
+  float_t rect_h = 0;
   vgcanvas_t* canvas = LCD(lcd)->canvas;
 
+  if (w <= 1) {
+    rect_w = 0.5f;
+  } else {
+    rect_w = w - 1;
+  }
+
+  if (h <= 1) {
+    rect_h = 0.5f;
+  } else {
+    rect_h = h - 1;
+  }
+
   vgcanvas_begin_path(canvas);
-  vgcanvas_rect(canvas, x, y, w, h);
+  vgcanvas_rect(canvas, x + 0.5f, y + 0.5f, rect_w, rect_h);
   vgcanvas_set_fill_color(canvas, lcd->fill_color);
   vgcanvas_fill(canvas);
 
@@ -223,7 +238,11 @@ static ret_t lcd_vgcanvas_end_frame(lcd_t* lcd) {
 }
 
 static ret_t lcd_vgcanvas_destroy(lcd_t* lcd) {
-  (void)lcd;
+  vgcanvas_t* canvas = LCD(lcd)->canvas;
+  vgcanvas_destroy(canvas);
+  memset(lcd, 0x00, sizeof(lcd_t));
+  TKMEM_FREE(lcd);
+
   return RET_OK;
 }
 
@@ -239,12 +258,10 @@ static bitmap_format_t lcd_vgcanvas_get_desired_bitmap_format(lcd_t* lcd) {
 }
 
 lcd_t* lcd_vgcanvas_init(wh_t w, wh_t h, vgcanvas_t* canvas) {
-  static lcd_vgcanvas_t lcd;
-  lcd_t* base = &(lcd.base);
+  lcd_vgcanvas_t* lcd = TKMEM_ZALLOC(lcd_vgcanvas_t);
+  lcd_t* base = &(lcd->base);
   system_info_t* info = system_info();
   return_value_if_fail(canvas != NULL, NULL);
-
-  memset(&lcd, 0x00, sizeof(lcd_vgcanvas_t));
 
   base->begin_frame = lcd_vgcanvas_begin_frame;
   base->set_clip_rect = lcd_vgcanvas_set_clip_rect;
@@ -280,7 +297,7 @@ lcd_t* lcd_vgcanvas_init(wh_t w, wh_t h, vgcanvas_t* canvas) {
   system_info_set_lcd_type(info, base->type);
   system_info_set_device_pixel_ratio(info, canvas->ratio);
 
-  lcd.canvas = canvas;
+  lcd->canvas = canvas;
 
   return base;
 }

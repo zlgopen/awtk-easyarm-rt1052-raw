@@ -20,13 +20,19 @@
  */
 
 #include "tkc/mem.h"
+#include "tkc/platform.h"
 #include "common/utils.h"
 #include "font_gen.h"
 #include "font_loader/font_loader_bitmap.h"
-#include "font_loader/font_loader_truetype.h"
+#ifdef WITH_STB_FONT
+#include "font_loader/font_loader_stb.h"
+#else
+#include "font_loader/font_loader_ft.h"
+#endif /*WITH_STB_FONT*/
 
 int main(int argc, char** argv) {
   uint32_t size = 0;
+  bool_t mono = FALSE;
   font_t* font = NULL;
   char* str_buff = NULL;
   uint8_t* ttf_buff = NULL;
@@ -35,10 +41,10 @@ int main(int argc, char** argv) {
   const char* str_filename = NULL;
   const char* out_filename = NULL;
 
-  TKMEM_INIT(4 * 1024 * 1024);
+  platform_prepare();
 
-  if (argc != 5) {
-    printf("Usage: %s ttf_filename str_filename out_filename font_size\n", argv[0]);
+  if (argc < 5) {
+    printf("Usage: %s ttf_filename str_filename out_filename font_size [mono]\n", argv[0]);
 
     return 0;
   }
@@ -48,13 +54,27 @@ int main(int argc, char** argv) {
   out_filename = argv[3];
   font_size = atoi(argv[4]);
 
-  exit_if_need_not_update(ttf_filename, out_filename);
-  exit_if_need_not_update(str_filename, out_filename);
+  if (argc == 6 && tk_str_eq(argv[5], "mono")) {
+    mono = TRUE;
+  }
+
+  exit_if_need_not_update_for_infiles(out_filename, 2, ttf_filename, str_filename);
 
   ttf_buff = (uint8_t*)read_file(ttf_filename, &size);
   return_value_if_fail(ttf_buff != NULL, 0);
-
-  font = font_truetype_create("default", ttf_buff, size);
+#ifdef WITH_STB_FONT
+  if (mono) {
+    assert(!"not support mono font");
+  } else {
+    font = font_stb_create("default", ttf_buff, size);
+  }
+#else
+  if (mono) {
+    font = font_ft_mono_create("default", ttf_buff, size);
+  } else {
+    font = font_ft_create("default", ttf_buff, size);
+  }
+#endif /*WITH_STB_FONT*/
 
   str_buff = read_file(str_filename, &size);
   return_value_if_fail(str_buff != NULL, 0);

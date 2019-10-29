@@ -21,11 +21,19 @@
 | <a href="#object_t_object_foreach_prop">object\_foreach\_prop</a> | 遍历所有属性。 |
 | <a href="#object_t_object_get_desc">object\_get\_desc</a> | 获取对象的描述信息。 |
 | <a href="#object_t_object_get_prop">object\_get\_prop</a> | 获取指定属性的值。 |
+| <a href="#object_t_object_get_prop_bool">object\_get\_prop\_bool</a> | 获取指定属性的bool类型的值。 |
+| <a href="#object_t_object_get_prop_bool_by_path">object\_get\_prop\_bool\_by\_path</a> | 获取指定属性的bool类型的值。 |
+| <a href="#object_t_object_get_prop_by_path">object\_get\_prop\_by\_path</a> | 获取指定path属性的值。 |
 | <a href="#object_t_object_get_prop_float">object\_get\_prop\_float</a> | 获取指定属性的浮点数类型的值。 |
+| <a href="#object_t_object_get_prop_float_by_path">object\_get\_prop\_float\_by\_path</a> | 获取指定属性的浮点数类型的值。 |
 | <a href="#object_t_object_get_prop_int">object\_get\_prop\_int</a> | 获取指定属性的整数类型的值。 |
+| <a href="#object_t_object_get_prop_int_by_path">object\_get\_prop\_int\_by\_path</a> | 获取指定属性的整数类型的值。 |
 | <a href="#object_t_object_get_prop_object">object\_get\_prop\_object</a> | 获取指定属性的object类型的值。 |
+| <a href="#object_t_object_get_prop_object_by_path">object\_get\_prop\_object\_by\_path</a> | 获取指定属性的object类型的值。 |
 | <a href="#object_t_object_get_prop_pointer">object\_get\_prop\_pointer</a> | 获取指定属性的指针类型的值。 |
+| <a href="#object_t_object_get_prop_pointer_by_path">object\_get\_prop\_pointer\_by\_path</a> | 获取指定属性的指针类型的值。 |
 | <a href="#object_t_object_get_prop_str">object\_get\_prop\_str</a> | 获取指定属性的字符串类型的值。 |
+| <a href="#object_t_object_get_prop_str_by_path">object\_get\_prop\_str\_by\_path</a> | 获取指定属性的字符串类型的值。 |
 | <a href="#object_t_object_get_size">object\_get\_size</a> | 获取对象占用内存的大小。 |
 | <a href="#object_t_object_get_type">object\_get\_type</a> | 获取对象的类型名称。 |
 | <a href="#object_t_object_has_prop">object\_has\_prop</a> | 检查是否存在指定的属性。 |
@@ -35,6 +43,7 @@
 | <a href="#object_t_object_remove_prop">object\_remove\_prop</a> | 删除指定属性。 |
 | <a href="#object_t_object_set_name">object\_set\_name</a> | 设置对象的名称。 |
 | <a href="#object_t_object_set_prop">object\_set\_prop</a> | 设置指定属性的值。 |
+| <a href="#object_t_object_set_prop_bool">object\_set\_prop\_bool</a> | 设置指定属性的bool类型的值。 |
 | <a href="#object_t_object_set_prop_float">object\_set\_prop\_float</a> | 设置指定属性的浮点数类型的值。 |
 | <a href="#object_t_object_set_prop_int">object\_set\_prop\_int</a> | 设置指定属性的整数类型的值。 |
 | <a href="#object_t_object_set_prop_object">object\_set\_prop\_object</a> | 设置指定属性的object类型的值。 |
@@ -260,6 +269,78 @@ ret_t object_get_prop (object_t* obj, const char* name, value_t* v);
 | obj | object\_t* | object对象。 |
 | name | const char* | 属性的名称。 |
 | v | value\_t* | 返回属性的值。 |
+#### object\_get\_prop\_bool 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_bool"> 获取指定属性的bool类型的值。
+
+
+
+
+* 函数原型：
+
+```
+bool_t object_get_prop_bool (object_t* obj, const char* name, bool_t defval);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 返回指定属性的bool类型的值。 |
+| obj | object\_t* | object对象。 |
+| name | const char* | 属性的名称。 |
+| defval | bool\_t | 缺省值。 |
+#### object\_get\_prop\_bool\_by\_path 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_bool_by_path"> 获取指定属性的bool类型的值。
+
+
+
+
+* 函数原型：
+
+```
+bool_t object_get_prop_bool_by_path (object_t* obj, const char* path, bool_t defval);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 返回指定属性的bool类型的值。 |
+| obj | object\_t* | object对象。 |
+| path | const char* | 属性的path。 |
+| defval | bool\_t | 缺省值。 |
+#### object\_get\_prop\_by\_path 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_by_path"> 获取指定path属性的值。
+
+
+
+
+* 函数原型：
+
+```
+ret_t object_get_prop_by_path (object_t* obj, const char* path, value_t* v);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| obj | object\_t* | object对象。 |
+| path | const char* | 属性的path，各级之间用.分隔。 |
+| v | value\_t* | 返回属性的值。 |
 #### object\_get\_prop\_float 函数
 -----------------------
 
@@ -283,6 +364,30 @@ float_t object_get_prop_float (object_t* obj, const char* name, float_t defval);
 | 返回值 | float\_t | 返回指定属性的浮点数类型的值。 |
 | obj | object\_t* | object对象。 |
 | name | const char* | 属性的名称。 |
+| defval | float\_t | 缺省值。 |
+#### object\_get\_prop\_float\_by\_path 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_float_by_path"> 获取指定属性的浮点数类型的值。
+
+
+
+
+* 函数原型：
+
+```
+float_t object_get_prop_float_by_path (object_t* obj, const char* path, float_t defval);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | float\_t | 返回指定属性的浮点数类型的值。 |
+| obj | object\_t* | object对象。 |
+| path | const char* | 属性的path。 |
 | defval | float\_t | 缺省值。 |
 #### object\_get\_prop\_int 函数
 -----------------------
@@ -308,6 +413,30 @@ int32_t object_get_prop_int (object_t* obj, const char* name, int32_t defval);
 | obj | object\_t* | object对象。 |
 | name | const char* | 属性的名称。 |
 | defval | int32\_t | 缺省值。 |
+#### object\_get\_prop\_int\_by\_path 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_int_by_path"> 获取指定属性的整数类型的值。
+
+
+
+
+* 函数原型：
+
+```
+int32_t object_get_prop_int_by_path (object_t* obj, const char* path, int32_t defval);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | int32\_t | 返回指定属性的整数类型的值。 |
+| obj | object\_t* | object对象。 |
+| path | const char* | 属性的path。 |
+| defval | int32\_t | 缺省值。 |
 #### object\_get\_prop\_object 函数
 -----------------------
 
@@ -331,6 +460,29 @@ object_t* object_get_prop_object (object_t* obj, const char* name);
 | 返回值 | object\_t* | 返回指定属性的object类型的值。 |
 | obj | object\_t* | object对象。 |
 | name | const char* | 属性的名称。 |
+#### object\_get\_prop\_object\_by\_path 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_object_by_path"> 获取指定属性的object类型的值。
+
+
+
+
+* 函数原型：
+
+```
+object_t* object_get_prop_object_by_path (object_t* obj, const char* path);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | object\_t* | 返回指定属性的object类型的值。 |
+| obj | object\_t* | object对象。 |
+| path | const char* | 属性的path。 |
 #### object\_get\_prop\_pointer 函数
 -----------------------
 
@@ -354,6 +506,29 @@ void* object_get_prop_pointer (object_t* obj, const char* name);
 | 返回值 | void* | 返回指定属性的指针类型的值。 |
 | obj | object\_t* | object对象。 |
 | name | const char* | 属性的名称。 |
+#### object\_get\_prop\_pointer\_by\_path 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_pointer_by_path"> 获取指定属性的指针类型的值。
+
+
+
+
+* 函数原型：
+
+```
+void* object_get_prop_pointer_by_path (object_t* obj, const char* path);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | void* | 返回指定属性的指针类型的值。 |
+| obj | object\_t* | object对象。 |
+| path | const char* | 属性的path。 |
 #### object\_get\_prop\_str 函数
 -----------------------
 
@@ -377,6 +552,29 @@ const char* object_get_prop_str (object_t* obj, const char* name);
 | 返回值 | const char* | 返回指定属性的字符串类型的值。 |
 | obj | object\_t* | object对象。 |
 | name | const char* | 属性的名称。 |
+#### object\_get\_prop\_str\_by\_path 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_get_prop_str_by_path"> 获取指定属性的字符串类型的值。
+
+
+
+
+* 函数原型：
+
+```
+const char* object_get_prop_str_by_path (object_t* obj, const char* path);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | const char* | 返回指定属性的字符串类型的值。 |
+| obj | object\_t* | object对象。 |
+| path | const char* | 属性的path。 |
 #### object\_get\_size 函数
 -----------------------
 
@@ -580,6 +778,30 @@ ret_t object_set_prop (object_t* obj, const char* name, value_t* value);
 | obj | object\_t* | object对象。 |
 | name | const char* | 属性的名称。 |
 | value | value\_t* | 属性的值。 |
+#### object\_set\_prop\_bool 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="object_t_object_set_prop_bool"> 设置指定属性的bool类型的值。
+
+
+
+
+* 函数原型：
+
+```
+ret_t object_set_prop_bool (object_t* obj, const char* name, bool_t value);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| obj | object\_t* | object对象。 |
+| name | const char* | 属性的名称。 |
+| value | bool\_t | 属性的值。 |
 #### object\_set\_prop\_float 函数
 -----------------------
 

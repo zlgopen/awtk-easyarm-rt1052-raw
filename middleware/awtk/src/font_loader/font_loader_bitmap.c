@@ -68,9 +68,8 @@ static ret_t font_bitmap_get_glyph(font_t* f, wchar_t c, font_size_t font_size, 
 
 static bool_t font_bitmap_match(font_t* f, const char* name, font_size_t font_size) {
   font_bitmap_t* font = (font_bitmap_t*)f;
-  font_bitmap_header_t* header = (font_bitmap_header_t*)(font->buff);
   if (name == NULL || strcmp(name, font->base.name) == 0) {
-    return (int32_t)(header->font_size) == (int32_t)font_size;
+    return TRUE;
   }
 
   return FALSE;
@@ -123,7 +122,7 @@ static font_t* font_bitmap_load(font_loader_t* loader, const char* name, const u
 
 font_loader_t* font_loader_bitmap(void) {
   static font_loader_t loader;
-  loader.type = ASSET_TYPE_FONT_TTF;
+  loader.type = ASSET_TYPE_FONT_BMP;
   loader.load = font_bitmap_load;
 
   return &loader;

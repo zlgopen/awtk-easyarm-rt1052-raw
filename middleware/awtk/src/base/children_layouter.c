@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   children_layouter.c
  * Author: AWTK Develop Team
  * Brief:  children layouter
@@ -112,3 +112,9 @@ ret_t children_layouter_destroy(children_layouter_t* layouter) {
 
   return layouter->vt->destroy(layouter);
 }
+
+#ifdef WITHOUT_LAYOUTER
+children_layouter_t* children_layouter_create(const char* params) {
+  return NULL;
+}
+#endif /*WITHOUT_LAYOUTER*/

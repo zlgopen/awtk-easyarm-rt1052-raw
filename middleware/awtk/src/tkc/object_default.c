@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   object_default.c
  * Author: AWTK Develop Team
  * Brief:  default object
@@ -64,9 +64,10 @@ static ret_t object_default_clean_invalid_props(object_t* obj) {
   return RET_OK;
 }
 
-static ret_t object_default_on_destroy(object_t* obj) {
+ret_t object_default_clear_props(object_t* obj) {
   uint32_t i = 0;
   object_default_t* o = OBJECT_DEFAULT(obj);
+  return_value_if_fail(o != NULL, RET_BAD_PARAMS);
 
   for (i = 0; i < o->props_size; i++) {
     named_value_t* iter = o->props + i;
@@ -74,6 +75,14 @@ static ret_t object_default_on_destroy(object_t* obj) {
   }
 
   o->props_size = 0;
+
+  return RET_OK;
+}
+
+static ret_t object_default_on_destroy(object_t* obj) {
+  object_default_t* o = OBJECT_DEFAULT(obj);
+
+  object_default_clear_props(obj);
   o->props_capacity = 0;
   TKMEM_FREE(o->props);
 
@@ -253,6 +262,23 @@ static ret_t object_default_foreach_prop(object_t* obj, tk_visit_t on_prop, void
   return ret;
 }
 
+value_t* object_default_find_prop(object_t* obj, tk_compare_t cmp, const void* ctx) {
+  object_default_t* o = OBJECT_DEFAULT(obj);
+  return_value_if_fail(o != NULL && cmp != NULL, NULL);
+
+  if (o->props_size > 0) {
+    uint32_t i = 0;
+    for (i = 0; i < o->props_size; i++) {
+      named_value_t* iter = o->props + i;
+      if (cmp(iter, ctx) == 0) {
+        return &(iter->value);
+      }
+    }
+  }
+
+  return NULL;
+}
+
 static const object_vtable_t s_object_default_vtable = {
     .type = "object_default",
     .desc = "object_default",
@@ -299,6 +325,12 @@ object_t* object_default_clone(object_default_t* o) {
   }
 
   return dup;
+}
+
+object_default_t* object_default_cast(object_t* obj) {
+  return_value_if_fail(obj != NULL && obj->vt == &s_object_default_vtable, NULL);
+
+  return (object_default_t*)(obj);
 }
 
 ret_t object_default_unref(object_t* obj) {

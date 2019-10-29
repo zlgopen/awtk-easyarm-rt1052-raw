@@ -67,6 +67,8 @@ typedef struct _dialog_highlighter_vtable_t {
  *
  */
 struct _dialog_highlighter_t {
+  emitter_t emitter;
+
   /**
    * @property {bitmap_t} img
    * 底层窗口的截图。
@@ -148,6 +150,9 @@ bool_t dialog_highlighter_is_dynamic(dialog_highlighter_t* h);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t dialog_highlighter_destroy(dialog_highlighter_t* h);
+
+/*for window manager*/
+ret_t dialog_highlighter_clear_image(dialog_highlighter_t* h);
 
 END_C_DECLS
 

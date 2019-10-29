@@ -104,7 +104,8 @@ static align_h_t widget_get_text_align_h(widget_t* widget) {
 
 static ret_t widget_get_text_layout_info(widget_t* widget, text_layout_info_t* info) {
   value_t v;
-  return_value_if_fail(widget != NULL && info != NULL, RET_BAD_PARAMS);
+  style_t* style = widget->astyle;
+  return_value_if_fail(widget != NULL && info != NULL && style != NULL, RET_BAD_PARAMS);
 
   value_set_int(&v, 0);
   info->widget_w = widget->w;
@@ -114,26 +115,50 @@ static ret_t widget_get_text_layout_info(widget_t* widget, text_layout_info_t* i
 
   if (widget_get_prop(widget, WIDGET_PROP_LEFT_MARGIN, &v) == RET_OK) {
     info->margin_l = value_int(&v);
-  } else {
-    info->margin_l = 1;
+  }
+
+  if (info->margin_l == 0) {
+    info->margin_l = style_get_int(style, STYLE_ID_MARGIN_LEFT, 1);
+  }
+
+  if (info->margin_l == 0) {
+    info->margin_l = style_get_int(style, STYLE_ID_MARGIN, 1);
   }
 
   if (widget_get_prop(widget, WIDGET_PROP_RIGHT_MARGIN, &v) == RET_OK) {
     info->margin_r = value_int(&v);
-  } else {
-    info->margin_r = 1;
+  }
+
+  if (info->margin_r == 0) {
+    info->margin_r = style_get_int(style, STYLE_ID_MARGIN_RIGHT, 1);
+  }
+
+  if (info->margin_r == 0) {
+    info->margin_r = style_get_int(style, STYLE_ID_MARGIN, 1);
   }
 
   if (widget_get_prop(widget, WIDGET_PROP_TOP_MARGIN, &v) == RET_OK) {
     info->margin_t = value_int(&v);
-  } else {
-    info->margin_t = 1;
+  }
+
+  if (info->margin_t == 0) {
+    info->margin_t = style_get_int(style, STYLE_ID_MARGIN_TOP, 1);
+  }
+
+  if (info->margin_t == 0) {
+    info->margin_t = style_get_int(style, STYLE_ID_MARGIN, 1);
   }
 
   if (widget_get_prop(widget, WIDGET_PROP_BOTTOM_MARGIN, &v) == RET_OK) {
     info->margin_b = value_int(&v);
-  } else {
-    info->margin_b = 1;
+  }
+
+  if (info->margin_b == 0) {
+    info->margin_b = style_get_int(style, STYLE_ID_MARGIN_BOTTOM, 1);
+  }
+
+  if (info->margin_b == 0) {
+    info->margin_b = style_get_int(style, STYLE_ID_MARGIN, 1);
   }
 
   info->w = info->widget_w - info->margin_l - info->margin_r;
@@ -610,8 +635,6 @@ ret_t text_edit_paint(text_edit_t* text_edit, canvas_t* c) {
   rect_t clip_r;
   rect_t edit_r;
   DECL_IMPL(text_edit);
-  point_t p = {.x = 0, .y = 0};
-  widget_t* widget = text_edit->widget;
   text_layout_info_t* layout_info = &(impl->layout_info);
 
   if (text_edit->c != NULL) {
@@ -622,9 +645,8 @@ ret_t text_edit_paint(text_edit_t* text_edit, canvas_t* c) {
   }
 
   canvas_get_clip_rect(c, &save_r);
-  widget_to_screen(widget, &p);
 
-  edit_r = rect_init(p.x + layout_info->margin_l, p.y + layout_info->margin_t, layout_info->w,
+  edit_r = rect_init(c->ox + layout_info->margin_l, c->oy + layout_info->margin_t, layout_info->w,
                      layout_info->h);
   clip_r = rect_intersect(&save_r, &edit_r);
 
@@ -800,6 +822,48 @@ ret_t text_edit_drag(text_edit_t* text_edit, xy_t x, xy_t y) {
   return RET_OK;
 }
 
+static ret_t text_edit_handle_shortcut(text_edit_t* text_edit, key_event_t* evt,
+                                       STB_TexteditState* state, wstr_t* text) {
+#ifdef MACOS
+  if (evt->cmd) {
+#else
+  if (evt->ctrl) {
+#endif
+    uint32_t key = evt->key;
+    char c = tolower(key);
+    if (c == 'z') {
+      stb_textedit_key(text_edit, state, STB_TEXTEDIT_K_UNDO);
+    } else if (c == 'y') {
+      stb_textedit_key(text_edit, state, STB_TEXTEDIT_K_REDO);
+    } else if (c == 'c') {
+      text_edit_copy(text_edit);
+    } else if (c == 'x') {
+      text_edit_cut(text_edit);
+    } else if (c == 'a') {
+      state->select_start = 0;
+      state->select_end = text->size;
+    } else if (c == 'v') {
+      value_t v;
+      wstr_t str;
+      const char* data = clip_board_get_text();
+      if (data != NULL) {
+        value_set_str(&v, data);
+        wstr_init(&str, 0);
+        wstr_from_value(&str, &v);
+        wstr_normalize_newline(&str, STB_TEXTEDIT_NEWLINE);
+        text_edit_paste(text_edit, str.str, str.size);
+        wstr_reset(&str);
+      }
+    }
+
+    text_edit_layout(text_edit);
+
+    return RET_OK;
+  }
+
+  return RET_FAIL;
+}
+
 ret_t text_edit_key_down(text_edit_t* text_edit, key_event_t* evt) {
   uint32_t key = 0;
   wstr_t* text = NULL;
@@ -900,42 +964,18 @@ ret_t text_edit_key_down(text_edit_t* text_edit, key_event_t* evt) {
       return RET_OK;
     }
     default: {
-      if (!isprint((char)key)) {
-        return RET_OK;
+      if (key < 128 && isprint(key)) {
+        app_type_t app_type = system_info()->app_type;
+        if (app_type == APP_DESKTOP || app_type == APP_MOBILE) {
+          text_edit_handle_shortcut(text_edit, evt, state, text);
+          return RET_OK;
+        }
       }
       break;
     }
   }
 
-  if (evt->ctrl) {
-    char c = tolower(key);
-    if (c == 'z') {
-      stb_textedit_key(text_edit, state, STB_TEXTEDIT_K_UNDO);
-    } else if (c == 'y') {
-      stb_textedit_key(text_edit, state, STB_TEXTEDIT_K_REDO);
-    } else if (c == 'c') {
-      text_edit_copy(text_edit);
-    } else if (c == 'x') {
-      text_edit_cut(text_edit);
-    } else if (c == 'a') {
-      state->select_start = 0;
-      state->select_end = text->size;
-    } else if (c == 'v') {
-      value_t v;
-      wstr_t str;
-      const char* data = clip_board_get_text();
-      if (data != NULL) {
-        value_set_str(&v, data);
-        wstr_init(&str, 0);
-        wstr_from_value(&str, &v);
-        wstr_normalize_newline(&str, STB_TEXTEDIT_NEWLINE);
-        text_edit_paste(text_edit, str.str, str.size);
-        wstr_reset(&str);
-      }
-    }
-
-    text_edit_layout(text_edit);
-
+  if (text_edit_handle_shortcut(text_edit, evt, state, text) == RET_OK) {
     return RET_OK;
   }
 
@@ -1079,7 +1119,23 @@ ret_t text_edit_set_select(text_edit_t* text_edit, uint32_t start, uint32_t end)
 
   impl->state.select_start = start;
   impl->state.select_end = tk_min(end, text_edit->widget->text.size);
-  ;
+
+  text_edit_layout(text_edit);
+
+  return RET_OK;
+}
+
+ret_t text_edit_select_all(text_edit_t* text_edit) {
+  return_value_if_fail(text_edit != NULL, RET_BAD_PARAMS);
+
+  return text_edit_set_select(text_edit, 0, text_edit->widget->text.size);
+}
+
+ret_t text_edit_unselect(text_edit_t* text_edit) {
+  DECL_IMPL(text_edit);
+  return_value_if_fail(text_edit != NULL, RET_BAD_PARAMS);
+
+  impl->state.select_end = impl->state.select_start;
 
   text_edit_layout(text_edit);
 

@@ -34,7 +34,8 @@ static const char* children_layouter_list_view_to_string(children_layouter_t* la
   str_t* str = &(layouter->params);
   children_layouter_list_view_t* layout = (children_layouter_list_view_t*)layouter;
 
-  str_set(str, "listview(");
+  memset(temp, 0, sizeof(temp));
+  str_set(str, "list_view(");
   str_append(str, temp);
 
   if (layout->item_height) {
@@ -60,6 +61,11 @@ static const char* children_layouter_list_view_to_string(children_layouter_t* la
 
   if (layout->spacing) {
     tk_snprintf(temp, sizeof(temp) - 1, "spacing=%d,", (int)(layout->spacing));
+    str_append(str, temp);
+  }
+
+  if (layout->cols > 1) {
+    tk_snprintf(temp, sizeof(temp) - 1, "cols=%d,", (int)(layout->cols));
     str_append(str, temp);
   }
 
@@ -108,6 +114,10 @@ static ret_t children_layouter_list_view_set_param(children_layouter_t* layouter
       l->default_item_height = val;
       break;
     }
+    case 'c': {
+      l->cols = val;
+      break;
+    }
     case 'k': {
       if (strstr(name, "invisible") != NULL || name[1] == 'i') {
         l->keep_invisible = value_bool(v);
@@ -150,6 +160,10 @@ static ret_t children_layouter_list_view_get_param(children_layouter_t* layouter
     }
     case 'd': {
       value_set_int(v, l->default_item_height);
+      return RET_OK;
+    }
+    case 'c': {
+      value_set_int(v, l->cols);
       return RET_OK;
     }
     case 'k': {
@@ -205,6 +219,7 @@ static ret_t children_layouter_list_view_layout(children_layouter_t* layouter, w
     widget_t** children = NULL;
     darray_t children_for_layout;
     int32_t w = widget->w - x_margin * 2;
+    uint32_t cols = l->cols <= 1 ? 1 : l->cols;
 
     widget_layout_floating_children(widget);
     darray_init(&children_for_layout, widget->children->size, NULL, NULL);
@@ -217,18 +232,26 @@ static ret_t children_layouter_list_view_layout(children_layouter_t* layouter, w
     n = children_for_layout.size;
     children = (widget_t**)(children_for_layout.elms);
 
-    for (i = 0; i < n; i++) {
-      widget_t* iter = children[i];
+    if (cols <= 1) {
+      for (i = 0; i < n; i++) {
+        widget_t* iter = children[i];
 
-      if (item_height <= 0) {
-        h = iter->h;
+        if (item_height <= 0) {
+          h = iter->h;
+        }
+
+        if (h <= 0) {
+          h = default_item_height;
+        }
+
+        y = y + (h > 0 ? h : iter->h) + spacing;
+        if (y > virtual_h) {
+          virtual_h = y;
+        }
       }
-
-      if (h <= 0) {
-        h = default_item_height;
-      }
-
-      y = y + (h > 0 ? h : iter->h) + spacing;
+    } else {
+      uint32_t rows = (n % cols) ? (n / cols) + 1 : (n / cols);
+      y = (item_height + spacing) * rows;
       if (y > virtual_h) {
         virtual_h = y;
       }
@@ -246,6 +269,8 @@ static ret_t children_layouter_list_view_layout(children_layouter_t* layouter, w
             widget_set_visible_only(scroll_bar, TRUE);
             widget_set_enable(scroll_bar, TRUE);
           }
+        } else {
+          scroll_view->widget.w = list_view->widget.w - scroll_bar->w;
         }
       }
     }
@@ -253,21 +278,40 @@ static ret_t children_layouter_list_view_layout(children_layouter_t* layouter, w
     y = y_margin;
     w = scroll_view->widget.w - 2 * x_margin;
 
-    for (i = 0; i < n; i++) {
-      widget_t* iter = children[i];
+    if (cols <= 1) {
+      for (i = 0; i < n; i++) {
+        widget_t* iter = children[i];
 
-      if (item_height <= 0) {
-        h = iter->h;
+        if (item_height <= 0) {
+          h = iter->h;
+        }
+
+        if (h <= 0) {
+          h = default_item_height;
+        }
+
+        widget_move_resize(iter, x, y, w, h);
+        widget_layout(iter);
+
+        y = iter->y + iter->h + spacing;
       }
+    } else {
+      uint32_t row = 0;
+      uint32_t col = 0;
+      uint32_t item_w = (w - (cols - 1) * spacing) / cols;
 
-      if (h <= 0) {
-        h = default_item_height;
+      h = item_height;
+      for (i = 0; i < n; i++) {
+        widget_t* iter = children[i];
+
+        row = i / cols;
+        col = i % cols;
+        x = col * (item_w + spacing);
+        y = row * (item_height + spacing);
+
+        widget_move_resize(iter, x, y, item_w, h);
+        widget_layout(iter);
       }
-
-      widget_move_resize(iter, x, y, w, h);
-      widget_layout(iter);
-
-      y = iter->y + iter->h + spacing;
     }
 
     if (scroll_bar != NULL && (SCROLL_BAR(scroll_bar)->value) >= y) {
@@ -285,6 +329,14 @@ static ret_t children_layouter_list_view_layout(children_layouter_t* layouter, w
   scroll_view_set_virtual_h(list_view->scroll_view, virtual_h);
   item_height = tk_max(item_height, default_item_height);
   scroll_bar_set_params(list_view->scroll_bar, virtual_h, item_height);
+  scroll_view->xoffset = 0;
+  if (scroll_view->yoffset + widget->h > scroll_view->virtual_h) {
+    scroll_view->yoffset = scroll_view->virtual_h - widget->h;
+    scroll_view->yoffset = scroll_view->yoffset > 0 ? scroll_view->yoffset : 0;
+  }
+  if (scroll_view->on_scroll) {
+    scroll_view->on_scroll(widget, scroll_view->xoffset, scroll_view->yoffset);
+  }
 
   scroll_view_set_xslidable(list_view->scroll_view, FALSE);
   if (scroll_bar_is_mobile(list_view->scroll_bar)) {
@@ -308,7 +360,7 @@ static ret_t children_layouter_list_view_destroy(children_layouter_t* layouter) 
 }
 
 static const children_layouter_vtable_t s_children_layouter_list_view_vtable = {
-    .type = "listview",
+    .type = CHILDREN_LAYOUTER_LIST_VIEW,
     .to_string = children_layouter_list_view_to_string,
     .get_param = children_layouter_list_view_get_param,
     .set_param = children_layouter_list_view_set_param,

@@ -32,6 +32,7 @@ typedef ret_t (*mutable_image_prepare_image_t)(void* ctx, bitmap_t* image);
 /**
  * @class mutable_image_t
  * @parent image_base_t
+ * @annotation ["scriptable","design","widget"]
  *
  * mutable图片控件。
  *
@@ -140,6 +141,12 @@ ret_t mutable_image_set_framebuffer(widget_t* widget, uint32_t w, uint32_t h,
  * @return {widget_t*} mutable_image对象。
  */
 widget_t* mutable_image_cast(widget_t* widget);
+
+widget_t* mutable_image_init(widget_t* widget);
+
+ret_t mutable_image_on_destroy(widget_t* widget);
+
+ret_t mutable_image_on_paint_self(widget_t* widget, canvas_t* canvas);
 
 #define WIDGET_TYPE_MUTABLE_IMAGE "mutable"
 

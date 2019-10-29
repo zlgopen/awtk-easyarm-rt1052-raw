@@ -1,7 +1,7 @@
 /**
  * File:   sys_tick.c
  * Author: AWTK Develop Team
- * Brief:  use sys tick to implement sleep/get_time_ms.
+ * Brief:  use sys tick to implement sleep/get_time_ms64.
  *
  * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
@@ -21,21 +21,21 @@
 
 #include "tkc/types_def.h"
 
-static volatile uint32_t g_sys_tick;
+static volatile uint64_t g_sys_tick;
 
 void SysTick_Handler(void) {
   g_sys_tick++;
 }
 
-uint32_t get_time_ms() {
+uint64_t get_time_ms64() {
   return g_sys_tick;
 }
 
 void sleep_ms(uint32_t ms) {
   uint32_t count = 0;
-  uint32_t start = get_time_ms();
+  uint64_t start = get_time_ms64();
 
-  while (get_time_ms() < (start + ms)) {
+  while (get_time_ms64() < (start + ms)) {
     count++;
   }
 }

@@ -1,7 +1,12 @@
 import os
 import awtk_config as awtk
 
-DefaultEnvironment(CCFLAGS = awtk.CCFLAGS, 
+APP_TOOLS = None
+if awtk.TOOLS_NAME != '' :
+  APP_TOOLS = [awtk.TOOLS_NAME]
+
+DefaultEnvironment(TOOLS = APP_TOOLS,
+  CCFLAGS = awtk.CCFLAGS,
   LIBS = awtk.LIBS,
   LIBPATH = awtk.LIBPATH,
   CPPPATH = awtk.CPPPATH,
@@ -16,7 +21,12 @@ SConscriptFiles=awtk.NANOVG_BACKEND_PROJS + [
   '3rd/glad/SConscript',
   '3rd/gpinyin/SConscript', 
   '3rd/libunibreak/SConscript',
+  '3rd/lz4/SConscript',
+  '3rd/miniz/SConscript',
   'src/SConscript',
+  'src/streams/SConscript',
+  'src/compressors/SConscript',
+  'src/ubjson/SConscript',
   'tools/common/SConscript', 
   'tools/theme_gen/SConscript', 
   'tools/font_gen/SConscript', 

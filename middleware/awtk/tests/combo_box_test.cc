@@ -26,6 +26,44 @@ TEST(ComboBox, basic) {
   widget_destroy(w);
 }
 
+TEST(ComboBox, item_height) {
+  value_t v1;
+  value_t v2;
+  widget_t* w = combo_box_create(NULL, 10, 20, 30, 40);
+  combo_box_t* combo_box = COMBO_BOX(w);
+
+  value_set_int(&v1, 32);
+  ASSERT_EQ(widget_set_prop(w, WIDGET_PROP_ITEM_HEIGHT, &v1), RET_OK);
+  ASSERT_EQ(widget_get_prop(w, WIDGET_PROP_ITEM_HEIGHT, &v2), RET_OK);
+  ASSERT_EQ(value_int(&v1), value_int(&v2));
+  ASSERT_EQ(value_int(&v1), combo_box->item_height);
+
+  widget_destroy(w);
+}
+
+TEST(ComboBox, localize) {
+  value_t v1;
+  value_t v2;
+  widget_t* w = combo_box_create(NULL, 10, 20, 30, 40);
+  combo_box_t* combo_box = COMBO_BOX(w);
+
+  ASSERT_EQ(TRUE, combo_box->localize_options);
+
+  value_set_bool(&v1, TRUE);
+  ASSERT_EQ(widget_set_prop(w, WIDGET_PROP_LOCALIZE_OPTIONS, &v1), RET_OK);
+  ASSERT_EQ(widget_get_prop(w, WIDGET_PROP_LOCALIZE_OPTIONS, &v2), RET_OK);
+  ASSERT_EQ(value_bool(&v1), value_bool(&v2));
+  ASSERT_EQ(value_bool(&v1), combo_box->localize_options);
+
+  value_set_bool(&v1, FALSE);
+  ASSERT_EQ(widget_set_prop(w, WIDGET_PROP_LOCALIZE_OPTIONS, &v1), RET_OK);
+  ASSERT_EQ(widget_get_prop(w, WIDGET_PROP_LOCALIZE_OPTIONS, &v2), RET_OK);
+  ASSERT_EQ(value_bool(&v1), value_bool(&v2));
+  ASSERT_EQ(value_bool(&v1), combo_box->localize_options);
+
+  widget_destroy(w);
+}
+
 TEST(ComboBox, options) {
   widget_t* w = combo_box_create(NULL, 10, 20, 30, 40);
 
@@ -97,13 +135,14 @@ TEST(ComboBox, event) {
   combo_box_set_options(w, str);
   combo_box_set_selected_index(w, 0);
 
-  s_log = "";
   widget_on(w, EVT_VALUE_WILL_CHANGE, on_change_events, NULL);
   widget_on(w, EVT_VALUE_CHANGED, on_change_events, NULL);
 
+  s_log = "";
   combo_box_set_selected_index(w, 0);
   ASSERT_EQ(s_log, "");
 
+  s_log = "";
   combo_box_set_selected_index(w, 1);
   ASSERT_EQ(s_log, "will_change;change;");
 
@@ -115,6 +154,26 @@ TEST(ComboBox, cast) {
 
   ASSERT_EQ(w, edit_cast(w));
   ASSERT_EQ(w, combo_box_cast(w));
+
+  widget_destroy(w);
+}
+
+TEST(ComboBox, resize) {
+  widget_t* w = combo_box_create(NULL, 0, 0, 100, 100);
+  edit_t* edit = EDIT(w);
+
+  widget_resize(w, 200, 30);
+  ASSERT_EQ(edit->right_margin, 30);
+
+  widget_destroy(w);
+}
+
+TEST(ComboBox, move_resize) {
+  widget_t* w = combo_box_create(NULL, 0, 0, 100, 100);
+  edit_t* edit = EDIT(w);
+
+  widget_move_resize(w, 10, 10, 200, 50);
+  ASSERT_EQ(edit->right_margin, 50);
 
   widget_destroy(w);
 }

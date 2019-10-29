@@ -37,6 +37,7 @@ ret_t main_loop_quit(main_loop_t* l) {
 
   if (l->quit != NULL) {
     l->quit(l);
+    l->app_quited = TRUE;
   }
 
   return RET_OK;
@@ -84,25 +85,10 @@ ret_t main_loop_queue_event(main_loop_t* l, const event_queue_req_t* e) {
 #define TK_MAX_SLEEP_TIME (1000 / TK_MAX_FPS)
 
 ret_t main_loop_sleep_default(main_loop_t* l) {
-  uint32_t sleep_time = 0;
-  uint32_t now = time_now_ms();
+  uint64_t now = time_now_ms();
   uint32_t gap = now - l->last_loop_time;
+  uint32_t sleep_time = TK_MAX_SLEEP_TIME;
   int32_t least_sleep_time = gap > TK_MAX_SLEEP_TIME ? 0 : (TK_MAX_SLEEP_TIME - gap);
-  window_manager_t* wm = WINDOW_MANAGER(window_manager());
-
-  if (!wm->animating) {
-    int32_t next_timer = timer_next_time() - time_now_ms();
-
-    if (next_timer < 0) {
-      next_timer = 0;
-    }
-
-    sleep_time = tk_min(next_timer, TK_MAX_SLEEP_TIME);
-#ifdef WITH_SDL
-  } else if (gap <= 8) {
-    sleep_time = 8;
-#endif /*WITH_SDL*/
-  }
 
   sleep_time = tk_min(least_sleep_time, sleep_time);
   if (sleep_time > 0) {

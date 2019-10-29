@@ -1,0 +1,16 @@
+请在这里创建用户的应用文件夹，比如创建文件夹MyApp，可以将awtk-examples中的Demo拷贝过来作为模板
+
+代码结构如下：
+
+/user_apps/MyApp/
+            |
+            |-- bin/
+            |-- res/
+            |-- src/
+            |-- assets_c_gen.py
+            |-- assets_gen.bat
+            |-- assets_gen.py
+            |-- SConstruct
+
+
+注意：本文件夹中只能有一个应用文件夹参与编译，其他的应用要设置从工程中屏蔽（Exclude from Build）
