@@ -45,7 +45,6 @@ uint32_t awtk_mem[2 * 1024 * 1024];
 #define MEM2_ADDR           awtk_mem
 
 ret_t platform_prepare(void) {
-	timer_init(get_time_ms);
 	tk_mem_init(MEM2_ADDR, MEM2_MAX_SIZE);
 	
 	return RET_OK;
