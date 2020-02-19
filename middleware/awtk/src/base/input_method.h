@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input method interface.
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -90,7 +90,12 @@ typedef enum _input_type_t {
    * @const INPUT_CUSTOM
    * 使用自定义的软键盘(如计算器等应用不希望弹出系统软键盘)。
    */
-  INPUT_CUSTOM
+  INPUT_CUSTOM,
+  /**
+   * @const INPUT_CUSTOM_PASSWORD
+   * 使用自定义的密码软键盘。
+   */
+  INPUT_CUSTOM_PASSWORD
 } input_type_t;
 
 /**
@@ -211,6 +216,13 @@ struct _input_method_t {
    * 由于软键盘的弹出，可能会将窗口向上推移，win_delta_y为推移的距离。
    */
   int32_t win_delta_y;
+
+  /**
+   * @property {int32_t} win_old_y
+   * @annotation ["private"]
+   * 窗口原来的位置。
+   */
+  int32_t win_old_y;
 
   /**
    * @property {bool_t} action_button_enable

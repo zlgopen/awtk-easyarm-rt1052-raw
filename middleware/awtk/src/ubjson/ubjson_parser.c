@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   ubjson_parser.c
  * Author: AWTK Develop Team
  * Brief:  ubjson parser
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -277,7 +277,7 @@ ret_t ubjson_do_parse(ubjson_parser_t* parser) {
   return RET_BAD_PARAMS;
 }
 
-object_t* object_from_ubjson(void* data, uint32_t size) {
+object_t* ubjson_to_object(void* data, uint32_t size) {
   ubjson_parser_t parser;
   return_value_if_fail(data != NULL && size > 0, NULL);
 

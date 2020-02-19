@@ -1,8 +1,7 @@
 ## font\_manager\_t
 ### 概述
- 字体管理器，负责字体的加载和缓存管理。
- (如果使用nanovg，字体由nanovg内部管理)
-
+字体管理器，负责字体的加载和缓存管理。
+(如果使用nanovg，字体由nanovg内部管理)
 ----------------------------------
 ### 函数
 <p id="font_manager_t_methods">
@@ -18,6 +17,7 @@
 | <a href="#font_manager_t_font_manager_init">font\_manager\_init</a> | 初始化字体管理器。 |
 | <a href="#font_manager_t_font_manager_set">font\_manager\_set</a> | 设置缺省的字体管理器。 |
 | <a href="#font_manager_t_font_manager_set_assets_manager">font\_manager\_set\_assets\_manager</a> | 设置资源管理器对象 |
+| <a href="#font_manager_t_font_manager_unload_all">font\_manager\_unload\_all</a> | 卸载全部字体。 |
 | <a href="#font_manager_t_font_manager_unload_font">font\_manager\_unload\_font</a> | 卸载指定的字体。 |
 ### 属性
 <p id="font_manager_t_properties">
@@ -29,8 +29,7 @@
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager"> 获取缺省的字体管理器。
-
+> <p id="font_manager_t_font_manager">获取缺省的字体管理器。
 
 * 函数原型：
 
@@ -48,9 +47,7 @@ font_manager_t* font_manager ();
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_add_font"> 向缓存中加入字体。
-
-
+> <p id="font_manager_t_font_manager_add_font">向缓存中加入字体。
 
 * 函数原型：
 
@@ -71,9 +68,7 @@ ret_t font_manager_add_font (font_manager_t* fm, char* name, font_t* font);
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_create"> 创建字体管理器。
-
-
+> <p id="font_manager_t_font_manager_create">创建字体管理器。
 
 * 函数原型：
 
@@ -92,9 +87,7 @@ font_manager_t* font_manager_create (font_loader_t* loader);
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_deinit"> 析构字体管理器。
-
-
+> <p id="font_manager_t_font_manager_deinit">析构字体管理器。
 
 * 函数原型：
 
@@ -113,9 +106,7 @@ ret_t font_manager_deinit (font_manager_t* fm);
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_destroy"> 析构并释放字体管理器。
-
-
+> <p id="font_manager_t_font_manager_destroy">析构并释放字体管理器。
 
 * 函数原型：
 
@@ -134,9 +125,7 @@ ret_t font_manager_destroy (font_manager_t* fm);
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_get_font"> 从缓存中查找字体，如果没找到，再加载字体，并缓存。
-
-
+> <p id="font_manager_t_font_manager_get_font">从缓存中查找字体，如果没找到，再加载字体，并缓存。
 
 * 函数原型：
 
@@ -157,9 +146,7 @@ font_t* font_manager_get_font (font_manager_t* fm, char* name, font_size_t size)
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_init"> 初始化字体管理器。
-
-
+> <p id="font_manager_t_font_manager_init">初始化字体管理器。
 
 * 函数原型：
 
@@ -179,9 +166,7 @@ font_manager_t* font_manager_init (font_manager_t* fm, font_loader_t* loader);
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_set"> 设置缺省的字体管理器。
-
-
+> <p id="font_manager_t_font_manager_set">设置缺省的字体管理器。
 
 * 函数原型：
 
@@ -200,17 +185,15 @@ ret_t font_manager_set (font_manager_t* fm);
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_set_assets_manager"> 设置资源管理器对象
+> <p id="font_manager_t_font_manager_set_assets_manager">设置资源管理器对象
 
- 之所以需要设置资源管理器对象，而不是使用缺省的资源管理器对象，是因为在designer中有两个字体管理器：
+之所以需要设置资源管理器对象，而不是使用缺省的资源管理器对象，是因为在designer中有两个字体管理器：
 
- * 一个用于designer本身加载字体。
+* 一个用于designer本身加载字体。
 
- * 一个用于被设计的窗口加载字体。
+* 一个用于被设计的窗口加载字体。
 
 这两个字体管理器需要从不同的路径加载资源。
-
-
 
 * 函数原型：
 
@@ -225,14 +208,31 @@ ret_t font_manager_set_assets_manager (font_manager_t* imm, assets_manager_t* as
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | imm | font\_manager\_t* | 字体管理器对象。 |
 | assets\_manager | assets\_manager\_t* | 资源管理器。 |
+#### font\_manager\_unload\_all 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="font_manager_t_font_manager_unload_all">卸载全部字体。
+
+* 函数原型：
+
+```
+ret_t font_manager_unload_all (font_manager_t* fm);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| fm | font\_manager\_t* | 字体管理器对象。 |
 #### font\_manager\_unload\_font 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="font_manager_t_font_manager_unload_font"> 卸载指定的字体。
-
-
+> <p id="font_manager_t_font_manager_unload_font">卸载指定的字体。
 
 * 函数原型：
 

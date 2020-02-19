@@ -2,28 +2,20 @@
 ### 概述
 ![image](images/tk_istream_file_t_0.png)
 
-
- input stream base on file
-
-
+基于文件实现的输入流。
 ----------------------------------
 ### 函数
 <p id="tk_istream_file_t_methods">
 
 | 函数名称 | 说明 | 
 | -------- | ------------ | 
-| <a href="#tk_istream_file_t_tk_istream_file_create">tk\_istream\_file\_create</a> |  |
+| <a href="#tk_istream_file_t_tk_istream_file_create">tk\_istream\_file\_create</a> | 创建istream对象。 |
 #### tk\_istream\_file\_create 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="tk_istream_file_t_tk_istream_file_create">
- 创建istream对象。
-
-
-
-
+> <p id="tk_istream_file_t_tk_istream_file_create">创建istream对象。
 
 * 函数原型：
 

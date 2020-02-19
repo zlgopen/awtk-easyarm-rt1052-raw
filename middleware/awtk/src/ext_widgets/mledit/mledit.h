@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mledit
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,7 +42,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[mledit.xml](
- * https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/mledit.xml)
+ * https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/mledit.xml)
  *
  * 在c代码中使用函数mledit\_create创建多行编辑器控件。如：
  *
@@ -109,6 +109,13 @@ typedef struct _mledit_t {
    * 最大行数。
    */
   uint32_t max_lines;
+
+  /**
+   * @property {float_t} scroll_line
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 鼠标一次滚动行数。
+   */
+  float_t scroll_line;
 
   /*private*/
   text_edit_t* model;
@@ -195,6 +202,28 @@ ret_t mledit_set_max_lines(widget_t* widget, uint32_t max_lines);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t mledit_set_input_tips(widget_t* widget, const char* tips);
+
+/**
+ * @method mledit_set_cursor
+ * 设置编辑器光标位置。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {uint32_t} cursor 光标位置。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t mledit_set_cursor(widget_t* widget, uint32_t cursor);
+
+/**
+ * @method mledit_set_scroll_line
+ * 设置编辑器滚动速度。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {uint32_t} scroll_line 滚动行数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t mledit_set_scroll_line(widget_t* widget, uint32_t scroll_line);
 
 /**
  * @method mledit_cast

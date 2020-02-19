@@ -233,7 +233,7 @@ TEST(Widget, move) {
   ASSERT_EQ(w->x, 100);
   ASSERT_EQ(w->y, 200);
   ASSERT_EQ(event_log, string("will_move move "));
-  ASSERT_EQ(w->can_not_destroy, 0);
+  ASSERT_EQ(w->ref_count, 1);
 
   widget_destroy(w);
 }
@@ -250,7 +250,7 @@ TEST(Widget, resize) {
   ASSERT_EQ(w->w, 100);
   ASSERT_EQ(w->h, 200);
   ASSERT_EQ(event_log, string("will_resize resize "));
-  ASSERT_EQ(w->can_not_destroy, 0);
+  ASSERT_EQ(w->ref_count, 1);
 
   widget_destroy(w);
 }
@@ -269,7 +269,7 @@ TEST(Widget, move_resize) {
   ASSERT_EQ(w->w, 300);
   ASSERT_EQ(w->h, 400);
   ASSERT_EQ(event_log, string("will_move_resize move_resize "));
-  ASSERT_EQ(w->can_not_destroy, 0);
+  ASSERT_EQ(w->ref_count, 1);
 
   widget_destroy(w);
 }
@@ -343,6 +343,7 @@ TEST(Widget, timer) {
   ASSERT_EQ(timer_find(id)->id, id);
 
   widget_destroy(w);
+  idle_dispatch();
 
   ASSERT_EQ(timer_find(id), (timer_info_t*)NULL);
 }
@@ -733,7 +734,7 @@ TEST(Widget, calc_icon_text_rect_icon) {
   rect_t ir = rect_init(10, 20, 200, 40);
   rect_t r_icon;
 
-  widget_calc_icon_text_rect(&ir, 10, ICON_AT_TOP, 2, NULL, &r_icon);
+  widget_calc_icon_text_rect(&ir, 10, 10.0f, ICON_AT_TOP, 10, 10, 2, NULL, &r_icon);
 
   ASSERT_EQ(r_icon.x, ir.x);
   ASSERT_EQ(r_icon.y, ir.y);
@@ -745,7 +746,7 @@ TEST(Widget, calc_icon_text_rect_text) {
   rect_t ir = rect_init(10, 20, 200, 40);
   rect_t r_text;
 
-  widget_calc_icon_text_rect(&ir, 10, ICON_AT_TOP, 2, &r_text, NULL);
+  widget_calc_icon_text_rect(&ir, 10, 10.0f, ICON_AT_TOP, 10, 10, 2, &r_text, NULL);
 
   ASSERT_EQ(r_text.x, ir.x);
   ASSERT_EQ(r_text.y, ir.y);
@@ -760,7 +761,7 @@ TEST(Widget, calc_icon_text_rect_icon_top) {
   int32_t font_size = 20;
   rect_t ir = rect_init(10, 20, 200, 80);
 
-  widget_calc_icon_text_rect(&ir, font_size, ICON_AT_TOP, spacer, &r_text, &r_icon);
+  widget_calc_icon_text_rect(&ir, font_size, 10.0f, ICON_AT_TOP, 10, 10, spacer, &r_text, &r_icon);
 
   ASSERT_EQ(r_icon.x, ir.x);
   ASSERT_EQ(r_icon.y, ir.y);
@@ -780,7 +781,7 @@ TEST(Widget, calc_icon_text_rect_icon_left) {
   int32_t font_size = 20;
   rect_t ir = rect_init(10, 20, 200, 80);
 
-  widget_calc_icon_text_rect(&ir, font_size, ICON_AT_LEFT, spacer, &r_text, &r_icon);
+  widget_calc_icon_text_rect(&ir, font_size, 10.0f, ICON_AT_LEFT, 10, 10, spacer, &r_text, &r_icon);
 
   ASSERT_EQ(r_icon.x, ir.x);
   ASSERT_EQ(r_icon.y, ir.y);
@@ -800,7 +801,8 @@ TEST(Widget, calc_icon_text_rect_icon_right) {
   int32_t font_size = 20;
   rect_t ir = rect_init(10, 20, 200, 80);
 
-  widget_calc_icon_text_rect(&ir, font_size, ICON_AT_RIGHT, spacer, &r_text, &r_icon);
+  widget_calc_icon_text_rect(&ir, font_size, 10.0f, ICON_AT_RIGHT, 10, 10, spacer, &r_text,
+                             &r_icon);
 
   ASSERT_EQ(r_icon.x, ir.x + ir.w - ir.h);
   ASSERT_EQ(r_icon.y, ir.y);
@@ -810,6 +812,33 @@ TEST(Widget, calc_icon_text_rect_icon_right) {
   ASSERT_EQ(r_text.x, ir.x);
   ASSERT_EQ(r_text.y, ir.y);
   ASSERT_EQ(r_text.w, ir.w - ir.h - spacer);
+  ASSERT_EQ(r_text.h, ir.h);
+}
+
+TEST(Widget, calc_icon_text_rect_icon_centre) {
+  rect_t r_icon;
+  rect_t r_text;
+  int32_t spacer = 2;
+  int32_t font_size = 20;
+  float_t text_size = 30;
+  uint32_t icon_image_w = 20;
+  uint32_t icon_image_h = 20;
+  rect_t ir = rect_init(10, 20, 200, 80);
+
+  int32_t icon_h = ir.h - icon_image_h;
+  int32_t w = ir.w - spacer - text_size - icon_image_w;
+
+  widget_calc_icon_text_rect(&ir, font_size, text_size, ICON_AT_CENTRE, icon_image_w, icon_image_h,
+                             spacer, &r_text, &r_icon);
+
+  ASSERT_EQ(r_icon.x, ir.x + w / 2);
+  ASSERT_EQ(r_icon.y, ir.y + icon_h / 2);
+  ASSERT_EQ(r_icon.w, icon_image_w);
+  ASSERT_EQ(r_icon.h, icon_image_h);
+
+  ASSERT_EQ(r_text.x, ir.x + icon_image_w + spacer + w / 2);
+  ASSERT_EQ(r_text.y, ir.y);
+  ASSERT_EQ(r_text.w, text_size);
   ASSERT_EQ(r_text.h, ir.h);
 }
 
@@ -887,15 +916,15 @@ TEST(Widget, move_focus) {
 
   widget_set_focused(b1, TRUE);
   ASSERT_EQ(b1->focused, TRUE);
-  ASSERT_EQ(widget_move_focus(b1, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b1), RET_OK);
   ASSERT_EQ(b1->focused, FALSE);
   ASSERT_EQ(b2->focused, TRUE);
 
-  ASSERT_EQ(widget_move_focus(b2, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b2), RET_OK);
   ASSERT_EQ(b2->focused, FALSE);
   ASSERT_EQ(b3->focused, TRUE);
 
-  ASSERT_EQ(widget_move_focus(b3, FALSE), RET_OK);
+  ASSERT_EQ(widget_focus_prev(b3), RET_OK);
   ASSERT_EQ(b3->focused, FALSE);
   ASSERT_EQ(b2->focused, TRUE);
 
@@ -921,15 +950,15 @@ TEST(Widget, move_focus_skip_invisible) {
 
   widget_set_focused(b1, TRUE);
   ASSERT_EQ(b1->focused, TRUE);
-  ASSERT_EQ(widget_move_focus(b1, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b1), RET_OK);
   ASSERT_EQ(b1->focused, FALSE);
   ASSERT_EQ(b2->focused, TRUE);
 
-  ASSERT_EQ(widget_move_focus(b2, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b2), RET_OK);
   ASSERT_EQ(b2->focused, FALSE);
   ASSERT_EQ(b3->focused, TRUE);
 
-  ASSERT_EQ(widget_move_focus(b3, FALSE), RET_OK);
+  ASSERT_EQ(widget_focus_prev(b3), RET_OK);
   ASSERT_EQ(b3->focused, FALSE);
   ASSERT_EQ(b2->focused, TRUE);
 
@@ -957,7 +986,7 @@ TEST(Widget, move_focus_first) {
   widget_focus_first(w);
   ASSERT_EQ(widget_has_focused_widget_in_window(w), TRUE);
   ASSERT_EQ(b1->focused, TRUE);
-  ASSERT_EQ(widget_move_focus(b1, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b1), RET_OK);
   ASSERT_EQ(b1->focused, FALSE);
   ASSERT_EQ(b2->focused, TRUE);
 
@@ -985,22 +1014,22 @@ TEST(Widget, move_focus_pages) {
 
   widget_focus_first(w);
   ASSERT_EQ(b0->focused, TRUE);
-  ASSERT_EQ(widget_move_focus(b0, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b0), RET_OK);
   ASSERT_EQ(b0->focused, FALSE);
   ASSERT_EQ(b1->focused, TRUE);
 
-  ASSERT_EQ(widget_move_focus(b1, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b1), RET_OK);
   ASSERT_EQ(b1->focused, FALSE);
   ASSERT_EQ(b0->focused, TRUE);
 
   pages_set_active(pages, 1);
   widget_focus_first(w);
   ASSERT_EQ(b0->focused, TRUE);
-  ASSERT_EQ(widget_move_focus(b0, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b0), RET_OK);
   ASSERT_EQ(b0->focused, FALSE);
   ASSERT_EQ(b2->focused, TRUE);
 
-  ASSERT_EQ(widget_move_focus(b2, TRUE), RET_OK);
+  ASSERT_EQ(widget_focus_next(b2), RET_OK);
   ASSERT_EQ(b2->focused, FALSE);
   ASSERT_EQ(b0->focused, TRUE);
   widget_destroy(w);
@@ -1100,6 +1129,122 @@ TEST(Widget, feedback1) {
   ASSERT_EQ(count, 0);
   widget_on_keyup(w, (key_event_t*)key_event_init(&e, EVT_KEY_UP, w, TK_KEY_z));
   ASSERT_EQ(count, 1);
+
+  widget_destroy(w);
+}
+
+TEST(Widget, off) {
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+
+  ASSERT_EQ(widget_on(w, EVT_MOVE, widget_log_events, NULL) > 0, TRUE);
+  ASSERT_EQ(emitter_size(w->emitter), 1);
+  ASSERT_EQ(widget_off_by_func(w, EVT_MOVE, widget_log_events, NULL), RET_OK);
+
+  widget_destroy(w);
+}
+
+TEST(Widget, off_by_tag) {
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+
+  ASSERT_EQ(widget_on_with_tag(w, EVT_MOVE, widget_log_events, NULL, 1) > 0, TRUE);
+  ASSERT_EQ(widget_on_with_tag(w, EVT_MOVE, widget_log_events, NULL, 1) > 0, TRUE);
+  ASSERT_EQ(widget_on_with_tag(w, EVT_MOVE, widget_log_events, NULL, 1) > 0, TRUE);
+  ASSERT_EQ(widget_on_with_tag(w, EVT_MOVE, widget_log_events, NULL, 2) > 0, TRUE);
+  ASSERT_EQ(widget_on_with_tag(w, EVT_MOVE, widget_log_events, NULL, 2) > 0, TRUE);
+
+  ASSERT_EQ(emitter_size(w->emitter), 5);
+
+  ASSERT_EQ(widget_off_by_tag(w, 1), RET_OK);
+  ASSERT_EQ(emitter_size(w->emitter), 2);
+
+  widget_destroy(w);
+}
+
+static ret_t on_key_event(void* ctx, event_t* e) {
+  uint32_t* key = (uint32_t*)ctx;
+
+  *key = ((key_event_t*)e)->key;
+
+  return RET_OK;
+}
+
+TEST(Widget, map_key) {
+  key_event_t e;
+  uint32_t key = 0;
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+
+  key_event_init(&e, EVT_KEY_DOWN, w, TK_KEY_s);
+  ASSERT_EQ(widget_on(w, EVT_KEY_DOWN, on_key_event, &key) > 0, TRUE);
+
+  widget_on_keydown(w, &e);
+  ASSERT_EQ(key, TK_KEY_s);
+
+  widget_set_prop_str(w, "map_key:s", "left");
+  widget_on_keydown(w, &e);
+  ASSERT_EQ(key, TK_KEY_LEFT);
+
+  widget_destroy(w);
+}
+
+TEST(Widget, map_key1) {
+  key_event_t e;
+  uint32_t key = 0;
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+
+  ASSERT_EQ(widget_on(w, EVT_KEY_DOWN, on_key_event, &key) > 0, TRUE);
+
+  widget_set_prop_str(w, "map_key:left", "pageup");
+  widget_set_prop_str(w, "map_key:RIGHT", "PAGEDOWN");
+
+  key_event_init(&e, EVT_KEY_DOWN, w, TK_KEY_LEFT);
+  widget_on_keydown(w, &e);
+  ASSERT_EQ(key, TK_KEY_PAGEUP);
+
+  key_event_init(&e, EVT_KEY_DOWN, w, TK_KEY_RIGHT);
+  widget_on_keydown(w, &e);
+  ASSERT_EQ(key, TK_KEY_PAGEDOWN);
+
+  widget_destroy(w);
+}
+
+TEST(Widget, exec) {
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+
+  ASSERT_EQ(
+      widget_set_prop_str(w, WIDGET_PROP_ANIMATION,
+                          "move(y_from=0, y_to=128, yoyo_times=1000, duration=1000, delay=3000)"),
+      RET_OK);
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, "start_animator:move"), RET_OK);
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, "pause_animator:move"), RET_OK);
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, "stop_animator:move"), RET_OK);
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, "start_animator:move"), RET_OK);
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, "destroy_animator:move"), RET_OK);
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, "not found"), RET_NOT_FOUND);
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, NULL), RET_NOT_FOUND);
+
+  widget_destroy(w);
+}
+
+TEST(Widget, tr_text) {
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+  widget_set_tr_text(w, "hello");
+  widget_set_text(w, L"ok");
+
+  ASSERT_EQ(w->tr_text, (const char*)NULL);
+
+  widget_destroy(w);
+}
+
+TEST(Widget, dirty_rect_tolerance) {
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+
+  ASSERT_EQ(widget_set_dirty_rect_tolerance(w, 16), RET_OK);
+  ASSERT_EQ(w->dirty_rect_tolerance, 16);
+  ASSERT_EQ(w->dirty_rect_tolerance, widget_get_prop_int(w, WIDGET_PROP_DIRTY_RECT_TOLERANCE, 0));
+
+  ASSERT_EQ(widget_set_prop_int(w, WIDGET_PROP_DIRTY_RECT_TOLERANCE, 21), RET_OK);
+  ASSERT_EQ(w->dirty_rect_tolerance, 21);
+  ASSERT_EQ(w->dirty_rect_tolerance, widget_get_prop_int(w, WIDGET_PROP_DIRTY_RECT_TOLERANCE, 0));
 
   widget_destroy(w);
 }

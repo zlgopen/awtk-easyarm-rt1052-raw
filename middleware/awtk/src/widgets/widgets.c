@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   widgets.c
  * Author: AWTK Develop Team
  * Brief:  register widgets
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,6 +36,7 @@
 #include "widgets/check_button.h"
 #include "widgets/progress_bar.h"
 #include "widgets/color_tile.h"
+#include "widgets/clip_view.h"
 
 #ifndef AWTK_LITE
 #include "widgets/system_bar.h"
@@ -55,6 +56,7 @@
 #include "widgets/combo_box_item.h"
 #include "widgets/tab_button_group.h"
 #include "widgets/spin_box.h"
+#include "widgets/digit_clock.h"
 #endif /*AWTK_LITE*/
 #endif /*AWTK_NOGUI*/
 
@@ -76,9 +78,11 @@ ret_t tk_widgets_init(void) {
   widget_factory_register(f, WIDGET_TYPE_BUTTON_GROUP, button_group_create);
   widget_factory_register(f, WIDGET_TYPE_POPUP, popup_create);
   widget_factory_register(f, WIDGET_TYPE_COLOR_TILE, color_tile_create);
+  widget_factory_register(f, WIDGET_TYPE_CLIP_VIEW, clip_view_create);
   widget_factory_register(f, WIDGET_TYPE_GROUP_BOX, group_box_create);
 #ifndef AWTK_LITE
   widget_factory_register(f, WIDGET_TYPE_SYSTEM_BAR, system_bar_create);
+  widget_factory_register(f, WIDGET_TYPE_SYSTEM_BAR_BOTTOM, system_bar_bottom_create);
   widget_factory_register(f, WIDGET_TYPE_CALIBRATION_WIN, calibration_win_create);
   widget_factory_register(f, WIDGET_TYPE_VIEW, view_create);
   widget_factory_register(f, WIDGET_TYPE_OVERLAY, overlay_create);
@@ -95,6 +99,7 @@ ret_t tk_widgets_init(void) {
   widget_factory_register(f, WIDGET_TYPE_ROW, row_create);
   widget_factory_register(f, WIDGET_TYPE_COLUMN, column_create);
   widget_factory_register(f, WIDGET_TYPE_APP_BAR, app_bar_create);
+  widget_factory_register(f, WIDGET_TYPE_DIGIT_CLOCK, digit_clock_create);
 #endif /*AWTK_LITE*/
 #endif /**AWTK_NOGUI*/
   return RET_OK;

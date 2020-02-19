@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   event_source_manager_default.c
  * Author: AWTK Develop Team
  * Brief:  event manager_default manager_default
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -73,7 +73,6 @@ static ret_t event_source_manager_default_dispatch_fds(event_source_manager_t* m
   }
 
   if (max_fd == 0) {
-    sleep_ms(sleep_time);
     return RET_OK;
   }
 
@@ -94,7 +93,6 @@ static ret_t event_source_manager_default_dispatch_fds(event_source_manager_t* m
         ret_t r = event_source_dispatch(iter);
         if (r == RET_REMOVE) {
           event_source_manager_remove(manager, iter);
-          object_unref(OBJECT(iter));
         }
       }
     }
@@ -105,7 +103,6 @@ static ret_t event_source_manager_default_dispatch_fds(event_source_manager_t* m
 #else
 static ret_t event_source_manager_default_dispatch_fds(event_source_manager_t* manager,
                                                        uint32_t sleep_time) {
-  sleep_ms(sleep_time);
   return RET_OK;
 }
 #endif /*WITH_SOCKET*/
@@ -131,7 +128,6 @@ static ret_t event_source_manager_default_dispatch_no_fd(event_source_manager_t*
       ret_t r = event_source_dispatch(iter);
       if (r == RET_REMOVE) {
         event_source_manager_remove(manager, iter);
-        object_unref(OBJECT(iter));
       }
     }
   }

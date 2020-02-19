@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mutable_image
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,7 +50,7 @@ typedef ret_t (*mutable_image_prepare_image_t)(void* ctx, bitmap_t* image);
  *
  * >更多用法请参考：
  * [mutable
- * image](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/mutable_image.xml)
+ * image](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/mutable_image.xml)
  *
  * 在c代码中使用函数mutable\_image\_create创建mutable图片控件。如：
  *
@@ -148,7 +148,7 @@ ret_t mutable_image_on_destroy(widget_t* widget);
 
 ret_t mutable_image_on_paint_self(widget_t* widget, canvas_t* canvas);
 
-#define WIDGET_TYPE_MUTABLE_IMAGE "mutable"
+#define WIDGET_TYPE_MUTABLE_IMAGE "mutable_image"
 
 #define MUTABLE_IMAGE(widget) ((mutable_image_t*)(mutable_image_cast(WIDGET(widget))))
 

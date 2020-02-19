@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  vector graphics canvas interface.
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -154,6 +154,12 @@ ret_t vgcanvas_close_path(vgcanvas_t* vg) {
   return_value_if_fail(vg != NULL && vg->vt->close_path != NULL, RET_BAD_PARAMS);
 
   return vg->vt->close_path(vg);
+}
+
+ret_t vgcanvas_path_winding(vgcanvas_t* vg, bool_t dir) {
+  return_value_if_fail(vg != NULL && vg->vt->path_winding != NULL, RET_BAD_PARAMS);
+
+  return vg->vt->path_winding(vg, dir);
 }
 
 ret_t vgcanvas_transform(vgcanvas_t* vg, float_t a, float_t b, float_t c, float_t d, float_t e,

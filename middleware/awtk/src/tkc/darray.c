@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dynamic darray.
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -123,19 +123,20 @@ ret_t darray_remove(darray_t* darray, void* data) {
   }
 }
 
-ret_t darray_remove_all(darray_t* darray, void* data) {
+ret_t darray_remove_all(darray_t* darray, tk_compare_t cmp, void* ctx) {
   int32_t i = 0;
   int32_t k = 0;
   int32_t size = 0;
   void** elms = NULL;
-
   return_value_if_fail(darray != NULL, RET_BAD_PARAMS);
+
   elms = darray->elms;
   size = darray->size;
+  cmp = cmp != NULL ? cmp : darray->compare;
 
   for (i = 0, k = 0; i < size; i++) {
     void* iter = elms[i];
-    if (darray->compare(iter, data) == 0) {
+    if (cmp(iter, ctx) == 0) {
       darray->destroy(iter);
       elms[i] = NULL;
     } else {
@@ -146,6 +147,78 @@ ret_t darray_remove_all(darray_t* darray, void* data) {
     }
   }
   darray->size = k;
+
+  return RET_OK;
+}
+
+void quick_sort_impl(void** array, size_t left, size_t right, tk_compare_t cmp) {
+  size_t save_left = left;
+  size_t save_right = right;
+  void* x = array[left];
+
+  while (left < right) {
+    while (cmp(array[right], x) >= 0 && left < right) right--;
+    if (left != right) {
+      array[left] = array[right];
+      left++;
+    }
+
+    while (cmp(array[left], x) <= 0 && left < right) left++;
+    if (left != right) {
+      array[right] = array[left];
+      right--;
+    }
+  }
+  array[left] = x;
+
+  if (save_left < left) {
+    quick_sort_impl(array, save_left, left - 1, cmp);
+  }
+
+  if (save_right > left) {
+    quick_sort_impl(array, left + 1, save_right, cmp);
+  }
+
+  return;
+}
+
+ret_t quick_sort(void** array, size_t nr, tk_compare_t cmp) {
+  ret_t ret = RET_OK;
+
+  return_value_if_fail(array != NULL && cmp != NULL, RET_BAD_PARAMS);
+
+  if (nr > 1) {
+    quick_sort_impl(array, 0, nr - 1, cmp);
+  }
+
+  return ret;
+}
+
+ret_t darray_sort(darray_t* darray, tk_compare_t cmp) {
+  return_value_if_fail(darray != NULL, RET_BAD_PARAMS);
+  cmp = cmp != NULL ? cmp : darray->compare;
+
+  quick_sort(darray->elms, darray->size, cmp);
+
+  return RET_OK;
+}
+
+ret_t darray_find_all(darray_t* darray, tk_compare_t cmp, void* ctx, darray_t* matched) {
+  int32_t i = 0;
+  int32_t size = 0;
+  void** elms = NULL;
+  return_value_if_fail(darray != NULL && matched != NULL, RET_BAD_PARAMS);
+
+  elms = darray->elms;
+  size = darray->size;
+  cmp = cmp != NULL ? cmp : darray->compare;
+
+  for (i = 0; i < size; i++) {
+    void* iter = elms[i];
+    if (cmp(iter, ctx) == 0) {
+      return_value_if_fail(darray_push(matched, iter) == RET_OK, RET_OOM);
+    }
+  }
 
   return RET_OK;
 }

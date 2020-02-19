@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window_base
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -73,6 +73,30 @@ static ret_t window_base_load_theme_obj(widget_t* widget) {
   return RET_OK;
 }
 
+static ret_t window_base_unload_theme_obj(widget_t* widget) {
+  window_base_t* window_base = WINDOW_BASE(widget);
+  assets_manager_t* am = widget_get_assets_manager(widget);
+
+  if (window_base->res_theme != NULL) {
+    assets_manager_unref(am, window_base->res_theme);
+    window_base->res_theme = NULL;
+  }
+
+  if (window_base->theme_obj != NULL) {
+    theme_destroy(window_base->theme_obj);
+    window_base->theme_obj = NULL;
+  }
+
+  return RET_OK;
+}
+
+static ret_t window_base_reload_theme_obj(widget_t* widget) {
+  window_base_unload_theme_obj(widget);
+
+  log_debug("window_base_reload_theme_obj\n");
+  return window_base_load_theme_obj(widget);
+}
+
 ret_t window_base_get_prop(widget_t* widget, const char* name, value_t* v) {
   window_base_t* window_base = WINDOW_BASE(widget);
   return_value_if_fail(widget != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
@@ -117,10 +141,22 @@ ret_t window_base_get_prop(widget_t* widget, const char* name, value_t* v) {
     value_set_int(v, window_base->closable);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_PREV_KEY)) {
-    value_set_int(v, window_base->move_focus_prev_key);
+    value_set_str(v, window_base->move_focus_prev_key);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_NEXT_KEY)) {
-    value_set_int(v, window_base->move_focus_next_key);
+    value_set_str(v, window_base->move_focus_next_key);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_UP_KEY)) {
+    value_set_str(v, window_base->move_focus_up_key);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_DOWN_KEY)) {
+    value_set_str(v, window_base->move_focus_down_key);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_LEFT_KEY)) {
+    value_set_str(v, window_base->move_focus_left_key);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_RIGHT_KEY)) {
+    value_set_str(v, window_base->move_focus_right_key);
     return RET_OK;
   }
 
@@ -148,28 +184,23 @@ ret_t window_base_set_prop(widget_t* widget, const char* name, const value_t* v)
     window_base->theme = tk_str_copy(window_base->theme, value_str(v));
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_PREV_KEY)) {
-    if (v->type == VALUE_TYPE_STRING) {
-      const key_type_value_t* kv = keys_type_find(value_str(v));
-      if (kv != NULL) {
-        window_base->move_focus_prev_key = kv->value;
-      } else {
-        log_debug("invalid key: %s\n", value_str(v));
-      }
-    } else {
-      window_base->move_focus_prev_key = value_int(v);
-    }
+    window_base->move_focus_prev_key = tk_str_copy(window_base->move_focus_prev_key, value_str(v));
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_NEXT_KEY)) {
-    if (v->type == VALUE_TYPE_STRING) {
-      const key_type_value_t* kv = keys_type_find(value_str(v));
-      if (kv != NULL) {
-        window_base->move_focus_next_key = kv->value;
-      } else {
-        log_debug("invalid key: %s\n", value_str(v));
-      }
-    } else {
-      window_base->move_focus_next_key = value_int(v);
-    }
+    window_base->move_focus_next_key = tk_str_copy(window_base->move_focus_next_key, value_str(v));
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_UP_KEY)) {
+    window_base->move_focus_up_key = tk_str_copy(window_base->move_focus_up_key, value_str(v));
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_DOWN_KEY)) {
+    window_base->move_focus_down_key = tk_str_copy(window_base->move_focus_down_key, value_str(v));
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_LEFT_KEY)) {
+    window_base->move_focus_left_key = tk_str_copy(window_base->move_focus_left_key, value_str(v));
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_MOVE_FOCUS_RIGHT_KEY)) {
+    window_base->move_focus_right_key =
+        tk_str_copy(window_base->move_focus_right_key, value_str(v));
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_CLOSABLE)) {
     if (v->type == VALUE_TYPE_STRING) {
@@ -190,18 +221,23 @@ ret_t window_base_on_destroy(widget_t* widget) {
   window_base_t* window_base = WINDOW_BASE(widget);
   return_value_if_fail(widget != NULL && window_base != NULL, RET_BAD_PARAMS);
 
+  if (window_base->save_focus_widget) {
+    widget_unref(window_base->save_focus_widget);
+    window_base->save_focus_widget = NULL;
+  }
+
   TKMEM_FREE(window_base->theme);
   TKMEM_FREE(window_base->open_anim_hint);
   TKMEM_FREE(window_base->close_anim_hint);
+  TKMEM_FREE(window_base->move_focus_prev_key);
+  TKMEM_FREE(window_base->move_focus_next_key);
+  TKMEM_FREE(window_base->move_focus_up_key);
+  TKMEM_FREE(window_base->move_focus_down_key);
+  TKMEM_FREE(window_base->move_focus_left_key);
+  TKMEM_FREE(window_base->move_focus_right_key);
 
-  if (window_base->theme_obj != NULL) {
-    theme_destroy(window_base->theme_obj);
-  }
-
-  if (window_base->res_theme != NULL) {
-    assets_manager_t* am = widget_get_assets_manager(widget);
-    assets_manager_unref(am, window_base->res_theme);
-  }
+  window_base_unload_theme_obj(widget);
+  tk_mem_dump();
 
   return RET_OK;
 }
@@ -222,6 +258,16 @@ ret_t window_base_invalidate(widget_t* widget, rect_t* r) {
   return RET_OK;
 }
 
+static widget_t* window_base_get_key_target_leaf(widget_t* widget) {
+  widget_t* iter = widget;
+
+  while (iter->key_target != NULL) {
+    iter = iter->key_target;
+  }
+
+  return iter;
+}
+
 ret_t window_base_on_event(widget_t* widget, event_t* e) {
   window_base_t* win = WINDOW_BASE(widget);
   return_value_if_fail(widget != NULL && win != NULL, RET_BAD_PARAMS);
@@ -229,14 +275,54 @@ ret_t window_base_on_event(widget_t* widget, event_t* e) {
   if (e->type == EVT_WINDOW_WILL_OPEN) {
     win->stage = WINDOW_STAGE_CREATED;
     window_base_load_theme_obj(widget);
+    widget_layout_children(widget);
+    widget_update_style_recursive(widget);
+    tk_mem_dump();
   } else if (e->type == EVT_WINDOW_OPEN) {
     win->stage = WINDOW_STAGE_OPENED;
+  } else if (e->type == EVT_WINDOW_LOAD) {
   } else if (e->type == EVT_WINDOW_CLOSE) {
     win->stage = WINDOW_STAGE_CLOSED;
+  } else if (e->type == EVT_THEME_CHANGED) {
+    window_base_reload_theme_obj(widget);
   } else if (e->type == EVT_REQUEST_CLOSE_WINDOW) {
     log_debug("EVT_REQUEST_CLOSE_WINDOW\n");
     if (win->closable == WINDOW_CLOSABLE_YES) {
       window_close(widget);
+    }
+  } else if (e->type == EVT_WINDOW_TO_FOREGROUND) {
+    win->stage = WINDOW_STAGE_OPENED;
+    widget->parent->grab_widget_count =
+        widget->grab_widget_count + win->grab_count_when_to_foreground;
+    if (widget->parent->grab_widget_count) {
+      widget->parent->grab_widget = widget;
+    }
+    if (win->save_focus_widget) {
+      widget_set_focused_internal(win->save_focus_widget, TRUE);
+      widget_unref(win->save_focus_widget);
+      win->save_focus_widget = NULL;
+    }
+  } else if (e->type == EVT_WINDOW_TO_BACKGROUND) {
+    win->stage = WINDOW_STAGE_SUSPEND;
+    if (widget->parent != NULL && widget->parent->grab_widget == widget) {
+      win->grab_count_when_to_foreground =
+          widget->parent->grab_widget_count - widget->grab_widget_count;
+      widget->parent->grab_widget_count = 0;
+      widget->parent->grab_widget = NULL;
+    } else {
+      win->grab_count_when_to_foreground = 0;
+    }
+    if (win->save_focus_widget) {
+      widget_unref(win->save_focus_widget);
+      win->save_focus_widget = NULL;
+    }
+    widget_t* save_focus_widget = window_base_get_key_target_leaf(widget);
+    if (save_focus_widget != widget) {
+      win->save_focus_widget = save_focus_widget;
+      if (win->save_focus_widget) {
+        widget_ref(win->save_focus_widget);
+      }
+      widget_set_focused(widget, FALSE);
     }
   }
 
@@ -256,8 +342,9 @@ widget_t* window_base_create(widget_t* parent, const widget_vtable_t* vt, xy_t x
 
   return_value_if_fail(window_manager_open_window(parent, widget) == RET_OK, NULL);
   win->stage = WINDOW_STAGE_NONE;
-  win->move_focus_next_key = TK_KEY_MOVE_FOCUS_NEXT;
-  win->move_focus_prev_key = TK_KEY_MOVE_FOCUS_PREV;
+  win->move_focus_prev_key = NULL;
+  win->move_focus_next_key = tk_strdup(TK_KEY_MOVE_FOCUS_NEXT);
+
 #ifdef ENABLE_MEM_LEAK_CHECK
   tk_mem_dump();
 #endif /*ENABLE_MEM_LEAK_CHECK*/

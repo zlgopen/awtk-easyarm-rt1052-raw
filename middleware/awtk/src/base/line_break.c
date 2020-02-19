@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  line break and work break algorithm.
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,8 +23,8 @@
 
 #ifdef WITH_UNICODE_BREAK
 
-#include "linebreak.h"
-#include "wordbreak.h"
+#include "libunibreak/linebreak.h"
+#include "libunibreak/wordbreak.h"
 
 break_type_t line_break_check(wchar_t c1, wchar_t c2) {
   int ret = 0;

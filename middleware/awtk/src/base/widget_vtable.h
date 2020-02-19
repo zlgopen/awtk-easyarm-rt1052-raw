@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget vtable default impl
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,6 +36,7 @@ ret_t widget_on_click_default(widget_t* widget, pointer_event_t* e);
 ret_t widget_on_pointer_down_default(widget_t* widget, pointer_event_t* e);
 ret_t widget_on_pointer_move_default(widget_t* widget, pointer_event_t* e);
 ret_t widget_on_pointer_up_default(widget_t* widget, pointer_event_t* e);
+ret_t widget_on_copy_default(widget_t* widget, widget_t* other);
 ret_t widget_get_prop_default(widget_t* widget, const char* name, value_t* v);
 ret_t widget_set_prop_default(widget_t* widget, const char* name, const value_t* v);
 widget_t* widget_find_target_default(widget_t* widget, xy_t x, xy_t y);

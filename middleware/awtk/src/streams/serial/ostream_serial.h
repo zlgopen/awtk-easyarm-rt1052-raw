@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input stream base on serial
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,7 @@ typedef struct _tk_ostream_serial_t tk_ostream_serial_t;
 
 /**
  * @class tk_ostream_serial_t
- * @parent tk_ostream_t
+ * 基于串口实现的输出流。
  *
  * input stream base on fd
  *

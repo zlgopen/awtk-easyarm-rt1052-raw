@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  buffered ostream: do write when call flush.
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -97,7 +97,7 @@ tk_ostream_t* tk_ostream_buffered_create(tk_ostream_t* real_ostream) {
   ostream_buffered = TK_OSTREAM_BUFFERED(obj);
   return_value_if_fail(ostream_buffered != NULL, NULL);
 
-  OBJECT_REF(ostream_buffered->real_ostream);
+  OBJECT_REF(real_ostream);
   ostream_buffered->real_ostream = real_ostream;
   wbuffer_init_extendable(&(ostream_buffered->wb));
 

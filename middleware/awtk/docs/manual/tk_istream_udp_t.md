@@ -2,30 +2,22 @@
 ### 概述
 ![image](images/tk_istream_udp_t_0.png)
 
-
- input stream base on socket
-
-
+基于UDP实现的输入流。
 ----------------------------------
 ### 函数
 <p id="tk_istream_udp_t_methods">
 
 | 函数名称 | 说明 | 
 | -------- | ------------ | 
-| <a href="#tk_istream_udp_t_tk_istream_udp_create">tk\_istream\_udp\_create</a> |  |
-| <a href="#tk_istream_udp_t_tk_istream_udp_set_target_with_addr">tk\_istream\_udp\_set\_target\_with\_addr</a> |  |
-| <a href="#tk_istream_udp_t_tk_istream_udp_set_target_with_host">tk\_istream\_udp\_set\_target\_with\_host</a> |  |
+| <a href="#tk_istream_udp_t_tk_istream_udp_create">tk\_istream\_udp\_create</a> | 创建istream对象。 |
+| <a href="#tk_istream_udp_t_tk_istream_udp_set_target_with_addr">tk\_istream\_udp\_set\_target\_with\_addr</a> | 设置目标。 |
+| <a href="#tk_istream_udp_t_tk_istream_udp_set_target_with_host">tk\_istream\_udp\_set\_target\_with\_host</a> | 设置目标。 |
 #### tk\_istream\_udp\_create 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="tk_istream_udp_t_tk_istream_udp_create">
- 创建istream对象。
-
-
-
-
+> <p id="tk_istream_udp_t_tk_istream_udp_create">创建istream对象。
 
 * 函数原型：
 
@@ -44,12 +36,7 @@ tk_istream_t* tk_istream_udp_create (int sock);
 
 * 函数功能：
 
-> <p id="tk_istream_udp_t_tk_istream_udp_set_target_with_addr">
- 设置目标。
-
-
-
-
+> <p id="tk_istream_udp_t_tk_istream_udp_set_target_with_addr">设置目标。
 
 * 函数原型：
 
@@ -69,12 +56,7 @@ ret_t tk_istream_udp_set_target_with_addr (tk_istream_t* stream, struct sockaddr
 
 * 函数功能：
 
-> <p id="tk_istream_udp_t_tk_istream_udp_set_target_with_host">
- 设置目标。
-
-
-
-
+> <p id="tk_istream_udp_t_tk_istream_udp_set_target_with_host">设置目标。
 
 * 函数原型：
 

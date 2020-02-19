@@ -1,7 +1,6 @@
 ## tk\_cond\_var\_t
 ### 概述
- 简化版的条件变量。
-
+简化版的条件变量。
 ----------------------------------
 ### 函数
 <p id="tk_cond_var_t_methods">
@@ -17,9 +16,7 @@
 
 * 函数功能：
 
-> <p id="tk_cond_var_t_tk_cond_var_awake"> 唤醒。
-
-
+> <p id="tk_cond_var_t_tk_cond_var_awake">唤醒。
 
 * 函数原型：
 
@@ -38,9 +35,7 @@ ret_t tk_cond_var_awake (tk_cond_var_t* cond_var);
 
 * 函数功能：
 
-> <p id="tk_cond_var_t_tk_cond_var_create"> 创建cond_var。
-
-
+> <p id="tk_cond_var_t_tk_cond_var_create">创建cond_var。
 
 * 函数原型：
 
@@ -58,9 +53,7 @@ tk_cond_var_t* tk_cond_var_create ();
 
 * 函数功能：
 
-> <p id="tk_cond_var_t_tk_cond_var_destroy"> 销毁cond_var对象。
-
-
+> <p id="tk_cond_var_t_tk_cond_var_destroy">销毁cond_var对象。
 
 * 函数原型：
 
@@ -79,9 +72,7 @@ ret_t tk_cond_var_destroy (tk_cond_var_t* cond_var);
 
 * 函数功能：
 
-> <p id="tk_cond_var_t_tk_cond_var_wait"> 等待。
-
-
+> <p id="tk_cond_var_t_tk_cond_var_wait">等待。
 
 * 函数原型：
 

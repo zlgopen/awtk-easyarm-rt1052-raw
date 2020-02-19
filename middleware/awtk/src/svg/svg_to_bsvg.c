@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   svg_to_bsvg.c
  * Author: AWTK Develop Team
  * Brief:  svg to  bsvg
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -73,7 +73,7 @@ static ret_t svg_on_sub_path(void* ctx, const void* data) {
 static void svg_init_shape(bsvg_builder_t* svg, svg_shape_t* shape, const char** attrs) {
   uint32_t i = 0;
   bsvg_header_t* header = svg->header;
-
+  shape->no_stroke = TRUE;
   shape->fill = header->fill;
   shape->stroke = header->stroke;
 
@@ -90,13 +90,22 @@ static void svg_init_shape(bsvg_builder_t* svg, svg_shape_t* shape, const char**
       if (tk_str_eq(v, "transparent") || tk_str_eq(v, "none")) {
         shape->no_stroke = TRUE;
       } else {
-        shape->stroke = color_parse(v);
+        shape->no_stroke = FALSE;
+        if (tk_str_eq(v, "") || v == NULL) {
+          shape->stroke = color_init(0x00, 0x00, 0x00, 0xff);
+        } else {
+          shape->stroke = color_parse(v);
+        }
       }
     } else if (tk_str_eq(k, "fill")) {
       if (tk_str_eq(v, "transparent") || tk_str_eq(v, "none")) {
         shape->no_fill = TRUE;
       } else {
-        shape->fill = color_parse(v);
+        if (tk_str_eq(v, "") || v == NULL) {
+          shape->fill = color_init(0x00, 0x00, 0x00, 0xff);
+        } else {
+          shape->fill = color_parse(v);
+        }
       }
     }
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mutable style
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -141,12 +141,6 @@ widget_state_style_t* widget_state_style_find(widget_state_style_t* first, const
   }
 
   return NULL;
-}
-
-const char* style_mutable_get_name(style_t* s) {
-  style_mutable_t* style = STYLE_MUTABLE(s);
-
-  return style->name;
 }
 
 ret_t style_mutable_set_name(style_t* s, const char* name) {

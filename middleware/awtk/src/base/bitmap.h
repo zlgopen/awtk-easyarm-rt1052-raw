@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  bitmap interface
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,119 +24,15 @@
 
 #include "tkc/color.h"
 #include "base/types_def.h"
+#include "base/graphic_buffer.h"
 
 BEGIN_C_DECLS
-
-struct _bitmap_t;
-typedef struct _bitmap_t bitmap_t;
 
 typedef ret_t (*bitmap_destroy_t)(bitmap_t* bitmap);
 
 /**
- * @enum bitmap_format_t
- * @prefix BITMAP_FMT_
- * @annotation ["scriptable"]
- * 位图格式常量定义。
- */
-typedef enum _bitmap_format_t {
-  /**
-   * @const BITMAP_FMT_NONE
-   * 无效格式。
-   */
-  BITMAP_FMT_NONE = 0,
-  /**
-   * @const BITMAP_FMT_RGBA8888
-   * 一个像素占用4个字节，RGBA占一个字节，按内存地址递增。
-   */
-  BITMAP_FMT_RGBA8888,
-  /**
-   * @const BITMAP_FMT_ABGR8888
-   * 一个像素占用4个字节，ABGR占一个字节，按内存地址递增。
-   */
-  BITMAP_FMT_ABGR8888,
-  /**
-   * @const BITMAP_FMT_BGRA8888
-   * 一个像素占用4个字节，BGRA占一个字节，按内存地址递增。
-   */
-  BITMAP_FMT_BGRA8888,
-  /**
-   * @const BITMAP_FMT_ARGB8888
-   * 一个像素占用4个字节，ARGB占一个字节，按内存地址递增。
-   */
-  BITMAP_FMT_ARGB8888,
-  /**
-   * @const BITMAP_FMT_RGB565
-   * 一个像素占用2个字节，RGB分别占用5,6,5位, 按内存地址递增。
-   */
-  BITMAP_FMT_RGB565,
-  /**
-   * @const BITMAP_FMT_BGR565
-   * 一个像素占用2个字节，BGR分别占用5,6,5位, 按内存地址递增。
-   */
-  BITMAP_FMT_BGR565,
-  /**
-   * @const BITMAP_FMT_RGB888
-   * 一个像素占用3个字节，RGB占一个字节，按内存地址递增。
-   */
-  BITMAP_FMT_RGB888,
-  /**
-   * @const BITMAP_FMT_BGR888
-   * 一个像素占用3个字节，RGB占一个字节，按内存地址递增。
-   */
-  BITMAP_FMT_BGR888,
-  /**
-   * @const BITMAP_FMT_GRAY
-   * 一个像素占用1个字节。
-   */
-  BITMAP_FMT_GRAY,
-  /**
-   * @const BITMAP_FMT_MONO
-   * 一个像素占用1比特。
-   */
-  BITMAP_FMT_MONO,
-} bitmap_format_t;
-
-/**
- * @enum bitmap_flag_t
- * @annotation ["scriptable"]
- * @prefix BITMAP_FLAG_
- * 位图标志常量定义。
- */
-typedef enum _bitmap_flag_t {
-  /**
-   * @const BITMAP_FLAG_NONE
-   * 无特殊标志。
-   */
-  BITMAP_FLAG_NONE = 0,
-  /**
-   * @const BITMAP_FLAG_OPAQUE
-   * 不透明图片。
-   */
-  BITMAP_FLAG_OPAQUE = 1,
-  /**
-   * @const BITMAP_FLAG_IMMUTABLE
-   * 图片内容不会变化。
-   */
-  BITMAP_FLAG_IMMUTABLE = 2,
-  /**
-   * @const BITMAP_FLAG_TEXTURE
-   * OpenGL Texture, bitmap的id是有效的texture id。
-   */
-  BITMAP_FLAG_TEXTURE = 4,
-  /**
-   * @const BITMAP_FLAG_CHANGED
-   * 如果是MUTABLE的图片，更新时需要设置此标志，底层可能会做特殊处理，比如更新图片到GPU。
-   */
-  BITMAP_FLAG_CHANGED = 8,
-  /**
-   * @const BITMAP_FLAG_PREMULTI_ALPHA
-   * 预乘alpha。
-   */
-  BITMAP_FLAG_PREMULTI_ALPHA = 16
-} bitmap_flag_t;
-
-/**
  * @class bitmap_t
+ * @order -9
  * @annotation ["scriptable"]
  * 位图。
  */
@@ -178,11 +74,11 @@ struct _bitmap_t {
    */
   const char* name;
   /**
-   * @property {uint8_t*} data
+   * @property {graphic_buffer_t*} buffer
    * @annotation ["readable"]
    * 图片数据。
    */
-  const uint8_t* data;
+  graphic_buffer_t* buffer;
 
   bool_t is_gif;
   /*for gif begin*/
@@ -245,6 +141,36 @@ bitmap_t* bitmap_create_ex(uint32_t w, uint32_t h, uint32_t line_length, bitmap_
  * @return {uint32_t} 返回一个像素占用的字节数。
  */
 uint32_t bitmap_get_bpp(bitmap_t* bitmap);
+
+/**
+ * @method bitmap_lock_buffer_for_read
+ * 为读取数据而锁定bitmap的图片缓冲区。
+ *
+ * @param {bitmap_t*} bitmap bitmap对象。
+ *
+ * @return {uint8_t*} 返回缓存区的首地址。
+ */
+uint8_t* bitmap_lock_buffer_for_read(bitmap_t* bitmap);
+
+/**
+ * @method bitmap_lock_buffer_for_write
+ * 为修改数据而锁定bitmap的图片缓冲区。
+ *
+ * @param {bitmap_t*} bitmap bitmap对象。
+ *
+ * @return {uint8_t*} 返回缓存区的首地址。
+ */
+uint8_t* bitmap_lock_buffer_for_write(bitmap_t* bitmap);
+
+/**
+ * @method bitmap_unlock_buffer
+ * 解锁图像缓冲区。
+ *
+ * @param {bitmap_t*} bitmap bitmap对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t bitmap_unlock_buffer(bitmap_t* bitmap);
 
 /**
  * @method bitmap_get_pixel
@@ -425,12 +351,35 @@ typedef enum _image_draw_type_t {
    * 垂直方向3宫格显示，水平方向缩放显示。
    * 将图片在垂直方向上分成等大小的3块，上下两块按原大小显示在目标矩形的上下，中间一块缩放显示在目标区域中间剩余部分。
    */
-  IMAGE_DRAW_PATCH3_Y_SCALE_X
-} image_draw_type_t;
+  IMAGE_DRAW_PATCH3_Y_SCALE_X,
 
-#ifndef BITMAP_ALIGN_SIZE
-#define BITMAP_ALIGN_SIZE 32
-#endif /*BITMAP_ALIGN_SIZE*/
+  /**
+   * @const IMAGE_DRAW_REPEAT9
+   * 平铺9宫格显示。
+   * 将图片分成4个角和5块平铺块，4个角按原大小显示在目标矩形的4个角，其余5块会平铺对应的目标区域。
+   * 切割方法为（如下图）：
+   * 如果图片宽度为奇数，则中间一块为一列数据，如果图片宽度为偶数，则中间一块为二列数据，其他数据分为左右块
+   * 如果图片高度为奇数，则中间一块为一行数据，如果图片高度为偶数，则中间一块为二行数据，其他数据分为上下块
+   * 中间一块数据根据上面两条规则组成4中情况，分别是一列一行数据，一列两行数据，两列一行数据和两行两列数据
+   */
+  IMAGE_DRAW_REPEAT9,
+
+  /**
+   * @const IMAGE_DRAW_REPEAT3_X
+   * 水平方向3宫格显示，垂直方向居中显示。
+   * 将图片在水平方向上分成左右相等两块和中间一块，如果图片宽度为奇数，则中间一块为一列数据，如果图片宽度为偶数，则中间一块为二列数据，其他数据分为左右块。
+   * 左右两块按原大小显示在目标矩形的左右，中间一列像素点平铺显示在目标区域中间剩余部分。
+   */
+  IMAGE_DRAW_REPEAT3_X,
+
+  /**
+   * @const IMAGE_DRAW_REPEAT3_Y
+   * 垂直方向3宫格显示，水平方向居中显示。
+   * 将图片在垂直方向上分成上下相等两块和中间一块，如果图片高度为奇数，则中间一块为一行数据，如果图片高度为偶数，则中间一块为二行数据，其他数据分为上下块
+   * 上下两块按原大小显示在目标矩形的上下，中间一块平铺显示在目标区域中间剩余部分。
+   */
+  IMAGE_DRAW_REPEAT3_Y
+} image_draw_type_t;
 
 /*private*/
 ret_t bitmap_alloc_data(bitmap_t* bitmap);
@@ -440,10 +389,10 @@ bool_t rgba_data_is_opaque(const uint8_t* data, uint32_t w, uint32_t h, uint8_t 
 bitmap_t* bitmap_clone(bitmap_t* bitmap);
 ret_t bitmap_premulti_alpha(bitmap_t* bitmap);
 
-#if defined(WITH_SDL) || defined(LINUX)
+#if defined(WITH_STB_IMAGE) || defined(WITH_FS_RES)
 /*for helping debug drawing bugs*/
 bool_t bitmap_save_png(bitmap_t* bitmap, const char* filename);
-#endif /*defined(WITH_SDL) || defined(LINUX)*/
+#endif /*defined(WITH_STB_IMAGE) || defined(WITH_FS_RES)*/
 
 #define TK_BITMAP_MONO_LINE_LENGTH(w) (((w + 15) >> 4) << 1)
 

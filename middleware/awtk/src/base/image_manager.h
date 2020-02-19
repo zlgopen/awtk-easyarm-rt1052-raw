@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  image manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -112,6 +112,17 @@ image_manager_t* image_manager_init(image_manager_t* imm);
 ret_t image_manager_get_bitmap(image_manager_t* imm, const char* name, bitmap_t* image);
 
 /**
+ * @method image_manager_preload
+ * 预加载指定的图片。
+ * @annotation ["scriptable"]
+ * @param {image_manager_t*} imm 图片管理器对象。
+ * @param {char*} name 图片名称。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t image_manager_preload(image_manager_t* imm, const char* name);
+
+/**
  * @method image_manager_unload_unused
  * 从图片管理器中卸载指定时间内没有使用的图片。
  * @param {image_manager_t*} imm 图片管理器对象。
@@ -120,6 +131,16 @@ ret_t image_manager_get_bitmap(image_manager_t* imm, const char* name, bitmap_t*
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t image_manager_unload_unused(image_manager_t* imm, uint32_t time_delta_s);
+
+/**
+ * @method image_manager_unload_all
+ * 从图片管理器中卸载全部图片。
+ *
+ * @param {image_manager_t*} imm 图片管理器对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t image_manager_unload_all(image_manager_t* imm);
 
 /**
  * @method image_manager_unload_bitmap

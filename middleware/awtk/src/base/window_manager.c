@@ -1,9 +1,9 @@
-﻿/**
+/**
  * File:   window_manager.c
  * Author: AWTK Develop Team
  * Brief:  window manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +22,7 @@
 #include "base/widget.h"
 #include "base/canvas.h"
 #include "base/dialog.h"
+#include "base/window.h"
 #include "base/dialog_highlighter.h"
 #include "base/input_device_status.h"
 #include "base/window_manager.h"
@@ -39,25 +40,40 @@ ret_t window_manager_set(widget_t* widget) {
   return RET_OK;
 }
 
-static ret_t window_manager_default_impl_back(widget_t* widget) {
-  event_t e;
+static ret_t window_manager_close_keyboard(widget_t* widget) {
   widget_t* top_window = window_manager_get_top_window(widget);
-  return_value_if_fail(top_window != NULL, RET_NOT_FOUND);
-
-  if (widget_is_normal_window(top_window)) {
-    e = event_init(EVT_REQUEST_CLOSE_WINDOW, top_window);
-    return widget_dispatch(top_window, &e);
-  } else {
-    log_warn("not support call window_manager_back on non-normal window\n");
-    return RET_FAIL;
+  if (widget_is_keyboard(top_window)) {
+    window_manager_close_window_force(widget, top_window);
+    top_window = window_manager_get_top_window(widget);
   }
+
+  return RET_OK;
 }
 
-static ret_t window_manager_back_to_home_sync(widget_t* widget) {
+static ret_t window_manager_default_impl_back(widget_t* widget) {
+  event_t e;
+  widget_t* top = window_manager_get_top_window(widget);
+  return_value_if_fail(top != NULL, RET_NOT_FOUND);
+
+  if (widget_is_normal_window(top)) {
+    e = event_init(EVT_REQUEST_CLOSE_WINDOW, top);
+    return widget_dispatch(top, &e);
+  } else if (widget_is_dialog(top)) {
+    if (dialog_is_modal(top)) {
+      dialog_quit(top, DIALOG_QUIT_NONE);
+    } else {
+      window_close(top);
+    }
+  }
+
+  return RET_OK;
+}
+
+static ret_t window_manager_back_to_win_sync(widget_t* widget, widget_t* target) {
   uint32_t k = 0;
   darray_t wins;
   widget_t* top = NULL;
-  widget_t* home = NULL;
+  widget_t* prev = NULL;
   int32_t children_nr = widget_count_children(widget);
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
@@ -67,17 +83,20 @@ static ret_t window_manager_back_to_home_sync(widget_t* widget) {
 
   darray_init(&wins, 10, NULL, NULL);
   WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
-  if (home == NULL) {
+  if (prev == NULL) {
     if (widget_is_normal_window(iter)) {
-      home = iter;
+      if (target == NULL || target == iter) {
+        prev = iter;
+      }
     }
-  } else if ((i + 1) < children_nr) {
+  } else {
     if (!widget_is_system_bar(iter)) {
       darray_push(&wins, iter);
     }
   }
   WIDGET_FOR_EACH_CHILD_END()
 
+  top = wins.size > 0 ? WIDGET(darray_pop(&wins)) : NULL;
   for (k = 0; k < wins.size; k++) {
     widget_t* iter = WIDGET(wins.elms[k]);
     assert(!widget_is_dialog(iter));
@@ -85,56 +104,64 @@ static ret_t window_manager_back_to_home_sync(widget_t* widget) {
   }
   darray_deinit(&wins);
 
-  children_nr = widget_count_children(widget);
-  top = widget_get_child(widget, children_nr - 1);
-  return_value_if_fail(top != home, RET_OK);
+  if (top == NULL) {
+    return RET_OK;
+  }
 
   return window_manager_close_window(widget, top);
 }
 
-static ret_t window_manager_back_to_home_async(const idle_info_t* info) {
-  widget_t* widget = WIDGET(info->ctx);
+typedef struct _back_to_win_info_t {
+  widget_t* widget;
+  widget_t* target;
+} back_to_win_info_t;
 
-  window_manager_back_to_home_sync(widget);
+static ret_t window_manager_back_to_home_async(const idle_info_t* info) {
+  back_to_win_info_t* back_to_win_info = (back_to_win_info_t*)(info->ctx);
+  window_manager_back_to_win_sync(back_to_win_info->widget, back_to_win_info->target);
+  TKMEM_FREE(back_to_win_info);
 
   return RET_REMOVE;
 }
 
 static ret_t window_manager_back_to_home_on_dialog_destroy(void* ctx, event_t* e) {
-  widget_t* widget = WIDGET(ctx);
-
-  window_manager_back_to_home_sync(widget);
+  back_to_win_info_t* back_to_win_info = (back_to_win_info_t*)(ctx);
+  window_manager_back_to_win_sync(back_to_win_info->widget, back_to_win_info->target);
+  TKMEM_FREE(back_to_win_info);
 
   return RET_REMOVE;
 }
 
-static ret_t window_manager_default_impl_back_to_home(widget_t* widget) {
+static ret_t window_manager_default_impl_back_to(widget_t* widget, widget_t* target) {
   widget_t* top = NULL;
+  back_to_win_info_t* info = NULL;
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
 
   top = window_manager_get_top_window(widget);
   return_value_if_fail(top != NULL, RET_BAD_PARAMS);
 
+  info = TKMEM_ZALLOC(back_to_win_info_t);
+  return_value_if_fail(info != NULL, RET_OOM);
+
+  info->widget = widget;
+  info->target = target;
+
   if (!widget_is_dialog(top) || !dialog_is_modal(top)) {
-    idle_add(window_manager_back_to_home_async, widget);
-
-    return RET_OK;
+    idle_add(window_manager_back_to_home_async, info);
   } else {
-    if (dialog_is_quited(top)) {
-      widget_on(top, EVT_DESTROY, window_manager_back_to_home_on_dialog_destroy, widget);
-    } else {
-      log_warn("not support call window_manager_back_to_home on dialog\n");
-    }
-
-    return RET_FAIL;
+    assert(widget_is_dialog(top) && dialog_is_modal(top));
+    dialog_quit(top, DIALOG_QUIT_NONE);
+    widget_on(top, EVT_DESTROY, window_manager_back_to_home_on_dialog_destroy, info);
   }
+
+  return RET_OK;
 }
 
 static widget_t* window_manager_default_impl_get_top_main_window(widget_t* widget) {
   return_value_if_fail(widget != NULL, NULL);
 
   WIDGET_FOR_EACH_CHILD_BEGIN_R(widget, iter, i)
-  if (widget_is_normal_window(iter) && iter->visible) {
+  if (iter != NULL && widget_is_normal_window(iter) && iter->visible) {
     return iter;
   }
   WIDGET_FOR_EACH_CHILD_END();
@@ -237,6 +264,9 @@ ret_t window_manager_dispatch_input_event(widget_t* widget, event_t* e) {
   return_value_if_fail(e != NULL, RET_BAD_PARAMS);
   return_value_if_fail(wm != NULL && wm->vt != NULL, RET_BAD_PARAMS);
   return_value_if_fail(wm->vt->dispatch_input_event != NULL, RET_BAD_PARAMS);
+  if (widget_dispatch(widget, e) == RET_STOP) {
+    return RET_STOP;
+  }
 
   return wm->vt->dispatch_input_event(widget, e);
 }
@@ -269,21 +299,36 @@ ret_t window_manager_set_cursor(widget_t* widget, const char* cursor) {
 ret_t window_manager_back(widget_t* widget) {
   window_manager_t* wm = WINDOW_MANAGER(widget);
   return_value_if_fail(wm != NULL && wm->vt != NULL, RET_BAD_PARAMS);
+
+  window_manager_close_keyboard(widget);
   if (wm->vt->back != NULL) {
     return wm->vt->back(widget);
   } else {
     return window_manager_default_impl_back(widget);
   }
 }
-ret_t window_manager_back_to_home(widget_t* widget) {
+
+ret_t window_manager_back_to(widget_t* widget, const char* target) {
   window_manager_t* wm = WINDOW_MANAGER(widget);
   return_value_if_fail(wm != NULL && wm->vt != NULL, RET_BAD_PARAMS);
 
-  if (wm->vt->back_to_home != NULL) {
-    return wm->vt->back_to_home(widget);
+  window_manager_close_keyboard(widget);
+
+  if (wm->vt->back_to != NULL) {
+    return wm->vt->back_to(widget, target);
   } else {
-    return window_manager_default_impl_back_to_home(widget);
+    widget_t* target_widget = NULL;
+    if (target != NULL) {
+      target_widget = widget_child(widget, target);
+      return_value_if_fail(target_widget != NULL, RET_BAD_PARAMS);
+    }
+
+    return window_manager_default_impl_back_to(widget, target_widget);
   }
+}
+
+ret_t window_manager_back_to_home(widget_t* widget) {
+  return window_manager_back_to(widget, NULL);
 }
 
 xy_t window_manager_get_pointer_x(widget_t* widget) {
@@ -328,15 +373,58 @@ bool_t window_manager_get_pointer_pressed(widget_t* widget) {
   return pressed;
 }
 
+bool_t window_manager_is_animating(widget_t* widget) {
+  ret_t ret = RET_OK;
+  bool_t playing = TRUE;
+
+  window_manager_t* wm = WINDOW_MANAGER(widget);
+  return_value_if_fail(wm != NULL && wm->vt != NULL, FALSE);
+  return_value_if_fail(wm->vt->is_animating != NULL, FALSE);
+
+  ret = wm->vt->is_animating(widget, &playing);
+
+  if (ret == RET_OK) {
+    return playing;
+  }
+  return FALSE;
+}
+
 static ret_t wm_on_locale_changed(void* ctx, event_t* e) {
   widget_t* widget = WIDGET(ctx);
+  font_manager_t* fm = widget_get_font_manager(widget);
+  image_manager_t* imm = widget_get_image_manager(widget);
+
   return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(fm != NULL && imm != NULL, RET_BAD_PARAMS);
+
+  font_manager_unload_all(fm);
+  image_manager_unload_all(imm);
+  widget_reset_canvas(widget_get_child(widget, 0));
 
   WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
   widget_re_translate_text(iter);
   widget_dispatch(iter, e);
   WIDGET_FOR_EACH_CHILD_END();
   widget_invalidate(widget, NULL);
+
+  return RET_OK;
+}
+
+static ret_t on_theme_changed(void* ctx, const void* data) {
+  widget_t* widget = WIDGET(data);
+  widget_update_style(widget);
+
+  return RET_OK;
+}
+
+ret_t window_manager_on_theme_changed(widget_t* widget) {
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
+  event_t e = event_init(EVT_THEME_CHANGED, iter);
+  widget_dispatch(iter, &e);
+  widget_foreach(iter, on_theme_changed, NULL);
+  WIDGET_FOR_EACH_CHILD_END();
 
   return RET_OK;
 }
@@ -404,7 +492,7 @@ widget_t* window_manager_find_target(widget_t* widget, void* win, xy_t x, xy_t y
     return iter;
   }
 
-  if (widget_is_dialog(iter) || widget_is_popup(iter)) {
+  if (widget_is_dialog(iter) || (widget_is_popup(iter) && widget_is_opened_popup(iter))) {
     return iter;
   }
   WIDGET_FOR_EACH_CHILD_END()
@@ -447,4 +535,15 @@ dialog_highlighter_t* window_manager_get_dialog_highlighter(widget_t* widget) {
   }
 
   return NULL;
+}
+
+ret_t window_manager_resize(widget_t* widget, wh_t w, wh_t h) {
+  window_manager_t* wm = WINDOW_MANAGER(widget);
+  return_value_if_fail(wm != NULL && wm->vt != NULL, RET_BAD_PARAMS);
+
+  if (wm->vt->resize != NULL) {
+    return wm->vt->resize(widget, w, h);
+  }
+
+  return RET_NOT_IMPL;
 }

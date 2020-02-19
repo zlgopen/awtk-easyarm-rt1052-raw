@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  idle manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -123,6 +123,9 @@ ret_t idle_dispatch(void);
  * @return {uint32_t} 返回idle的个数。
  */
 uint32_t idle_count(void);
+
+/*internal use*/
+bool_t idle_exist(idle_func_t on_idle, void* ctx);
 
 END_C_DECLS
 

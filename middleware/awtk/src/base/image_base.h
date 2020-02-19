@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  image base
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,9 +47,9 @@ BEGIN_C_DECLS
  * 如果需要显示文件系统中的图片，只需将图片名称换成实际的文件名，并加上"file://"前缀即可。如：
  *
  *```
- *  <image draw_type="center" image="file://./demos/assets/raw/images/xx/flag_CN.png" />
- *  <gif image="file://./demos/assets/raw/images/x2/bee.gif" />
- *  <svg image="file://./demos/assets/raw/images/svg/china.bsvg" />
+ *  <image draw_type="center" image="file://./demos/assets/default/raw/images/xx/flag_CN.png" />
+ *  <gif image="file://./demos/assets/default/raw/images/x2/bee.gif" />
+ *  <svg image="file://./demos/assets/default/raw/images/svg/china.bsvg" />
  * ```
  */
 typedef struct _image_base_t {
@@ -218,6 +218,7 @@ ret_t image_base_get_prop(widget_t* widget, const char* name, value_t* v);
 ret_t image_base_set_prop(widget_t* widget, const char* name, const value_t* v);
 bool_t image_need_transform(widget_t* widget);
 ret_t image_transform(widget_t* widget, canvas_t* c);
+ret_t image_base_on_copy(widget_t* widget, widget_t* other);
 
 #define IMAGE_BASE(widget) ((image_base_t*)(image_base_cast(WIDGET(widget))))
 

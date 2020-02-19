@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  demoui
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -263,7 +263,7 @@ static ret_t on_open_window(void* ctx, event_t* e) {
   if (tk_str_eq(name, "toast")) {
     dialog_toast("Hello AWTK!\nThis is a toast!", 3000);
   } else if (tk_str_eq(name, "info")) {
-    dialog_info(NULL, "Hello AWTK!\nThis is info dialog!");
+    dialog_info("info", "hello awtk");
   } else if (tk_str_eq(name, "warn")) {
     dialog_warn(NULL, "Hello AWTK!\nDanger!!!");
   } else if (tk_str_eq(name, "confirm")) {
@@ -372,6 +372,33 @@ static ret_t on_combo_box_will_change(void* ctx, event_t* e) {
   return RET_OK;
 }
 
+static ret_t on_pages_add_child(void* ctx, event_t* e) {
+  widget_t* widget = WIDGET(ctx);
+  widget_t* win = widget_get_window(widget);
+
+  widget_t* close_btn = widget_lookup(win, "close", TRUE);
+  widget_t* text_label = widget_lookup(win, "text", TRUE);
+  widget_t* tab_button_parent = widget_lookup_by_type(win, "tab_button", TRUE)->parent;
+
+  if (close_btn != NULL) {
+    widget_on(close_btn, EVT_CLICK, on_close, win);
+  }
+
+  if (text_label != NULL) {
+    WIDGET_FOR_EACH_CHILD_BEGIN(tab_button_parent, iter, i)
+
+    if (tk_str_eq(iter->vt->type, "tab_button")) {
+      if (TAB_BUTTON(iter)->value) {
+        widget_set_text_utf8(text_label, iter->name);
+      }
+    }
+
+    WIDGET_FOR_EACH_CHILD_END();
+  }
+
+  return RET_OK;
+}
+
 static ret_t on_combo_box_changed(void* ctx, event_t* e) {
   widget_t* combo_box = WIDGET(ctx);
   widget_t* win = widget_get_window(combo_box);
@@ -427,6 +454,20 @@ static ret_t on_show_fps(void* ctx, event_t* e) {
   widget_invalidate(widget, NULL);
   window_manager_set_show_fps(widget, !wm->show_fps);
   widget_set_text(button, wm->show_fps ? L"Hide FPS" : L"Show FPS");
+
+  return RET_OK;
+}
+
+static ret_t on_reload_theme_test(void* ctx, event_t* e) {
+  widget_set_theme(WIDGET(e->target), "dark");
+
+  return RET_OK;
+}
+
+static ret_t on_snapshot(void* ctx, event_t* e) {
+  bitmap_t* bitmap = widget_take_snapshot(window_manager());
+  bitmap_save_png(bitmap, "test.png");
+  bitmap_destroy(bitmap);
 
   return RET_OK;
 }
@@ -525,9 +566,14 @@ static ret_t install_one(void* ctx, const void* iter) {
       widget_on(widget, EVT_PAINT, on_paint_stroke_gradient, NULL);
     } else if (tk_str_eq(name, "paint_vgcanvas")) {
       widget_on(widget, EVT_PAINT, on_paint_vgcanvas, NULL);
+    } else if (tk_str_eq(name, "snapshot")) {
+      widget_on(widget, EVT_CLICK, on_snapshot, NULL);
     } else if (tk_str_eq(name, "memtest")) {
       widget_t* win = widget_get_window(widget);
       widget_on(widget, EVT_CLICK, on_mem_test, win);
+    } else if (tk_str_eq(name, "reload_theme")) {
+      widget_t* win = widget_get_window(widget);
+      widget_on(widget, EVT_CLICK, on_reload_theme_test, win);
     } else if (tk_str_eq(name, "show_fps")) {
       widget_on(widget, EVT_CLICK, on_show_fps, widget);
     } else if (tk_str_eq(name, "clone_self")) {
@@ -580,6 +626,8 @@ static ret_t install_one(void* ctx, const void* iter) {
       if (win) {
         widget_on(widget, EVT_CLICK, on_quit_app, win);
       }
+    } else if (tk_str_eq(name, "pages")) {
+      widget_on(widget, EVT_WIDGET_ADD_CHILD, on_pages_add_child, widget);
     }
   } else if (tk_str_eq(widget->vt->type, "combo_box")) {
     widget_on(widget, EVT_VALUE_CHANGED, on_combo_box_changed, widget);
@@ -613,6 +661,7 @@ static ret_t timer_preload(const timer_info_t* timer) {
   if (s_preload_nr == total) {
 #if !defined(MOBILE_APP)
     window_open("system_bar");
+/*    window_open("system_bar_bottom");*/
 #endif /*MOBILE_APP*/
 
     open_window("main", win);
@@ -677,8 +726,16 @@ static ret_t on_key_back_or_back_to_home(void* ctx, event_t* e) {
   key_event_t* evt = (key_event_t*)e;
   if (evt->key == TK_KEY_F2) {
     window_manager_back(WIDGET(ctx));
+
+    return RET_STOP;
   } else if (evt->key == TK_KEY_F3) {
     window_manager_back_to_home(WIDGET(ctx));
+
+    return RET_STOP;
+  } else if (evt->key == TK_KEY_F4) {
+    window_manager_back_to(WIDGET(ctx), "main");
+
+    return RET_STOP;
   }
 
   return RET_OK;

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  bitmap font generator
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -58,10 +58,10 @@ uint32_t font_gen_buff(font_t* font, uint16_t font_size, const char* str, uint8_
   int size = 0;
   uint8_t* p = NULL;
   wchar_t wstr[MAX_CHARS];
-
+  font_vmetrics_t vmetrics = font_get_vmetrics(font, font_size);
   font_bitmap_header_t* header = (font_bitmap_header_t*)output_buff;
 
-  utf8_to_utf16(str, wstr, MAX_CHARS);
+  tk_utf8_to_utf16(str, wstr, MAX_CHARS);
   size = wcslen(wstr);
 
   qsort(wstr, size, sizeof(wchar_t), char_cmp);
@@ -69,7 +69,9 @@ uint32_t font_gen_buff(font_t* font, uint16_t font_size, const char* str, uint8_
 
   header->char_nr = size;
   header->font_size = (uint8_t)font_size;
-  header->baseline = (uint8_t)font_get_baseline(font, font_size);
+  header->ascent = vmetrics.ascent;
+  header->descent = vmetrics.descent;
+  header->line_gap = vmetrics.line_gap;
 
   p = (uint8_t*)(header->index + size);
   return_value_if_fail(buff_size > 512, 0);

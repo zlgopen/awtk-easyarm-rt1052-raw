@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  scroll_view
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -60,7 +60,7 @@ typedef ret_t (*scroll_view_on_scroll_to_t)(widget_t* widget, int32_t xoffset_en
  * > 滚动视图一般作为列表视图的子控件使用。
  *
  * > 更多用法请参考：[list\_view\_m.xml](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/list_view_m.xml)
+ *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/list_view_m.xml)
  *
  * 在c代码中使用函数scroll\_view\_create创建列表视图控件。如：
  *
@@ -94,13 +94,25 @@ typedef struct _scroll_view_t {
   int32_t xoffset;
   /**
    * @property {int32_t} yoffset
-   * @annotation ["set_prop","get_prop","readable","scriptable"]
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * y偏移量。
    */
   int32_t yoffset;
   /**
+   * @property {float_t} xspeed_scale
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * x偏移速度比例。
+   */
+  float_t xspeed_scale;
+  /**
+   * @property {float_t} yspeed_scale
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * y偏移速度比例。
+   */
+  float_t yspeed_scale;
+  /**
    * @property {bool_t} xslidable
-   * @annotation ["set_prop","get_prop","readable","scriptable"]
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * 是否允许x方向滑动。
    */
   bool_t xslidable;
@@ -113,6 +125,7 @@ typedef struct _scroll_view_t {
 
   /*private*/
   point_t down;
+  bool_t pressed;
   bool_t dragged;
   int32_t xoffset_end;
   int32_t yoffset_end;
@@ -212,6 +225,18 @@ ret_t scroll_view_set_yslidable(widget_t* widget, bool_t yslidable);
 ret_t scroll_view_set_offset(widget_t* widget, int32_t xoffset, int32_t yoffset);
 
 /**
+ * @method scroll_view_set_speed_scale
+ * 设置偏移速度比例。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {float_t} xspeed_scale x偏移速度比例。。
+ * @param {float_t} yspeed_scale y偏移速度比例。。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t scroll_view_set_speed_scale(widget_t* widget, float_t xspeed_scale, float_t yspeed_scale);
+
+/**
  * @method scroll_view_scroll_to
  * 滚动到指定的偏移量。
  * @annotation ["scriptable"]
@@ -225,7 +250,24 @@ ret_t scroll_view_set_offset(widget_t* widget, int32_t xoffset, int32_t yoffset)
 ret_t scroll_view_scroll_to(widget_t* widget, int32_t xoffset_end, int32_t yoffset_end,
                             int32_t duration);
 
+/**
+ * @method scroll_view_scroll_delta_to
+ * 滚动到指定的偏移量。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {int32_t} xoffset_delta x偏移量。
+ * @param {int32_t} yoffset_delta y偏移量。
+ * @param {int32_t} duration 时间。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t scroll_view_scroll_delta_to(widget_t* widget, int32_t xoffset_delta, int32_t yoffset_delta,
+                                  int32_t duration);
+
 #define SCROLL_VIEW(widget) ((scroll_view_t*)(scroll_view_cast(WIDGET(widget))))
+
+#define SCROLL_VIEW_X_SPEED_SCALE "xspeed_scale"
+#define SCROLL_VIEW_Y_SPEED_SCALE "yspeed_scale"
 
 /*public for subclass and runtime type check*/
 TK_EXTERN_VTABLE(scroll_view);

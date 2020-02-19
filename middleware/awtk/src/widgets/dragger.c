@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dragger
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -96,7 +96,7 @@ static ret_t dragger_on_event(widget_t* widget, event_t* e) {
         dragger_move(widget, pointer_event->x - dragger->down_x,
                      pointer_event->y - dragger->down_y);
       }
-      break;
+      return RET_STOP;
     }
     case EVT_POINTER_LEAVE:
       widget_set_state(widget, WIDGET_STATE_NORMAL);
@@ -165,8 +165,8 @@ static ret_t dragger_set_prop(widget_t* widget, const char* name, const value_t*
   return RET_NOT_FOUND;
 }
 
-static const char* s_dragger_clone_properties[] = {WIDGET_PROP_X_MIN, WIDGET_PROP_X_MAX,
-                                                   WIDGET_PROP_Y_MIN, WIDGET_PROP_Y_MAX, NULL};
+static const char* const s_dragger_clone_properties[] = {
+    WIDGET_PROP_X_MIN, WIDGET_PROP_X_MAX, WIDGET_PROP_Y_MIN, WIDGET_PROP_Y_MAX, NULL};
 TK_DECL_VTABLE(dragger) = {.size = sizeof(dragger_t),
                            .type = WIDGET_TYPE_DRAGGER,
                            .clone_properties = s_dragger_clone_properties,

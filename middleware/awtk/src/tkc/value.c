@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  generic value type
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -195,14 +195,14 @@ uint64_t value_uint64(const value_t* v) {
   }
 }
 
-value_t* value_set_pointer(value_t* v, pointer_t value) {
+value_t* value_set_pointer(value_t* v, void* value) {
   return_value_if_fail(v != NULL, NULL);
 
   v->value.ptr = value;
   return value_init(v, VALUE_TYPE_POINTER);
 }
 
-pointer_t value_pointer(const value_t* v) {
+void* value_pointer(const value_t* v) {
   return_value_if_fail(v != NULL, NULL);
   switch (v->type) {
     case VALUE_TYPE_STRING: {

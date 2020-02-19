@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   lcd_mono.h
  * Author: AWTK Develop Team
  * Brief:  mono lcd
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * this program is distributed in the hope that it will be useful,
  * but without any warranty; without even the implied warranty of
@@ -128,10 +128,15 @@ static ret_t lcd_mono_draw_glyph(lcd_t* lcd, glyph_t* glyph, rect_t* src, xy_t x
 }
 
 static ret_t lcd_mono_draw_image_mono(lcd_t* lcd, bitmap_t* img, rect_t* src, rect_t* dst) {
-  const uint8_t* data = (const uint8_t*)(img->data);
+  ret_t ret = RET_OK;
+  const uint8_t* data = NULL;
   return_value_if_fail(src->w == dst->w && src->h == dst->h, RET_OK);
 
-  return lcd_mono_draw_data(lcd, data, img->w, img->h, src, dst->x, dst->y, FALSE);
+  data = bitmap_lock_buffer_for_read(img);
+  ret = lcd_mono_draw_data(lcd, data, img->w, img->h, src, dst->x, dst->y, FALSE);
+  bitmap_unlock_buffer(img);
+
+  return ret;
 }
 
 static ret_t lcd_mono_draw_image(lcd_t* lcd, bitmap_t* img, rect_t* src, rect_t* dst) {

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  a simple main loop
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * this program is distributed in the hope that it will be useful,
  * but without any warranty; without even the implied warranty of
@@ -53,6 +53,7 @@ struct _main_loop_simple_t {
   void* user2;
   void* user3;
   void* user4;
+  event_source_manager_t* event_source_manager;
   main_loop_dispatch_input_t dispatch_input;
 };
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  image_value
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -49,7 +49,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [image\_value](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/image_value.xml)
+ * [image\_value](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/image_value.xml)
  *
  * 在c代码中使用函数image\_value\_create创建图片值控件。如：
  *

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  reference count object
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -74,9 +74,10 @@ ret_t object_unref(object_t* obj) {
   return_value_if_fail(obj != NULL && obj->vt != NULL && obj->ref_count > 0, RET_BAD_PARAMS);
   return_value_if_fail(!(obj->visiting), RET_BUSY);
 
-  obj->ref_count--;
-  if (obj->ref_count < 1) {
+  if (obj->ref_count == 1) {
     object_destroy(obj);
+  } else {
+    obj->ref_count--;
   }
 
   return RET_OK;

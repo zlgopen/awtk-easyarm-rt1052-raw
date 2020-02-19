@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event structs
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,11 +47,11 @@ prop_change_event_t* prop_change_event_cast(event_t* event) {
   return (prop_change_event_t*)event;
 }
 
-event_t* event_create(uint32_t type, void* target) {
+event_t* event_create(uint32_t type) {
   event_t* e = TKMEM_ZALLOC(event_t);
 
   return_value_if_fail(e != NULL, NULL);
-  *e = event_init(type, target);
+  *e = event_init(type, NULL);
 
   return e;
 }
@@ -62,4 +62,33 @@ ret_t event_destroy(event_t* event) {
   TKMEM_FREE(event);
 
   return RET_OK;
+}
+
+progress_event_t* progress_event_cast(event_t* event) {
+  return_value_if_fail(event != NULL, NULL);
+  return_value_if_fail(event->type == EVT_PROGRESS, NULL);
+
+  return (progress_event_t*)event;
+}
+
+event_t* prop_change_event_init(prop_change_event_t* event, uint32_t type, const char* name,
+                                const value_t* value) {
+  return_value_if_fail(event != NULL, NULL);
+  memset(event, 0x00, sizeof(*event));
+
+  event->e.type = type;
+  event->name = name;
+  event->value = value;
+
+  return (event_t*)(event);
+}
+
+event_t* progress_event_init(progress_event_t* event, uint32_t percent) {
+  return_value_if_fail(event != NULL, NULL);
+  memset(event, 0x00, sizeof(*event));
+
+  event->e.type = EVT_PROGRESS;
+  event->percent = percent;
+
+  return (event_t*)(event);
 }

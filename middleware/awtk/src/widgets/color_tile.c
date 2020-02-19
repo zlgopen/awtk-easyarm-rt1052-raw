@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  color_tile
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -71,8 +71,8 @@ static ret_t color_tile_set_prop(widget_t* widget, const char* name, const value
   return RET_NOT_FOUND;
 }
 
-static const char* s_color_tile_properties[] = {WIDGET_PROP_BG_COLOR, WIDGET_PROP_BORDER_COLOR,
-                                                NULL};
+static const char* const s_color_tile_properties[] = {WIDGET_PROP_BG_COLOR,
+                                                      WIDGET_PROP_BORDER_COLOR, NULL};
 TK_DECL_VTABLE(color_tile) = {.size = sizeof(color_tile_t),
                               .type = WIDGET_TYPE_COLOR_TILE,
                               .parent = TK_PARENT_VTABLE(widget),

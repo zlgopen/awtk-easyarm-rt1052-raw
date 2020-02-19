@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  key code constants
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -712,6 +712,7 @@ typedef enum _key_code_t {
   TK_KEY_APP1 = SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_APP1),
   TK_KEY_APP2 = SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_APP2),
   TK_KEY_COMMAND = TK_KEY_RGUI,
+  TK_KEY_BACK = TK_KEY_AC_BACK,
 #else
   /**
    * @const TK_KEY_LSHIFT
@@ -863,6 +864,16 @@ typedef enum _key_code_t {
    * TK_KEY_COMMAND
    */
   TK_KEY_COMMAND = 0x20 + 164,
+  /**
+   * @const TK_KEY_BACK
+   * TK_KEY_BACK
+   */
+  TK_KEY_BACK = 0x20 + 165,
+  /**
+   * @const TK_KEY_CANCEL
+   * TK_KEY_CANCEL
+   */
+  TK_KEY_CANCEL = 0x20 + 167,
 #endif
 
 } key_code_t;

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  awtk widgets
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,6 +31,7 @@
 #include "widgets/calibration_win.h"
 #include "widgets/check_button.h"
 #include "widgets/color_tile.h"
+#include "widgets/clip_view.h"
 #include "widgets/column.h"
 #include "widgets/combo_box.h"
 #include "widgets/combo_box_item.h"
@@ -55,5 +56,6 @@
 #include "widgets/tab_button_group.h"
 #include "widgets/tab_control.h"
 #include "widgets/view.h"
+#include "widgets/digit_clock.h"
 
 #endif /*AWTK_WIDGETS_H*/

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  hscroll_label
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,7 +42,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[mledit.xml](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/mledit.xml)
+ *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/mledit.xml)
  *
  * 可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：
  *
@@ -55,7 +55,7 @@ BEGIN_C_DECLS
  *
  * > 更多用法请参考：
  * [theme default](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml)
+ *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml)
  *
  */
 typedef struct _hscroll_label_t {
@@ -67,6 +67,13 @@ typedef struct _hscroll_label_t {
    * 只有处于focus时才滚动(缺省否)。
    */
   bool_t only_focus;
+
+  /**
+   * @property {bool_t} only_parent_focus
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 只有父控件处于focus时才滚动(缺省否)。
+   */
+  bool_t only_parent_focus;
 
   /**
    * @property {bool_t} loop
@@ -119,7 +126,8 @@ typedef struct _hscroll_label_t {
 
   /*private*/
   uint32_t timer_id;
-  uint32_t start_time;
+  uint32_t elapsed;
+  bool_t paused;
   bool_t pressed;
   bool_t reversed;
 } hscroll_label_t;
@@ -170,6 +178,17 @@ ret_t hscroll_label_set_duration(widget_t* widget, int32_t duration);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t hscroll_label_set_only_focus(widget_t* widget, bool_t only_focus);
+
+/**
+ * @method hscroll_label_set_only_parent_focus
+ * 设置only_parent_focus。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t}  only_parent_focus 是否只有处于focus时才滚动。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t hscroll_label_set_only_parent_focus(widget_t* widget, bool_t only_parent_focus);
 
 /**
  * @method hscroll_label_set_loop
@@ -252,6 +271,7 @@ widget_t* hscroll_label_cast(widget_t* widget);
 #define HSCROLL_LABEL_PROP_DURATION "duration"
 #define HSCROLL_LABEL_PROP_ELLIPSES "ellipses"
 #define HSCROLL_LABEL_PROP_ONLY_FOCUS "only_focus"
+#define HSCROLL_LABEL_PROP_ONLY_PARENT_FOCUS "only_parent_focus"
 
 #define WIDGET_TYPE_HSCROLL_LABEL "hscroll_label"
 #define HSCROLL_LABEL(widget) ((hscroll_label_t*)(hscroll_label_cast(WIDGET(widget))))

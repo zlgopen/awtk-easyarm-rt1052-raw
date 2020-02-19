@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  awtk toolkit c libs
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,5 +51,14 @@
 #include "tkc/idle_manager.h"
 #include "tkc/timer_info.h"
 #include "tkc/timer_manager.h"
+#include "tkc/int_str.h"
+#include "tkc/str_str.h"
+#include "tkc/mime_types.h"
+#include "tkc/rom_fs.h"
+#include "tkc/ring_buffer.h"
+#include "tkc/named_value.h"
+#include "tkc/slist.h"
+#include "tkc/object_default.h"
+#include "tkc/object_array.h"
 
 #endif /*TK_TKC_H*/

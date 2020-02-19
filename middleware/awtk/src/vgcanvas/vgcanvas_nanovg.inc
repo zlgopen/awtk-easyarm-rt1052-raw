@@ -1,20 +1,20 @@
-#include "nanovg.h"
+﻿#include "nanovg.h"
 #include "tkc/mem.h"
 #include "tkc/utf8.h"
 #include "base/vgcanvas.h"
 #include "base/system_info.h"
 #include "base/image_manager.h"
+#include "base/font_manager.h"
 #include "base/assets_manager.h"
 
 static ret_t vgcanvas_nanovg_reset(vgcanvas_t* vgcanvas) {
-  (void)vgcanvas;
-
+  /*TODO: unload fonts*/
+  NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
+  nvgDeleteFontByName(vg, NULL);
   return RET_OK;
 }
 
 static ret_t vgcanvas_nanovg_flush(vgcanvas_t* vgcanvas) {
-  (void)vgcanvas;
-
   return RET_OK;
 }
 
@@ -172,11 +172,26 @@ static ret_t vgcanvas_nanovg_close_path(vgcanvas_t* vgcanvas) {
   return RET_OK;
 }
 
+static ret_t vgcanvas_nanovg_path_winding(vgcanvas_t* vgcanvas, bool_t dir) {
+  NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
+
+  nvgPathWinding(vg, dir);
+
+  return RET_OK;
+}
+
 static ret_t vgcanvas_nanovg_clip_rect(vgcanvas_t* vgcanvas, float_t x, float_t y, float_t w,
                                        float_t h) {
   NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
 
+#if WITH_NANOVG_GPU
+  rect_t r1 = rect_init(x, y, w, h);
+  rect_t cilp_rect = rect_intersect((const rect_t*)&vgcanvas->dirty_rect, (const rect_t*)&r1);
+  nvgScissor(vg, (float_t)cilp_rect.x, (float_t)cilp_rect.y, (float_t)cilp_rect.w,
+             (float_t)cilp_rect.h);
+#else
   nvgScissor(vg, x, y, w, h);
+#endif
 
   return RET_OK;
 }
@@ -245,7 +260,12 @@ static ret_t vgcanvas_nanovg_set_font(vgcanvas_t* vgcanvas, const char* name) {
         return RET_OK;
       }
 
-      r = assets_manager_ref(am, ASSET_TYPE_FONT, name);
+      if (r == NULL) {
+        font_t* font = font_manager_get_font(font_manager(), NULL, TK_DEFAULT_FONT_SIZE);
+        if (font != NULL) {
+          r = assets_manager_ref(assets_manager(), ASSET_TYPE_FONT, font->name);
+        }
+      }
     }
 
     if (r != NULL && r->subtype == ASSET_TYPE_FONT_TTF) {
@@ -362,7 +382,7 @@ static ret_t vgcanvas_nanovg_set_line_width(vgcanvas_t* vgcanvas, float_t value)
 
 static ret_t vgcanvas_nanovg_set_global_alpha(vgcanvas_t* vgcanvas, float_t value) {
   NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
-
+  vgcanvas->global_alpha = value;
   nvgGlobalAlpha(vg, value);
 
   return RET_OK;
@@ -505,6 +525,7 @@ static const vgcanvas_vtable_t vt = {
     .transform = vgcanvas_nanovg_transform,
     .set_transform = vgcanvas_nanovg_set_transform,
     .clip_rect = vgcanvas_nanovg_clip_rect,
+    .path_winding = vgcanvas_nanovg_path_winding,
     .fill = vgcanvas_nanovg_fill,
     .stroke = vgcanvas_nanovg_stroke,
     .paint = vgcanvas_nanovg_paint,

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  date time
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +23,15 @@
 #include "tkc/date_time.h"
 
 static date_time_get_now_t s_date_time_get_now;
+static date_time_set_now_t s_date_time_set_now;
+
+ret_t date_time_global_init(date_time_get_now_t get, date_time_set_now_t set) {
+  s_date_time_get_now = get;
+  s_date_time_set_now = set;
+
+  return RET_OK;
+}
+
 ret_t date_time_set_impl(date_time_get_now_t date_time_get_now) {
   s_date_time_get_now = date_time_get_now;
 
@@ -37,12 +46,21 @@ date_time_t* date_time_create(void) {
 
 date_time_t* date_time_init(date_time_t* dt) {
   return_value_if_fail(dt != NULL, NULL);
+
   memset(dt, 0x00, sizeof(date_time_t));
-  return_value_if_fail(s_date_time_get_now != NULL, dt);
+  if (s_date_time_get_now != NULL) {
+    s_date_time_get_now(dt);
+    return dt;
+  } else {
+    return NULL;
+  }
+}
 
-  s_date_time_get_now(dt);
+ret_t date_time_set(date_time_t* dt) {
+  return_value_if_fail(dt != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(s_date_time_set_now != NULL, RET_NOT_IMPL);
 
-  return dt;
+  return s_date_time_set_now(dt);
 }
 
 ret_t date_time_destroy(date_time_t* dt) {

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  string
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -101,6 +101,13 @@ ret_t str_append(str_t* str, const char* text) {
   return str_append_with_len(str, text, strlen(text));
 }
 
+ret_t str_append_int(str_t* str, int32_t value) {
+  char num[32];
+  tk_snprintf(num, sizeof(num), "%d", value);
+
+  return str_append(str, num);
+}
+
 ret_t str_append_char(str_t* str, char c) {
   return_value_if_fail(str != NULL, RET_BAD_PARAMS);
   return_value_if_fail(str_extend(str, str->size + 2) == RET_OK, RET_BAD_PARAMS);
@@ -190,8 +197,11 @@ ret_t str_unescape(str_t* str) {
           c = '\\';
           break;
         }
+        case '\0': {
+          break;
+        }
         default: {
-          log_warn("not support char\n");
+          log_warn("not support char: %s [%c]\n", str->str, *s);
           break;
         }
       }
@@ -251,7 +261,7 @@ ret_t str_from_value(str_t* str, const value_t* v) {
   }
 }
 
-ret_t str_from_wstr(str_t* str, const wchar_t* wstr) {
+ret_t str_from_wstr_with_len(str_t* str, const wchar_t* wstr, uint32_t len) {
   return_value_if_fail(str != NULL, RET_BAD_PARAMS);
 
   str->size = 0;
@@ -259,12 +269,12 @@ ret_t str_from_wstr(str_t* str, const wchar_t* wstr) {
     str->str[0] = '\0';
   }
 
-  if (wstr != NULL) {
-    uint32_t size = wcslen(wstr) * 4 + 1;
+  if (wstr != NULL && len > 0) {
+    uint32_t size = len * 4 + 1;
     return_value_if_fail(str_extend(str, size + 1) == RET_OK, RET_OOM);
 
     if (size > 0) {
-      utf8_from_utf16(wstr, str->str, size);
+      tk_utf8_from_utf16_ex(wstr, len, str->str, size);
       str->size = strlen(str->str);
     } else {
       str_set(str, "");
@@ -272,6 +282,12 @@ ret_t str_from_wstr(str_t* str, const wchar_t* wstr) {
   }
 
   return RET_OK;
+}
+
+ret_t str_from_wstr(str_t* str, const wchar_t* wstr) {
+  return_value_if_fail(str != NULL && wstr != NULL, RET_BAD_PARAMS);
+
+  return str_from_wstr_with_len(str, wstr, wcslen(wstr));
 }
 
 ret_t str_to_int(str_t* str, int32_t* v) {
@@ -541,8 +557,9 @@ ret_t str_expand_vars(str_t* str, const char* src, const object_t* obj) {
     if (c == '$') {
       if (p[1] && p[2]) {
         p = expand_var(str, p + 2, obj);
+      } else {
+        return RET_BAD_PARAMS;
       }
-      continue;
     } else {
       str_append_char(str, c);
       p++;

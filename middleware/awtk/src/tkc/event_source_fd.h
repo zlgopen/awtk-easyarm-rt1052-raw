@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event source fd
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,7 @@ typedef struct _event_source_fd_t event_source_fd_t;
  * @class event_source_fd_t
  * @parent object
  *
- * fd事件源。
+ * fd事件源。用于文件、管道和套接字。
  *
  */
 struct _event_source_fd_t {

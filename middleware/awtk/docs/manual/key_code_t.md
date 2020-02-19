@@ -1,7 +1,6 @@
 ## key\_code\_t
 ### 概述
- key code。
-### 常量
+key code。### 常量
 <p id="key_code_t_consts">
 
 | 名称 | 说明 | 
@@ -135,3 +134,5 @@
 | TK\_KEY\_F12 | TK\_KEY\_F12 |
 | TK\_KEY\_MENU | TK\_KEY\_MENU |
 | TK\_KEY\_COMMAND | TK\_KEY\_COMMAND |
+| TK\_KEY\_BACK | TK\_KEY\_BACK |
+| TK\_KEY\_CANCEL | TK\_KEY\_CANCEL |

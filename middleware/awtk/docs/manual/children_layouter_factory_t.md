@@ -1,8 +1,6 @@
 ## children\_layouter\_factory\_t
 ### 概述
- 子控件布局算法工厂。
-
-
+子控件布局算法工厂。
 ----------------------------------
 ### 函数
 <p id="children_layouter_factory_t_methods">
@@ -20,8 +18,7 @@
 
 * 函数功能：
 
-> <p id="children_layouter_factory_t_children_layouter_factory"> 获取缺省的子控件布局算法工厂对象。
-
+> <p id="children_layouter_factory_t_children_layouter_factory">获取缺省的子控件布局算法工厂对象。
 
 * 函数原型：
 
@@ -39,9 +36,7 @@ children_layouter_factory_t* children_layouter_factory ();
 
 * 函数功能：
 
-> <p id="children_layouter_factory_t_children_layouter_factory_create"> 创建子控件布局算法工厂对象。
-
-
+> <p id="children_layouter_factory_t_children_layouter_factory_create">创建子控件布局算法工厂对象。
 
 * 函数原型：
 
@@ -59,9 +54,7 @@ children_layouter_factory_t* children_layouter_factory_create ();
 
 * 函数功能：
 
-> <p id="children_layouter_factory_t_children_layouter_factory_create_layouter"> 创建指定类型的子控件布局算法对象。
-
-
+> <p id="children_layouter_factory_t_children_layouter_factory_create_layouter">创建指定类型的子控件布局算法对象。
 
 * 函数原型：
 
@@ -81,9 +74,7 @@ children_layouter_t* children_layouter_factory_create_layouter (children_layoute
 
 * 函数功能：
 
-> <p id="children_layouter_factory_t_children_layouter_factory_destroy"> 析构并释放子控件布局算法工厂对象。
-
-
+> <p id="children_layouter_factory_t_children_layouter_factory_destroy">析构并释放子控件布局算法工厂对象。
 
 * 函数原型：
 
@@ -102,9 +93,7 @@ ret_t children_layouter_factory_destroy (children_layouter_factory_t* factory);
 
 * 函数功能：
 
-> <p id="children_layouter_factory_t_children_layouter_factory_register"> 注册子控件布局算法创建函数。
-
-
+> <p id="children_layouter_factory_t_children_layouter_factory_register">注册子控件布局算法创建函数。
 
 * 函数原型：
 
@@ -125,9 +114,7 @@ ret_t children_layouter_factory_register (children_layouter_factory_t* factory, 
 
 * 函数功能：
 
-> <p id="children_layouter_factory_t_children_layouter_factory_set"> 设置缺省的子控件布局算法工厂对象。
-
-
+> <p id="children_layouter_factory_t_children_layouter_factory_set">设置缺省的子控件布局算法工厂对象。
 
 * 函数原型：
 

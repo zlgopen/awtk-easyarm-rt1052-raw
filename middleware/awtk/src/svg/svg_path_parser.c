@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  svg path_parser
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -62,6 +62,7 @@ static float svg_path_parser_get_number(svg_path_parser_t* parser) {
   uint32_t i = 0;
   const char* p = NULL;
   char token[TK_NUM_MAX_LEN + 1];
+  memset(token, 0x00, sizeof(token));
 
   return_value_if_fail(svg_path_parser_next_token_type(parser) == TOKEN_NUMBER, 0);
 
@@ -70,6 +71,7 @@ static float svg_path_parser_get_number(svg_path_parser_t* parser) {
     token[i++] = *p++;
   }
   while (*p == '.' || (*p >= '0' && *p <= '9')) {
+    if (*p == '.' && strrchr(token, '.') != NULL) break;
     token[i++] = *p++;
   }
   token[i] = '\0';

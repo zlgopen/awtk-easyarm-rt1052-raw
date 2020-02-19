@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  awtk
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,6 +35,8 @@ BEGIN_C_DECLS
 /**
  * @method tk_init
  * 初始化TK。
+ * @alias init
+ * @annotation ["static", "scriptable"]
  * @param {wh_t} w LCD宽度。
  * @param {wh_t} h LCD高度。
  * @param {app_type_t} app_type 应用程序的类型。
@@ -48,6 +50,8 @@ ret_t tk_init(wh_t w, wh_t h, app_type_t app_type, const char* app_name, const c
 /**
  * @method tk_run
  * 进入TK事件主循环。
+ * @alias run
+ * @annotation ["static", "scriptable"]
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  utils function
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,6 +48,9 @@ const char* skip_to_next(const char* p, char c);
 bool_t start_with(const char* p, const char* str);
 bool_t end_with(const char* p, const char* str);
 const char* get_next_token(const char* p, char* token, char c);
+
+wchar_t** argvw_create(int argc, char* argv[]);
+ret_t argvw_destroy(wchar_t** argvw);
 
 END_C_DECLS
 

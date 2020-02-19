@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  style interface
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -223,6 +223,18 @@ BEGIN_C_DECLS
  * 圆角半径(仅在WITH_VGCANVAS定义时生效)。
  */
 #define STYLE_ID_ROUND_RADIUS "round_radius"
+
+/**
+ * @const STYLE_ID_CHILDREN_LAYOUT
+ * 子控件布局参数。
+ */
+#define STYLE_ID_CHILDREN_LAYOUT "children_layout"
+
+/**
+ * @const STYLE_ID_SELF_LAYOUT
+ * 控件布局参数。
+ */
+#define STYLE_ID_SELF_LAYOUT "self_layout"
 
 struct _style_t;
 typedef struct _style_t style_t;

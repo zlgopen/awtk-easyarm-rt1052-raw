@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  ext widgets
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,7 @@ BEGIN_C_DECLS
 /**
  * @method tk_ext_widgets_init
  * 初始化AWTK扩展控件。
- * @annotation ["global", "scriptable"]
+ * @annotation ["global"]
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

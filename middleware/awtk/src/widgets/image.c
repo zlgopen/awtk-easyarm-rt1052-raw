@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  image
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,30 +33,27 @@ static ret_t image_on_paint_self(widget_t* widget, canvas_t* c) {
   image_base_t* image_base = IMAGE_BASE(widget);
   return_value_if_fail(image != NULL, RET_BAD_PARAMS);
 
-  if (image_base->image == NULL) {
-    return RET_OK;
-  }
-
-  return_value_if_fail(widget_load_image(widget, image_base->image, &bitmap) == RET_OK,
-                       RET_BAD_PARAMS);
-
-  if (vg != NULL) {
-    if (image_need_transform(widget)) {
-      if (image->draw_type == IMAGE_DRAW_ICON) {
-        vgcanvas_save(vg);
-        image_transform(widget, c);
-        vgcanvas_draw_icon(vg, &bitmap, 0, 0, bitmap.w, bitmap.h, 0, 0, widget->w, widget->h);
-        vgcanvas_restore(vg);
-
-        return RET_OK;
-      } else {
-        log_warn("only draw_type == icon supports transformation.\n");
+  do {
+    if (image_base->image != NULL &&
+        widget_load_image(widget, image_base->image, &bitmap) == RET_OK) {
+      if (vg != NULL) {
+        if (image_need_transform(widget)) {
+          if (image->draw_type == IMAGE_DRAW_ICON) {
+            vgcanvas_save(vg);
+            image_transform(widget, c);
+            vgcanvas_draw_icon(vg, &bitmap, 0, 0, bitmap.w, bitmap.h, 0, 0, widget->w, widget->h);
+            vgcanvas_restore(vg);
+            break;
+          } else {
+            log_warn("only draw_type == icon supports transformation.\n");
+          }
+        }
       }
-    }
-  }
 
-  dst = rect_init(0, 0, widget->w, widget->h);
-  canvas_draw_image_ex(c, &bitmap, image->draw_type, &dst);
+      dst = rect_init(0, 0, widget->w, widget->h);
+      canvas_draw_image_ex(c, &bitmap, image->draw_type, &dst);
+    }
+  } while (FALSE);
 
   widget_paint_helper(widget, c, NULL, NULL);
 
@@ -94,17 +91,29 @@ static ret_t image_set_prop(widget_t* widget, const char* name, const value_t* v
   }
 }
 
-static const char* s_image_clone_properties[] = {WIDGET_PROP_IMAGE,      WIDGET_PROP_DRAW_TYPE,
+static const char* const s_image_properties[] = {WIDGET_PROP_IMAGE,      WIDGET_PROP_DRAW_TYPE,
                                                  WIDGET_PROP_SCALE_X,    WIDGET_PROP_SCALE_Y,
                                                  WIDGET_PROP_ANCHOR_X,   WIDGET_PROP_ANCHOR_Y,
                                                  WIDGET_PROP_ROTATION,   WIDGET_PROP_CLICKABLE,
                                                  WIDGET_PROP_SELECTABLE, NULL};
 
+static ret_t image_on_copy(widget_t* widget, widget_t* other) {
+  image_t* image = IMAGE(widget);
+  image_t* image_other = IMAGE(other);
+
+  image_base_on_copy(widget, other);
+  image->draw_type = image_other->draw_type;
+
+  return RET_OK;
+}
+
 TK_DECL_VTABLE(image) = {.size = sizeof(image_t),
                          .type = WIDGET_TYPE_IMAGE,
-                         .clone_properties = s_image_clone_properties,
+                         .clone_properties = s_image_properties,
+                         .persistent_properties = s_image_properties,
                          .parent = TK_PARENT_VTABLE(image_base),
                          .create = image_create,
+                         .on_copy = image_on_copy,
                          .on_destroy = image_base_on_destroy,
                          .on_event = image_base_on_event,
                          .on_paint_self = image_on_paint_self,

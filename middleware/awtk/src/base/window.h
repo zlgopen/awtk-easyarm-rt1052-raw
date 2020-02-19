@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,7 @@ BEGIN_C_DECLS
 
 /**
  * @class window_t
- * @parent widget_t
+ * @parent window_base_t
  * @annotation ["scriptable","design","widget","window"]
  * 窗口。
  *
@@ -45,7 +45,7 @@ BEGIN_C_DECLS
  * ```
  *
  * >
- * 更多用法请参考：[window.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/)
+ * 更多用法请参考：[window.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
  *
  * 在c代码中使用函数window\_create创建窗口。如：
  *
@@ -67,7 +67,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L0)
+ * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L0)
  */
 typedef struct _window_t {
   window_base_t window;
@@ -97,6 +97,15 @@ typedef struct _window_t {
 widget_t* window_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 
 /**
+ * @method window_create_default
+ * 以缺省的方式创建window对象。
+ * @annotation ["constructor", "scriptable"]
+ *
+ * @return {widget_t*} 对象。
+ */
+widget_t* window_create_default(void);
+
+/**
  * @method window_set_fullscreen
  * 设置为全屏窗口。
  *
@@ -115,7 +124,7 @@ ret_t window_set_fullscreen(widget_t* widget, bool_t fullscreen);
  * @annotation ["constructor", "scriptable"]
  * 从资源文件中加载并创建window_base对象。本函数在ui_loader/ui_builder_default里实现。
  *
- * @param {char*} name window的名称。
+ * @param {const char*} name window的名称。
  *
  * @return {widget_t*} 对象。
  */
@@ -125,7 +134,7 @@ widget_t* window_open(const char* name);
  * @method window_open_and_close
  * @annotation ["constructor", "scriptable"]
  * 从资源文件中加载并创建window对象。本函数在ui_loader/ui_builder_default里实现。
- * @param {char*} name window的名称。
+ * @param {const char*} name window的名称。
  * @param {widget_t*} to_close 关闭该窗口。
  *
  * @return {widget_t*} 对象。

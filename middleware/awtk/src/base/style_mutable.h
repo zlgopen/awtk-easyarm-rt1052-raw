@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mutable style
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -73,16 +73,6 @@ typedef struct _style_mutable_t {
 } style_mutable_t;
 
 /**
- * @method style_mutable_get_name
- * 获取style的名称。
- * @annotation ["scriptable"]
- * @param {style_t*} s style对象。
- *
- * @return {const char*} style的名称。
- */
-const char* style_mutable_get_name(style_t* s);
-
-/**
  * @method style_mutable_set_name
  * 设置style的名称。
  * @annotation ["scriptable"]
@@ -100,7 +90,7 @@ ret_t style_mutable_set_name(style_t* s, const char* name);
  * @param {style_t*} s style对象。
  * @param {const char*} state 控件状态。
  * @param {const char*} name 属性名。
- * @param {int32_t} val 值。
+ * @param {uint32_t} val 值。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

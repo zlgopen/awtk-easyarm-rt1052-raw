@@ -86,6 +86,7 @@ static ret_t font_ft_get_glyph(font_t* f, wchar_t c, font_size_t font_size, glyp
     glyf = sf->face->glyph;
     FT_Get_Glyph(glyf, &glyph);
 
+    g->format = GLYPH_FMT_ALPHA;
     g->h = glyf->bitmap.rows;
     g->w = glyf->bitmap.width;
     g->pitch = glyf->bitmap.pitch;
@@ -115,15 +116,24 @@ static ret_t font_ft_get_glyph(font_t* f, wchar_t c, font_size_t font_size, glyp
   return g->data != NULL ? RET_OK : RET_NOT_FOUND;
 }
 
-static int32_t font_ft_get_baseline(font_t* f, font_size_t font_size) {
+static font_vmetrics_t font_ft_get_vmetrics(font_t* f, font_size_t font_size) {
+  int32_t height = 0;
+  font_vmetrics_t vmetrics;
   font_ft_t* font = (font_ft_t*)f;
   ft_fontinfo* sf = &(font->ft_font);
 
   FT_Set_Char_Size(sf->face, 0, font_size * 72, 0, 50);
 
-  int ascender = FT_MulFix(sf->face->ascender, sf->face->size->metrics.y_scale);
+  height = FT_MulFix(sf->face->height, sf->face->size->metrics.y_scale);
+  vmetrics.ascent = FT_MulFix(sf->face->ascender, sf->face->size->metrics.y_scale);
+  vmetrics.descent = FT_MulFix(sf->face->descender, sf->face->size->metrics.y_scale);
+  vmetrics.line_gap = height - (vmetrics.ascent - vmetrics.descent);
 
-  return ascender >> 6;
+  vmetrics.ascent = vmetrics.ascent >> 6;
+  vmetrics.descent = vmetrics.descent >> 6;
+  vmetrics.line_gap = vmetrics.line_gap >> 6;
+
+  return vmetrics;
 }
 
 static ret_t font_ft_destroy(font_t* f) {
@@ -167,7 +177,8 @@ font_t* font_ft_create_ex(const char* name, const uint8_t* buff, uint32_t size, 
   f->base.match = font_ft_match;
   f->base.destroy = font_ft_destroy;
   f->base.get_glyph = font_ft_get_glyph;
-  f->base.get_baseline = font_ft_get_baseline;
+  f->base.get_vmetrics = font_ft_get_vmetrics;
+  f->base.desc = mono ? "mono(freetype)" : "truetype(freetype)";
 
   tk_strncpy(f->base.name, name, TK_NAME_LEN);
 
@@ -181,14 +192,18 @@ font_t* font_ft_mono_create(const char* name, const uint8_t* buff, uint32_t size
 }
 
 font_t* font_ft_create(const char* name, const uint8_t* buff, uint32_t size) {
+#ifdef WITH_LCD_MONO
+  return font_ft_create_ex(name, buff, size, TRUE);
+#else
   return font_ft_create_ex(name, buff, size, FALSE);
+#endif
 }
 
 static font_t* font_ft_load(font_loader_t* loader, const char* name, const uint8_t* buff,
                             uint32_t buff_size) {
   (void)loader;
 
-  return font_ft_create_ex(name, buff, buff_size, FALSE);
+  return font_ft_create(name, buff, buff_size);
 }
 
 font_loader_t* font_loader_ft(void) {

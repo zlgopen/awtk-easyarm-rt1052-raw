@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   timer.c
  * Author: AWTK Develop Team
  * Brief:  timer manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -133,7 +133,6 @@ static ret_t timer_manager_dispatch_one(timer_manager_t* timer_manager, uint64_t
       } else {
         timer->start = now;
       }
-      timer->user_changed_time = FALSE;
     }
 
     object_unref((object_t*)timer);

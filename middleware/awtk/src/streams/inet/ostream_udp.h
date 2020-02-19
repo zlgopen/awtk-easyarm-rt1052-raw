@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input stream base on socket
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,7 +34,7 @@ typedef struct _tk_ostream_udp_t tk_ostream_udp_t;
  * @class tk_ostream_udp_t
  * @parent tk_ostream_t
  *
- * input stream base on socket
+ * 基于UDP实现的输出流。
  *
  */
 struct _tk_ostream_udp_t {

@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   mutable_image.h
  * Author: AWTK Develop Team
  * Brief:  mutable_image
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -75,7 +75,7 @@ ret_t mutable_image_on_paint_self(widget_t* widget, canvas_t* canvas) {
       }
     }
 
-    if (bitmap->data != NULL) {
+    if (bitmap->buffer != NULL) {
       rect_t src = rect_init(0, 0, bitmap->w, bitmap->h);
       rect_t dst = rect_init(0, 0, widget->w, widget->h);
       canvas_draw_image(canvas, bitmap, &src, &dst);

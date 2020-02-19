@@ -78,6 +78,8 @@ COMMON_CCFLAGS=COMMON_CCFLAGS+' -DSTBTT_STATIC -DSTB_IMAGE_STATIC -DWITH_STB_IMA
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_VGCANVAS -DWITH_UNICODE_BREAK -DWITH_DESKTOP_STYLE '
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DSDL2 -DHAS_STD_MALLOC -DWITH_SDL -DWITH_FS_RES -DHAS_STDIO -DHAVE_STDIO_H '
 
+GRAPHIC_BUFFER='default'
+
 #only for c compiler flags
 COMMON_CFLAGS=''
 
@@ -134,16 +136,16 @@ OS_PROJECTS=[]
 
 if OS_NAME == 'Darwin':
   TOOLS_NAME = ''
-  OS_FLAGS='-g -Wall'
+  OS_FLAGS='-g -Wall -fPIC '
   OS_LIBS = ['stdc++', 'pthread', 'm', 'dl']
-  OS_LINKFLAGS='-framework Cocoa -framework QuartzCore -framework OpenGL -weak_framework Metal -weak_framework MetalKit'
+  OS_LINKFLAGS='-framework IOKit -framework Cocoa -framework QuartzCore -framework OpenGL -weak_framework Metal -weak_framework MetalKit'
   COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DWITH_WIDGET_POOL=1000 '
   COMMON_CCFLAGS = COMMON_CCFLAGS + ' -D__APPLE__ -DHAS_PTHREAD -DMACOS -DENABLE_MEM_LEAK_CHECK1 '
   COMMON_CCFLAGS = COMMON_CCFLAGS + ' -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS  -DBGFX_CONFIG_RENDERER_METAL=1 '
 
 elif OS_NAME == 'Linux':
   TOOLS_NAME = ''
-  OS_FLAGS='-g -Wall'
+  OS_FLAGS='-g -Wall -fPIC ' 
   OS_LIBS = ['GL', 'gtk-3','gdk-3','Xext', 'X11', 'sndio','stdc++', 'pthread', 'm', 'dl']
   COMMON_CFLAGS=COMMON_CFLAGS+' -std=gnu99 '
   COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DLINUX -DHAS_PTHREAD'
@@ -232,5 +234,6 @@ os.environ['TK_3RD_ROOT'] = TK_3RD_ROOT;
 os.environ['INPUT_ENGINE'] = INPUT_ENGINE;
 os.environ['NANOVG_BACKEND'] = NANOVG_BACKEND;
 os.environ['NATIVE_WINDOW'] = NATIVE_WINDOW;
+os.environ['GRAPHIC_BUFFER'] = GRAPHIC_BUFFER;
 os.environ['FRAME_BUFFER_FORMAT'] = FRAME_BUFFER_FORMAT;
 

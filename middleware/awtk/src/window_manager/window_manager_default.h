@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,6 @@ BEGIN_C_DECLS
 /**
  * @class window_manager_default_t
  * @parent window_manager_t
- * @annotation ["scriptable"]
  * 缺省窗口管理器。
  */
 typedef struct _window_manager_default_t {
@@ -38,6 +37,7 @@ typedef struct _window_manager_default_t {
 
   /*private*/
   bool_t animating;
+  bool_t ready_animator;
   bool_t ignore_user_input;
   window_animator_t* animator;
 
@@ -52,7 +52,6 @@ typedef struct _window_manager_default_t {
   char* cursor;
   rect_t r_cursor;
 
-  widget_t* system_bar;
   input_device_status_t input_device_status;
   uint32_t screen_saver_timer_id;
   uint32_t screen_saver_time;

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  builts dialog_highlighter
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied highlighterrranty of
@@ -28,6 +28,8 @@ BEGIN_C_DECLS
 
 /**
  * @method dialog_highlighter_register_builtins
+ * @annotation ["private"]
+ *
  * 注册内置的对话框高亮策略。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。

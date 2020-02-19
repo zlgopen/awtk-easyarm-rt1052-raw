@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  gif_image
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,8 @@ BEGIN_C_DECLS
  * ```
  *
  * >更多用法请参考：
- * [gif image](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/gif_image.xml)
+ * [gif
+ * image](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/gif_image.xml)
  *
  * 在c代码中使用函数gif\_image\_create创建GIF图片控件。如：
  *
@@ -72,7 +73,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[theme default](
- * https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml)
+ * https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml)
  *
  */
 typedef struct _gif_image_t {

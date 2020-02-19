@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   vgcanvas_nanovg_soft.c
  * Author: AWTK Develop Team
  * Brief:  vector graphics canvas base on nanovg-soft
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,6 +54,7 @@ vgcanvas_t* vgcanvas_create(uint32_t w, uint32_t h, uint32_t stride, bitmap_form
   nanovg->base.vt = &vt;
   nanovg->base.ratio = 1;
   nanovg->base.format = format;
+  nanovg->base.stride = stride;
   nanovg->base.buff = (uint32_t*)data;
 
 #if defined(WITH_NANOVG_AGG)

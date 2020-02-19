@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  color_tile
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [color_tile](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/color_picker_rgb.xml)
+ * [color_tile](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/color_picker_rgb.xml)
  *
  * 在c代码中使用函数color_tile\_create创建色块控件。如：
  *

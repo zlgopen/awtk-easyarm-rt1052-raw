@@ -2,37 +2,35 @@
 ### 概述
 ![image](images/time_clock_t_0.png)
 
- 模拟时钟控件。
+模拟时钟控件。
 
- time\_clock\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均适用于time\_clock\_t控件。
+time\_clock\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均适用于time\_clock\_t控件。
 
- 在xml中使用"time\_clock"标签创建模拟时钟控件。如：
+在xml中使用"time\_clock"标签创建模拟时钟控件。如：
 
- ```xml
- <time_clock x="c" y="m" w="300" h="300" bg_image="clock_bg" image="clock"
-   hour_image="clock_hour" minute_image="clock_minute" second_image="clock_second"/>
- ```
+```xml
+<time_clock x="c" y="m" w="300" h="300" bg_image="clock_bg" image="clock"
+hour_image="clock_hour" minute_image="clock_minute" second_image="clock_second"/>
+```
 
- > 更多用法请参考：[time\_clock.xml](
- https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/time_clock.xml)
+> 更多用法请参考：[time\_clock.xml](
+https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/time_clock.xml)
 
- 在c代码中使用函数time\_clock\_create创建模拟时钟控件。如：
+在c代码中使用函数time\_clock\_create创建模拟时钟控件。如：
 
- ```c
- widget_t* tc = time_clock_create(win, 10, 10, 240, 240);
- time_clock_set_image(tc, "clock");
- time_clock_set_bg_image(tc, "clock_bg");
- time_clock_set_hour_image(tc, "clock_hour");
- time_clock_set_minute_image(tc, "clock_minute");
- time_clock_set_second_image(tc, "clock_second");
- ```
+```c
+widget_t* tc = time_clock_create(win, 10, 10, 240, 240);
+time_clock_set_image(tc, "clock");
+time_clock_set_bg_image(tc, "clock_bg");
+time_clock_set_hour_image(tc, "clock_hour");
+time_clock_set_minute_image(tc, "clock_minute");
+time_clock_set_second_image(tc, "clock_second");
+```
 
- > 完整示例请参考：[time_clock demo](
- https://github.com/zlgopen/awtk-c-demos/blob/master/demos/time_clock.c)
+> 完整示例请参考：[time_clock demo](
+https://github.com/zlgopen/awtk-c-demos/blob/master/demos/time_clock.c)
 
- time\_clock一般不需要设置style。
-
-
+time\_clock一般不需要设置style。
 ----------------------------------
 ### 函数
 <p id="time_clock_t_methods">
@@ -76,9 +74,7 @@
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_cast"> 转换为time_clock对象(供脚本语言使用)。
-
-
+> <p id="time_clock_t_time_clock_cast">转换为time_clock对象(供脚本语言使用)。
 
 * 函数原型：
 
@@ -97,9 +93,7 @@ widget_t* time_clock_cast (widget_t* widget);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_create"> 创建time_clock对象
-
-
+> <p id="time_clock_t_time_clock_create">创建time_clock对象
 
 * 函数原型：
 
@@ -122,9 +116,7 @@ widget_t* time_clock_create (widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_bg_image"> 设置背景图片。
-
-
+> <p id="time_clock_t_time_clock_set_bg_image">设置背景图片。
 
 * 函数原型：
 
@@ -144,9 +136,7 @@ ret_t time_clock_set_bg_image (widget_t* widget, const char* bg_image);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_hour"> 设置小时的值。
-
-
+> <p id="time_clock_t_time_clock_set_hour">设置小时的值。
 
 * 函数原型：
 
@@ -166,11 +156,8 @@ ret_t time_clock_set_hour (widget_t* widget, int32_t hour);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_hour_anchor"> 设置小时指针的旋转锚点。
- > 后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f
-
-
-
+> <p id="time_clock_t_time_clock_set_hour_anchor">设置小时指针的旋转锚点。
+> 后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f
 
 * 函数原型：
 
@@ -191,9 +178,7 @@ ret_t time_clock_set_hour_anchor (widget_t* widget, const char* anchor_x, const 
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_hour_image"> 设置小时的图片。
-
-
+> <p id="time_clock_t_time_clock_set_hour_image">设置小时的图片。
 
 * 函数原型：
 
@@ -213,9 +198,7 @@ ret_t time_clock_set_hour_image (widget_t* widget, const char* hour);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_image"> 设置中心图片。
-
-
+> <p id="time_clock_t_time_clock_set_image">设置中心图片。
 
 * 函数原型：
 
@@ -235,9 +218,7 @@ ret_t time_clock_set_image (widget_t* widget, const char* image);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_minute"> 设置分钟的值。
-
-
+> <p id="time_clock_t_time_clock_set_minute">设置分钟的值。
 
 * 函数原型：
 
@@ -257,11 +238,8 @@ ret_t time_clock_set_minute (widget_t* widget, int32_t minute);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_minute_anchor"> 设置分钟指针的旋转锚点。
- > 后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f
-
-
-
+> <p id="time_clock_t_time_clock_set_minute_anchor">设置分钟指针的旋转锚点。
+> 后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f
 
 * 函数原型：
 
@@ -282,9 +260,7 @@ ret_t time_clock_set_minute_anchor (widget_t* widget, const char* anchor_x, cons
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_minute_image"> 设置分钟的图片。
-
-
+> <p id="time_clock_t_time_clock_set_minute_image">设置分钟的图片。
 
 * 函数原型：
 
@@ -304,9 +280,7 @@ ret_t time_clock_set_minute_image (widget_t* widget, const char* minute_image);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_second"> 设置秒的值。
-
-
+> <p id="time_clock_t_time_clock_set_second">设置秒的值。
 
 * 函数原型：
 
@@ -326,11 +300,8 @@ ret_t time_clock_set_second (widget_t* widget, int32_t second);
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_second_anchor"> 设置秒钟指针的旋转锚点。
- > 后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f
-
-
-
+> <p id="time_clock_t_time_clock_set_second_anchor">设置秒钟指针的旋转锚点。
+> 后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f
 
 * 函数原型：
 
@@ -351,9 +322,7 @@ ret_t time_clock_set_second_anchor (widget_t* widget, const char* anchor_x, cons
 
 * 函数功能：
 
-> <p id="time_clock_t_time_clock_set_second_image"> 设置秒的图片。
-
-
+> <p id="time_clock_t_time_clock_set_second_image">设置秒的图片。
 
 * 函数原型：
 
@@ -370,8 +339,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | second\_image | const char* | 秒的图片。 |
 #### bg\_image 属性
 -----------------------
-> <p id="time_clock_t_bg_image"> 背景图片。
-
+> <p id="time_clock_t_bg_image">背景图片。
 
 * 类型：char*
 
@@ -387,8 +355,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### hour 属性
 -----------------------
-> <p id="time_clock_t_hour"> 小时。
-
+> <p id="time_clock_t_hour">小时。
 
 * 类型：int32\_t
 
@@ -404,8 +371,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### hour\_anchor\_x 属性
 -----------------------
-> <p id="time_clock_t_hour_anchor_x"> 时针图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
-
+> <p id="time_clock_t_hour_anchor_x">时针图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
 
 * 类型：char*
 
@@ -421,8 +387,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### hour\_anchor\_y 属性
 -----------------------
-> <p id="time_clock_t_hour_anchor_y"> 时针图片旋转锚点y坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
-
+> <p id="time_clock_t_hour_anchor_y">时针图片旋转锚点y坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
 
 * 类型：char*
 
@@ -438,8 +403,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### hour\_image 属性
 -----------------------
-> <p id="time_clock_t_hour_image"> 时针图片。
-
+> <p id="time_clock_t_hour_image">时针图片。
 
 * 类型：char*
 
@@ -455,8 +419,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### image 属性
 -----------------------
-> <p id="time_clock_t_image"> 中心图片。
-
+> <p id="time_clock_t_image">中心图片。
 
 * 类型：char*
 
@@ -472,8 +435,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### minute 属性
 -----------------------
-> <p id="time_clock_t_minute"> 分钟。
-
+> <p id="time_clock_t_minute">分钟。
 
 * 类型：int32\_t
 
@@ -489,8 +451,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### minute\_anchor\_x 属性
 -----------------------
-> <p id="time_clock_t_minute_anchor_x"> 分针图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
-
+> <p id="time_clock_t_minute_anchor_x">分针图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
 
 * 类型：char*
 
@@ -506,8 +467,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### minute\_anchor\_y 属性
 -----------------------
-> <p id="time_clock_t_minute_anchor_y"> 分针图片旋转锚点y坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
-
+> <p id="time_clock_t_minute_anchor_y">分针图片旋转锚点y坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
 
 * 类型：char*
 
@@ -523,8 +483,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### minute\_image 属性
 -----------------------
-> <p id="time_clock_t_minute_image"> 分针图片。
-
+> <p id="time_clock_t_minute_image">分针图片。
 
 * 类型：char*
 
@@ -540,8 +499,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### second 属性
 -----------------------
-> <p id="time_clock_t_second"> 秒。
-
+> <p id="time_clock_t_second">秒。
 
 * 类型：int32\_t
 
@@ -557,8 +515,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### second\_anchor\_x 属性
 -----------------------
-> <p id="time_clock_t_second_anchor_x"> 秒针图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
-
+> <p id="time_clock_t_second_anchor_x">秒针图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
 
 * 类型：char*
 
@@ -574,8 +531,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### second\_anchor\_y 属性
 -----------------------
-> <p id="time_clock_t_second_anchor_y"> 秒针图片旋转锚点y坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
-
+> <p id="time_clock_t_second_anchor_y">秒针图片旋转锚点y坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
 
 * 类型：char*
 
@@ -591,8 +547,7 @@ ret_t time_clock_set_second_image (widget_t* widget, const char* second_image);
 | 可通过widget\_set\_prop修改 | 是 |
 #### second\_image 属性
 -----------------------
-> <p id="time_clock_t_second_image"> 秒针图片。
-
+> <p id="time_clock_t_second_image">秒针图片。
 
 * 类型：char*
 

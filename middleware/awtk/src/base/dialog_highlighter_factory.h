@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dialog highlighter factory
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -95,6 +95,9 @@ dialog_highlighter_t* dialog_highlighter_factory_create_highlighter(
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t dialog_highlighter_factory_destroy(dialog_highlighter_factory_t* factory);
+
+/*public for internal use*/
+ret_t dialog_highlighter_on_dialog_destroy(void* ctx, event_t* e);
 
 END_C_DECLS
 

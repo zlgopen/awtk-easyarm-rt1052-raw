@@ -2,11 +2,9 @@
 ### 概述
 ![image](images/dragger_t_0.png)
 
- dragger控件。
+dragger控件。
 
- 目前主要用于scrollbar里的滑块。
-
-
+目前主要用于scrollbar里的滑块。
 ----------------------------------
 ### 函数
 <p id="dragger_t_methods">
@@ -30,9 +28,7 @@
 
 * 函数功能：
 
-> <p id="dragger_t_dragger_cast"> 转换为dragger对象(供脚本语言使用)。
-
-
+> <p id="dragger_t_dragger_cast">转换为dragger对象(供脚本语言使用)。
 
 * 函数原型：
 
@@ -51,9 +47,7 @@ widget_t* dragger_cast (widget_t* widget);
 
 * 函数功能：
 
-> <p id="dragger_t_dragger_create"> 创建dragger对象。
-
-
+> <p id="dragger_t_dragger_create">创建dragger对象。
 
 * 函数原型：
 
@@ -76,21 +70,19 @@ widget_t* dragger_create (widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 
 * 函数功能：
 
-> <p id="dragger_t_dragger_set_range"> 设置拖动的范围。
-
-
+> <p id="dragger_t_dragger_set_range">设置拖动的范围。
 
 * 函数原型：
 
 ```
-widget_t* dragger_set_range (widget_t* widget, xy_t x_min, xy_t y_min, xy_t x_max, xy_t y_max);
+ret_t dragger_set_range (widget_t* widget, xy_t x_min, xy_t y_min, xy_t x_max, xy_t y_max);
 ```
 
 * 参数说明：
 
 | 参数 | 类型 | 说明 |
 | -------- | ----- | --------- |
-| 返回值 | widget\_t* | 对象。 |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | dragger控件。 |
 | x\_min | xy\_t | x坐标最小值。 |
 | y\_min | xy\_t | y坐标最小值。 |
@@ -98,8 +90,7 @@ widget_t* dragger_set_range (widget_t* widget, xy_t x_min, xy_t y_min, xy_t x_ma
 | y\_max | xy\_t | y坐标最大值。 |
 #### x\_max 属性
 -----------------------
-> <p id="dragger_t_x_max"> x坐标的最大值。
-
+> <p id="dragger_t_x_max">x坐标的最大值。
 
 * 类型：xy\_t
 
@@ -115,8 +106,7 @@ widget_t* dragger_set_range (widget_t* widget, xy_t x_min, xy_t y_min, xy_t x_ma
 | 可通过widget\_set\_prop修改 | 是 |
 #### x\_min 属性
 -----------------------
-> <p id="dragger_t_x_min"> x坐标的最小值。
-
+> <p id="dragger_t_x_min">x坐标的最小值。
 
 * 类型：xy\_t
 
@@ -132,8 +122,7 @@ widget_t* dragger_set_range (widget_t* widget, xy_t x_min, xy_t y_min, xy_t x_ma
 | 可通过widget\_set\_prop修改 | 是 |
 #### y\_max 属性
 -----------------------
-> <p id="dragger_t_y_max"> y坐标的最大值。
-
+> <p id="dragger_t_y_max">y坐标的最大值。
 
 * 类型：xy\_t
 
@@ -149,8 +138,7 @@ widget_t* dragger_set_range (widget_t* widget, xy_t x_min, xy_t y_min, xy_t x_ma
 | 可通过widget\_set\_prop修改 | 是 |
 #### y\_min 属性
 -----------------------
-> <p id="dragger_t_y_min"> y坐标的最小值。
-
+> <p id="dragger_t_y_min">y坐标的最小值。
 
 * 类型：xy\_t
 

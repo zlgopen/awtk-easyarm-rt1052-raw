@@ -209,7 +209,7 @@ TEST(Edit, focus_next) {
   ASSERT_EQ(g->key_target, e1);
   ASSERT_EQ(widget_focus_next(e1), RET_OK);
   ASSERT_EQ(g->key_target, e2);
-  ASSERT_EQ(widget_focus_next(e1), RET_BAD_PARAMS);
+  ASSERT_EQ(widget_focus_next(e1), RET_FAIL);
 
   ASSERT_EQ(widget_focus_next(e2), RET_OK);
   ASSERT_EQ(g->key_target, e3);
@@ -232,7 +232,7 @@ TEST(Edit, focus_prev) {
 
   ASSERT_EQ(widget_focus_prev(e1), RET_OK);
   ASSERT_EQ(g->key_target, e3);
-  ASSERT_EQ(widget_focus_prev(e1), RET_BAD_PARAMS);
+  ASSERT_EQ(widget_focus_prev(e1), RET_FAIL);
 
   ASSERT_EQ(widget_focus_prev(e3), RET_OK);
   ASSERT_EQ(g->key_target, e2);
@@ -440,4 +440,14 @@ TEST(Edit, events) {
   ASSERT_EQ(wcscmp(b->text.str, L"1a"), 0);
 
   widget_destroy(b);
+}
+
+TEST(Edit, clone) {
+  widget_t* w1 = edit_create(NULL, 10, 20, 30, 40);
+  widget_t* w2 = widget_clone(w1, NULL);
+
+  ASSERT_EQ(widget_equal(w1, w2), TRUE);
+
+  widget_destroy(w1);
+  widget_destroy(w2);
 }

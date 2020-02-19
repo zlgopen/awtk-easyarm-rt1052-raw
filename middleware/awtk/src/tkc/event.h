@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,7 +27,7 @@
 BEGIN_C_DECLS
 
 /**
- * @enum event_base_type_t
+ * @enum event_type_t
  * @annotation ["scriptable"]
  * @prefix EVT_
  * 类型常量定义。
@@ -64,6 +64,16 @@ typedef enum _event_base_type_t {
    */
   EVT_PROPS_CHANGED,
   /**
+   * @const EVT_PROGRESS
+   * 进度状态(progress_event_t)。
+   */
+  EVT_PROGRESS,
+  /**
+   * @const EVT_DONE
+   * 完成(event_t)。
+   */
+  EVT_DONE,
+  /**
    * @const EVT_DESTROY
    * 对象销毁事件名(event_t)。
    */
@@ -72,6 +82,7 @@ typedef enum _event_base_type_t {
 
 /**
  * @class event_t
+ * @order -100
  * @annotation ["scriptable"]
  * 事件基类。
  */
@@ -120,11 +131,10 @@ event_t* event_cast(event_t* event);
  *
  * 主要给脚本语言使用。
  * @param {uint32_t} type 事件类型。
- * @param {void*} target 目标对象。
  *
  * @return {event_t*} 返回事件对象。
  */
-event_t* event_create(uint32_t type, void* target);
+event_t* event_create(uint32_t type);
 
 /**
  * @method event_destroy
@@ -177,9 +187,58 @@ typedef struct _prop_change_event_t {
  * 把event对象转prop_change_event_t对象，主要给脚本语言使用。
  * @param {event_t*} event event对象。
  *
- * @return {prop_change_event_t*} 对象。
+ * @return {prop_change_event_t*}  返回event对象。
  */
 prop_change_event_t* prop_change_event_cast(event_t* event);
+
+/**
+ * @method prop_change_event_init
+ * 初始prop change event。
+ * 
+ * @param {prop_change_event_t*} event event对象。
+ * @param {uint32_t} percent 进度。
+ *
+ * @return {event_t*} 返回event对象。
+ */
+event_t* prop_change_event_init(prop_change_event_t* event, uint32_t type, const char* name,
+                                const value_t* value);
+
+/**
+ * @class progress_event_t
+ * @annotation ["scriptable"]
+ * @parent event_t
+ * 进度变化事件。
+ */
+typedef struct _progress_event_t {
+  event_t e;
+  /**
+   * @property {uint32_t} percent
+   * @annotation ["readable", "scriptable"]
+   * 进度百分比。
+   */
+  uint32_t percent;
+} progress_event_t;
+
+/**
+ * @method progress_event_cast
+ * @annotation ["cast", "scriptable"]
+ * 把event对象转progress_event_t对象，主要给脚本语言使用。
+ * @param {event_t*} event event对象。
+ *
+ * @return {progress_event_t*}  返回event对象。
+ */
+progress_event_t* progress_event_cast(event_t* event);
+
+/**
+ * @method progress_event_init
+ * 初始progress event。
+ * 
+ * @param {progress_event_t*} event event对象。
+ * @param {uint32_t} percent 进度。
+ *
+ * @return {event_t*} 返回event对象。
+ */
+event_t* progress_event_init(progress_event_t* event, uint32_t percent);
 
 END_C_DECLS
 

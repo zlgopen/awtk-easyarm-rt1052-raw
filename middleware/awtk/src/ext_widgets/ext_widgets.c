@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  ext widgets
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +23,7 @@
 #include "switch/switch.h"
 #include "guage/guage.h"
 #include "mledit/mledit.h"
+#include "features/draggable.h"
 #include "mledit/line_number.h"
 #include "guage/guage_pointer.h"
 #include "gif_image/gif_image.h"
@@ -34,7 +35,6 @@
 #include "slide_menu/slide_menu.h"
 #include "image_value/image_value.h"
 #include "time_clock/time_clock.h"
-#include "time_clock/digit_clock.h"
 #include "scroll_view/list_item.h"
 #include "scroll_view/list_view.h"
 #include "slide_view/slide_view.h"
@@ -82,7 +82,6 @@ ret_t tk_ext_widgets_init() {
   widget_factory_register(f, WIDGET_TYPE_KEYBOARD, keyboard_create);
   widget_factory_register(f, WIDGET_TYPE_CANDIDATES, candidates_create);
   widget_factory_register(f, WIDGET_TYPE_TIME_CLOCK, time_clock_create);
-  widget_factory_register(f, WIDGET_TYPE_DIGIT_CLOCK, digit_clock_create);
   widget_factory_register(f, WIDGET_TYPE_GUAGE, guage_create);
   widget_factory_register(f, WIDGET_TYPE_GUAGE_POINTER, guage_pointer_create);
   widget_factory_register(f, WIDGET_TYPE_TEXT_SELECTOR, text_selector_create);
@@ -99,6 +98,7 @@ ret_t tk_ext_widgets_init() {
   widget_factory_register(f, WIDGET_TYPE_LINE_NUMBER, line_number_create);
   widget_factory_register(f, WIDGET_TYPE_HSCROLL_LABEL, hscroll_label_create);
   widget_factory_register(f, WIDGET_TYPE_COMBO_BOX_EX, combo_box_ex_create);
+  widget_factory_register(f, WIDGET_TYPE_DRAGGABLE, draggable_create);
 
   children_layouter_register_ext_builtins();
 

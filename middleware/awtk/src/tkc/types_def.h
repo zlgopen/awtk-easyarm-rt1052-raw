@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  basic types definitions.
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,6 +33,14 @@
 #include <string.h>
 #include <limits.h>
 
+#ifdef __cplusplus
+#define BEGIN_C_DECLS extern "C" {
+#define END_C_DECLS }
+#else
+#define BEGIN_C_DECLS
+#define END_C_DECLS
+#endif
+
 #if defined(HAS_STDIO) || defined(AWTK_WEB)
 #include <stdio.h>
 #else
@@ -55,7 +63,6 @@ typedef uint8_t bool_t;
 
 typedef int32_t xy_t;
 typedef int32_t wh_t;
-typedef void* pointer_t;
 typedef uint16_t font_size_t;
 
 #if defined(WITH_DOUBLE_FLOAT)
@@ -183,38 +190,7 @@ typedef enum _ret_t {
   RET_EOS
 } ret_t;
 
-#ifdef ANDROID
-#include "android/log.h"
-#define log_debug(...) __android_log_print(ANDROID_LOG_DEBUG, "AWTK", __VA_ARGS__)
-#define log_info(...) __android_log_print(ANDROID_LOG_INFO, "AWTK", __VA_ARGS__)
-#define log_warn(...) __android_log_print(ANDROID_LOG_WARN, "AWTK", __VA_ARGS__)
-#define log_error(...) __android_log_print(ANDROID_LOG_ERROR, "AWTK", __VA_ARGS__)
-#elif defined(WIN32)
-#include <windows.h>
-#define strcasecmp stricmp
-#if defined(__GNUC__)
-#define log_debug(format, args...) printf(format, ##args)
-#define log_info(format, args...) printf(format, ##args)
-#define log_warn(format, args...) printf(format, ##args)
-#define log_error(format, args...) printf(format, ##args)
-#else
-#define log_debug(format, ...) printf(format, __VA_ARGS__)
-#define log_info(format, ...) printf(format, __VA_ARGS__)
-#define log_warn(format, ...) printf(format, __VA_ARGS__)
-#define log_error(format, ...) printf(format, __VA_ARGS__)
-#endif
-#define snprintf _snprintf
-#elif defined(HAS_STDIO) || defined(AWTK_WEB)
-#define log_debug(format, args...) printf(format, ##args)
-#define log_info(format, args...) printf(format, ##args)
-#define log_warn(format, args...) printf(format, ##args)
-#define log_error(format, args...) printf(format, ##args)
-#else
-#define log_debug(format, args...)
-#define log_info(format, args...)
-#define log_warn(format, args...)
-#define log_error(format, args...)
-#endif
+#include "tkc/log.h"
 
 #if defined(WIN32) || defined(__ARMCC_VERSION)
 #define random rand
@@ -227,6 +203,11 @@ typedef enum _ret_t {
 
 #if defined(WIN32)
 #define TK_PATH_SEP '\\'
+#ifndef snprintf
+#define snprintf _snprintf
+#endif /*snprintf*/
+
+#define strcasecmp stricmp
 #else
 #define TK_PATH_SEP '/'
 #endif /*TK_PATH_SEP*/
@@ -278,14 +259,6 @@ typedef enum _ret_t {
     return (value);                                     \
   }
 
-#endif
-
-#ifdef __cplusplus
-#define BEGIN_C_DECLS extern "C" {
-#define END_C_DECLS }
-#else
-#define BEGIN_C_DECLS
-#define END_C_DECLS
 #endif
 
 #define tk_min(a, b) ((a) < (b) ? (a) : (b))
@@ -346,8 +319,8 @@ enum { TK_NAME_LEN = 31 };
 #define TK_CONST_DATA_ALIGN(v) v __attribute__((aligned(8)))
 #endif /*_MSC_VER*/
 
-typedef uint64_t (*tk_get_time_t)();
-typedef uint64_t (*tk_get_time_ms_t)();
+typedef uint64_t (*tk_get_time_t)(void);
+typedef uint64_t (*tk_get_time_ms_t)(void);
 typedef void (*tk_sleep_ms_t)(uint32_t ms);
 
 #if defined(WIN32) && !defined(NDEBUG)

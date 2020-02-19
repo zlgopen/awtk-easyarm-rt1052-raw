@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  sdl2 implemented lcd interface/
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -91,6 +91,13 @@ static ret_t lcd_sdl2_flush(lcd_t* lcd) {
     log_debug("dirty_rect: %d %d %d %d\n", dr->x, dr->y, dr->w, dr->h);
 
     SDL_RenderCopy(info->render, info->texture, &sr, &sr);
+
+    if (src.buffer != NULL) {
+      graphic_buffer_destroy(src.buffer);
+    }
+    if (dst.buffer != NULL) {
+      graphic_buffer_destroy(dst.buffer);
+    }
   }
 
   if (lcd->draw_mode != LCD_DRAW_OFFLINE) {

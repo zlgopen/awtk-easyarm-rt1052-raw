@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  reference count object
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -57,6 +57,7 @@ struct _object_vtable_t {
 
 /**
  * @class object_t
+ * @order -9
  * @parent emitter_t
  * @annotation ["scriptable"]
  *
@@ -317,7 +318,6 @@ ret_t object_set_prop_str(object_t* obj, const char* name, const char* value);
  * @method object_set_prop_pointer
  * 设置指定属性的指针类型的值。
  *
- * @annotation ["scriptable"]
  * @param {object_t*} obj object对象。
  * @param {const char*} name 属性的名称。
  * @param {void*} value 属性的值。
@@ -395,7 +395,6 @@ ret_t object_copy_prop(object_t* obj, object_t* src, const char* name);
  * @method object_foreach_prop
  * 遍历所有属性。
  *
- * @annotation ["scriptable:custom"]
  * @param {object_t*} obj object对象。
  * @param {tk_visit_t} on_prop 回调函数。
  * @param {void*} ctx 回调函数上下文。
@@ -446,6 +445,7 @@ bool_t object_can_exec(object_t* obj, const char* name, const char* args);
  * @method object_exec
  * 执行指定的命令。
  *
+ * @alias execute
  * @annotation ["scriptable"]
  * @param {object_t*} obj object对象。
  * @param {const char*} name 命令的名称。

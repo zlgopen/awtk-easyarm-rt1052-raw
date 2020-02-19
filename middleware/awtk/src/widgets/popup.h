@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  popup
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,7 @@ BEGIN_C_DECLS
 
 /**
  * @class popup_t
- * @parent widget_t
+ * @parent window_base_t
  * @annotation ["scriptable","design","widget","window"]
  * 弹出窗口。
  *
@@ -51,7 +51,7 @@ BEGIN_C_DECLS
  * ```
  *
  * >
- * 更多用法请参考：[popup](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/)
+ * 更多用法请参考：[popup](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
  *
  * 在c代码中使用函数popup\_create创建弹出窗口。如：
  *
@@ -62,7 +62,7 @@ BEGIN_C_DECLS
  *
  * > 创建之后，和使用普通窗口是一样的。
  *
- * > 完整示例请参考：[combo_box.c](https://github.com/zlgopen/awtk/src/widgets/combo_box.c)
+ * > 完整示例请参考：[combo_box.c](https://github.com/zlgopen/awtk-c-demos/blob/master/demos/combo_box.c)
  *
  * 可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：
  *
@@ -75,7 +75,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L324)
+ * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L324)
  */
 typedef struct _popup_t {
   window_base_t window;
@@ -93,6 +93,9 @@ typedef struct _popup_t {
    * 点击到窗口外时是否关闭窗口。
    */
   bool_t close_when_click_outside;
+
+  /*private*/
+  bool_t is_outside;
 } popup_t;
 
 /**

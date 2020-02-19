@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   children_layouter_default_default.c
  * Author: AWTK Develop Team
  * Brief:  children layouter default
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -306,9 +306,6 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
     for (i = 0; i < n; i++) {
       iter = children[i];
       children_w += iter->w + spacing;
-      if (children_w > (layout_w - 2 * x_margin)) {
-        break;
-      }
     }
     children_w -= spacing;
 
@@ -328,7 +325,6 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
     x = xoffset;
     for (i = 0; i < n; i++) {
       iter = children[i];
-      return_value_if_fail(x <= layout_w, RET_BAD_PARAMS);
       widget_move_resize(iter, x, y, iter->w, h);
       x += iter->w + spacing;
     }
@@ -351,7 +347,6 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
 
     for (i = 0; i < n; i++) {
       iter = children[i];
-      return_value_if_fail(y <= layout_h, RET_BAD_PARAMS);
       widget_move_resize(iter, x, y, w, iter->h);
       y += iter->h + spacing;
     }
@@ -425,8 +420,19 @@ static ret_t children_layouter_default_destroy(children_layouter_t* layouter) {
   return RET_OK;
 }
 
+static children_layouter_t* children_layouter_default_clone(children_layouter_t* layouter) {
+  children_layouter_default_t* l = TKMEM_ZALLOC(children_layouter_default_t);
+
+  memcpy(l, layouter, sizeof(*l));
+  str_init(&(l->layouter.params), 0);
+  str_set(&(l->layouter.params), layouter->params.str);
+
+  return (children_layouter_t*)l;
+}
+
 static const children_layouter_vtable_t s_children_layouter_default_vtable = {
     .type = "default",
+    .clone = children_layouter_default_clone,
     .to_string = children_layouter_default_to_string,
     .get_param = children_layouter_default_get_param,
     .set_param = children_layouter_default_set_param,

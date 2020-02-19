@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   style.c
  * Author: AWTK Develop Team
  * Brief:  style interface
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -81,7 +81,9 @@ bool_t style_is_mutable(style_t* s) {
 #include "tkc/color_parser.h"
 
 static uint32_t to_border(const char* value) {
-  uint32_t border = 0;
+  uint32_t border = tk_atoi(value);
+  if (border != 0) return border;
+
   if (strstr(value, "left")) {
     border |= BORDER_LEFT;
   }
@@ -104,6 +106,9 @@ static uint32_t to_border(const char* value) {
 static uint32_t to_icon_at(const char* value) {
   uint32_t icon_at = ICON_AT_AUTO;
 
+  if (strstr(value, "centre")) {
+    icon_at = ICON_AT_CENTRE;
+  }
   if (strstr(value, "left")) {
     icon_at = ICON_AT_LEFT;
   }

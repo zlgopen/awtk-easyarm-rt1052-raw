@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  timer info
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -106,13 +106,6 @@ struct _timer_info_t {
    * 定时器销毁时的回调函数上下文。
    */
   void* on_destroy_ctx;
-
-  /**
-   * @property {bool_t} user_changed_time
-   * @annotation ["readable", "scriptable"]
-   * 用户是否修改了系统时间。
-   */
-  bool_t user_changed_time;
 
   /*private*/
   uint64_t last_dispatch_time;

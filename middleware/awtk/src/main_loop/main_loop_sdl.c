@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  sdl2 implemented main_loop interface
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * this program is distributed in the hope that it will be useful,
  * but without any warranty; without even the implied warranty of
@@ -28,9 +28,11 @@
 #include "base/idle.h"
 #include "base/events.h"
 #include "base/timer.h"
+#include "base/system_info.h"
 #include <SDL.h>
 
 #include <stdio.h>
+#include "awtk_global.h"
 #include "tkc/time_now.h"
 #include "base/input_method.h"
 
@@ -164,6 +166,11 @@ static ret_t main_loop_sdl2_dispatch_window_event(main_loop_simple_t* loop, SDL_
     case SDL_WINDOWEVENT_SIZE_CHANGED: {
       event_t e = event_init(EVT_NATIVE_WINDOW_RESIZED, NULL);
       SDL_Window* win = SDL_GetWindowFromID(event->window.windowID);
+      int ww = 0;
+      int wh = 0;
+      SDL_GetWindowSize(win, &ww, &wh);
+      system_info_set_lcd_w(system_info(), ww);
+      system_info_set_lcd_h(system_info(), wh);
       window_manager_dispatch_native_window_event(l->wm, &e, win);
       break;
     }
@@ -196,7 +203,7 @@ static ret_t main_loop_sdl2_dispatch_window_event(main_loop_simple_t* loop, SDL_
         e = event_init(EVT_NATIVE_WINDOW_DESTROY, NULL);
         window_manager_dispatch_native_window_event(l->wm, &e, win);
 
-        main_loop_quit(&(loop->base));
+        tk_quit();
       }
     } break;
 #if SDL_VERSION_ATLEAST(2, 0, 5)

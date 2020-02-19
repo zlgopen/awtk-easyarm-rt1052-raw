@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  enumerations
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,10 +36,17 @@ static const key_type_value_t align_v_name_value[] = {
     {"top", 0, ALIGN_V_TOP}, {"middle", 0, ALIGN_V_MIDDLE}, {"bottom", 0, ALIGN_V_BOTTOM}};
 
 static const key_type_value_t input_type_name_value[] = {
-    {"int", 0, INPUT_INT},       {"float", 0, INPUT_FLOAT}, {"uint", 0, INPUT_UINT},
-    {"ufloat", 0, INPUT_UFLOAT}, {"text", 0, INPUT_TEXT},   {"password", 0, INPUT_PASSWORD},
-    {"hex", 0, INPUT_HEX},       {"email", 0, INPUT_EMAIL}, {"phone", 0, INPUT_PHONE},
+    {"int", 0, INPUT_INT},
+    {"float", 0, INPUT_FLOAT},
+    {"uint", 0, INPUT_UINT},
+    {"ufloat", 0, INPUT_UFLOAT},
+    {"text", 0, INPUT_TEXT},
+    {"password", 0, INPUT_PASSWORD},
+    {"hex", 0, INPUT_HEX},
+    {"email", 0, INPUT_EMAIL},
+    {"phone", 0, INPUT_PHONE},
     {"custom", 0, INPUT_CUSTOM},
+    {"custom_password", 0, INPUT_CUSTOM_PASSWORD},
 };
 
 static const key_type_value_t align_h_name_value[] = {
@@ -70,7 +77,10 @@ static const key_type_value_t image_draw_type_name_value[] = {
     {"patch3_x", 0, IMAGE_DRAW_PATCH3_X},
     {"patch3_y", 0, IMAGE_DRAW_PATCH3_Y},
     {"patch3_x_scale_y", 0, IMAGE_DRAW_PATCH3_X_SCALE_Y},
-    {"patch3_y_scale_x", 0, IMAGE_DRAW_PATCH3_Y_SCALE_X}};
+    {"patch3_y_scale_x", 0, IMAGE_DRAW_PATCH3_Y_SCALE_X},
+    {"repeat9", 0, IMAGE_DRAW_REPEAT9},
+    {"repeat3_x", 0, IMAGE_DRAW_REPEAT3_X},
+    {"repeat3_y", 0, IMAGE_DRAW_REPEAT3_Y}};
 
 static const key_type_value_t easing_type_name_value[] = {
     {"linear", 0, EASING_LINEAR},
@@ -198,6 +208,8 @@ static const key_type_value_t keys_type_name_value[] = {
     {"DELETE", 0, TK_KEY_DELETE},
     {"LEFTBRACE", 0, TK_KEY_LEFTBRACE},
     {"RIGHTBRACE", 0, TK_KEY_RIGHTBRACE},
+    {"BACK", 0, TK_KEY_BACK},
+    {"CANCEL", 0, TK_KEY_CANCEL},
 #ifdef SDL2
     {"PRINTSCREEN", 0, TK_KEY_PRINTSCREEN},
     {"SCROLLLOCK", 0, TK_KEY_SCROLLLOCK},
@@ -233,7 +245,6 @@ static const key_type_value_t keys_type_name_value[] = {
     {"VOLUMEDOWN", 0, TK_KEY_VOLUMEDOWN},
     {"ALTERASE", 0, TK_KEY_ALTERASE},
     {"SYSREQ", 0, TK_KEY_SYSREQ},
-    {"CANCEL", 0, TK_KEY_CANCEL},
     {"CLEAR", 0, TK_KEY_CLEAR},
     {"PRIOR", 0, TK_KEY_PRIOR},
     {"RETURN2", 0, TK_KEY_RETURN2},
@@ -378,27 +389,13 @@ const key_type_value_t* easing_type_find_by_value(uint32_t value) {
   return find_item_by_value(easing_type_name_value, ARRAY_SIZE(easing_type_name_value), value);
 }
 
-static const char* key_name_fix(char fixed_name[TK_NAME_LEN + 1], const char* name) {
-  uint32_t len = strlen(name);
-  tk_strncpy(fixed_name, name, TK_NAME_LEN);
-
-  if (len > 1) {
-    uint32_t i = 0;
-    for (i = 0; i < len; i++) {
-      fixed_name[i] = toupper(fixed_name[i]);
-    }
-  }
-
-  return fixed_name;
-}
-
 const key_type_value_t* keys_type_find(const char* name) {
   char fixed_name[TK_NAME_LEN + 1];
   return_value_if_fail(name != NULL, NULL);
 
   memset(fixed_name, 0x00, sizeof(fixed_name));
   return find_item(keys_type_name_value, ARRAY_SIZE(keys_type_name_value),
-                   key_name_fix(fixed_name, name));
+                   tk_normalize_key_name(name, fixed_name));
 }
 
 const key_type_value_t* keys_type_find_by_value(uint32_t value) {

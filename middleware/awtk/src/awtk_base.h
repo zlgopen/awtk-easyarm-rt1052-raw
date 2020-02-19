@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  awtk toolkit c libs
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -82,4 +82,5 @@
 #include "base/window_animator_factory.h"
 #include "base/window_base.h"
 #include "base/window_manager.h"
+#include "base/style_mutable.h"
 #endif /*TK_BASE_H*/

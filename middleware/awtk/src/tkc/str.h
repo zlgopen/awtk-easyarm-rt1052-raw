@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  string
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -195,6 +195,16 @@ ret_t str_remove(str_t* str, uint32_t offset, uint32_t len);
 ret_t str_append_char(str_t* str, char c);
 
 /**
+ * @method str_append_int
+ * 追加一个整数。
+ * @param {str_t*} str str对象。
+ * @param {int32_t} value 要追加的整数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t str_append_int(str_t* str, int32_t value);
+
+/**
  * @method str_pop
  * 删除最后一个字符。
  * @param {str_t*} str str对象。
@@ -267,11 +277,22 @@ ret_t str_from_value(str_t* str, const value_t* v);
  * @method str_from_wstr
  * 用value初始化字符串。
  * @param {str_t*} str str对象。
- * @param {wchar_t*} wstr wstr。
+ * @param {wchar_t*} wstr Unicode字符串。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t str_from_wstr(str_t* str, const wchar_t* wstr);
+
+/**
+ * @method str_from_wstr_with_len
+ * 用value初始化字符串。
+ * @param {str_t*} str str对象。
+ * @param {wchar_t*} wstr Unicode字符串
+ * @param {uint32_t} len Unicode字符串的长度。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t str_from_wstr_with_len(str_t* str, const wchar_t* wstr, uint32_t len);
 
 /**
  * @method str_to_int

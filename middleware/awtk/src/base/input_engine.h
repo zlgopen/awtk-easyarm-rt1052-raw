@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input method engine
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,7 +32,7 @@ typedef struct _input_engine_t input_engine_t;
 typedef ret_t (*input_engine_reset_input_t)(input_engine_t* engine);
 typedef ret_t (*input_engine_input_t)(input_engine_t* engine, int key);
 
-#define TK_IM_MAX_INPUT_CHARS 15
+#define TK_IM_MAX_INPUT_CHARS 11
 #define TK_IM_MAX_CANDIDATE_CHARS 127
 
 /**

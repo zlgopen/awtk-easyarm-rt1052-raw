@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   text_edit.c
  * Author: AWTK Develop Team
  * Brief:  text_edit
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -82,6 +82,7 @@ typedef struct _text_edit_impl_t {
   bool_t single_line;
   bool_t caret_visible;
   uint32_t line_height;
+  uint32_t last_line_number;
   text_layout_info_t layout_info;
 
   /*for single line edit*/
@@ -331,8 +332,11 @@ static row_info_t* text_edit_multi_line_layout_line(text_edit_t* text_edit, uint
     if (impl->wrap_word) {
       if ((x + char_w) > layout_info->w) {
         if (last_breakable_x > 0) {
-          i = last_breakable_i;
+          i = last_breakable_i + 1;
           x = last_breakable_x;
+        }
+        if (i == offset) {
+          i++;
         }
         break;
       }
@@ -356,6 +360,12 @@ static row_info_t* text_edit_multi_line_layout_line(text_edit_t* text_edit, uint
     }
   }
 
+  if (last_char == STB_TEXTEDIT_NEWLINE) {
+    impl->last_line_number = row_num + 1;
+  } else {
+    impl->last_line_number = row_num;
+  }
+
   row->text_w = x;
   row->offset = offset;
   row->length = i - offset;
@@ -374,15 +384,16 @@ static row_info_t* text_edit_layout_line(text_edit_t* text_edit, uint32_t row_nu
   }
 }
 
-ret_t text_edit_layout(text_edit_t* text_edit) {
+static ret_t text_edit_layout_impl(text_edit_t* text_edit) {
   uint32_t i = 0;
   uint32_t offset = 0;
   DECL_IMPL(text_edit);
+  row_info_t* iter = NULL;
   uint32_t max_rows = impl->rows->capacity;
   wstr_t* text = &(text_edit->widget->text);
   uint32_t size = text_edit->widget->text.size;
   text_layout_info_t* layout_info = &(impl->layout_info);
-
+  uint32_t char_w = canvas_measure_text(text_edit->c, text->str, 1) + CHAR_SPACING;
   impl->caret.x = 0;
   impl->caret.y = 0;
   impl->rows->size = 0;
@@ -395,8 +406,13 @@ ret_t text_edit_layout(text_edit_t* text_edit) {
   impl->line_height = text_edit->c->font_size * FONT_BASELINE;
 
   widget_get_text_layout_info(text_edit->widget, layout_info);
+
+  if (layout_info->w < char_w) {
+    return RET_OK;
+  }
+
   while ((offset < size || size == 0) && i < max_rows) {
-    row_info_t* iter = text_edit_layout_line(text_edit, i, offset);
+    iter = text_edit_layout_line(text_edit, i, offset);
     if (iter == NULL || iter->length == 0) {
       break;
     }
@@ -404,7 +420,10 @@ ret_t text_edit_layout(text_edit_t* text_edit) {
     i++;
   }
 
-  if (offset < size) {
+  if (i == max_rows && !impl->single_line) {
+    impl->last_line_number = max_rows;
+    text_edit_set_caret_pos(impl, iter->x, iter->length, text_edit->c->font_size);
+  } else if (offset < size) {
     text->size = offset;
     text->str[offset] = 0;
   }
@@ -416,8 +435,18 @@ ret_t text_edit_layout(text_edit_t* text_edit) {
   return RET_OK;
 }
 
+ret_t text_edit_layout(text_edit_t* text_edit) {
+  if (text_edit == NULL || text_edit->c == NULL || text_edit->widget == NULL ||
+      text_edit->widget->initializing || text_edit->widget->loading) {
+    return RET_BAD_PARAMS;
+  }
+
+  return text_edit_layout_impl(text_edit);
+}
+
 static void text_edit_layout_for_stb(StbTexteditRow* row, STB_TEXTEDIT_STRING* str, int offset) {
   DECL_IMPL(str);
+  if (str->c == NULL) return;
   uint32_t font_size = str->c->font_size;
   row_info_t* info = rows_find_by_offset(impl->rows, offset);
 
@@ -605,6 +634,8 @@ static ret_t text_edit_paint_text(text_edit_t* text_edit, canvas_t* c) {
 }
 
 static ret_t text_edit_do_paint(text_edit_t* text_edit, canvas_t* c) {
+  bool_t is_notify = FALSE;
+  uint32_t new_line_height = 0;
   DECL_IMPL(text_edit);
   return_value_if_fail(text_edit != NULL && c != NULL, RET_BAD_PARAMS);
 
@@ -616,7 +647,10 @@ static ret_t text_edit_do_paint(text_edit_t* text_edit, canvas_t* c) {
   }
 
   widget_prepare_text_style(text_edit->widget, c);
-  impl->line_height = c->font_size * FONT_BASELINE;
+
+  new_line_height = c->font_size * FONT_BASELINE;
+  is_notify = impl->line_height != new_line_height;
+  impl->line_height = new_line_height;
 
   if (text_edit_paint_text(text_edit, c) == RET_OK) {
     DECL_IMPL(text_edit);
@@ -625,6 +659,10 @@ static ret_t text_edit_do_paint(text_edit_t* text_edit, canvas_t* c) {
     if (state->select_start == state->select_end && impl->caret_visible) {
       text_edit_paint_caret(text_edit, c);
     }
+  }
+
+  if (is_notify) {
+    text_edit_layout(text_edit);
   }
 
   return RET_OK;
@@ -854,6 +892,8 @@ static ret_t text_edit_handle_shortcut(text_edit_t* text_edit, key_event_t* evt,
         text_edit_paste(text_edit, str.str, str.size);
         wstr_reset(&str);
       }
+    } else if (key > 128 || !isprint(key)) {
+      return RET_FAIL;
     }
 
     text_edit_layout(text_edit);
@@ -878,6 +918,26 @@ ret_t text_edit_key_down(text_edit_t* text_edit, key_event_t* evt) {
   layout_info = &(impl->layout_info);
 
   switch (key) {
+#ifdef SDL2
+    case TK_KEY_KP_DIVIDE:
+    case TK_KEY_KP_MULTIPLY:
+    case TK_KEY_KP_MINUS:
+    case TK_KEY_KP_PLUS:
+    case TK_KEY_KP_PERIOD:
+    case TK_KEY_NUMLOCKCLEAR:
+    case TK_KEY_KP_0:
+    case TK_KEY_KP_1:
+    case TK_KEY_KP_2:
+    case TK_KEY_KP_3:
+    case TK_KEY_KP_4:
+    case TK_KEY_KP_5:
+    case TK_KEY_KP_6:
+    case TK_KEY_KP_7:
+    case TK_KEY_KP_8:
+    case TK_KEY_KP_9:
+      return RET_OK;
+    case TK_KEY_KP_ENTER:
+#endif
     case TK_KEY_RETURN: {
       key = STB_TEXTEDIT_NEWLINE;
       break;
@@ -1158,6 +1218,7 @@ ret_t text_edit_get_state(text_edit_t* text_edit, text_edit_state_t* state) {
 
   state->cursor = impl->state.cursor;
   state->max_rows = impl->rows->capacity;
+  state->last_line_number = impl->last_line_number;
 
   state->select_start = tk_min(impl->state.select_start, impl->state.select_end);
   state->select_end = tk_max(impl->state.select_start, impl->state.select_end);

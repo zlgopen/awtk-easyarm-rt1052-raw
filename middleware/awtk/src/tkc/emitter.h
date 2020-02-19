@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  emitter dispatcher
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,6 +35,7 @@ struct _emitter_item_t {
   uint32_t type;
   event_func_t handler;
 
+  uint32_t tag;
   tk_destroy_t on_destroy;
   void* on_destroy_ctx;
   emitter_item_t* next;
@@ -42,6 +43,7 @@ struct _emitter_item_t {
 
 /**
  * @class emitter_t
+ * @order -10
  * @annotation ["scriptable"]
  *
  * 事件分发器, 用于实现观察者模式。
@@ -107,8 +109,7 @@ emitter_t* emitter_init(emitter_t* emitter);
  * @annotation ["scriptable"]
  * @param {emitter_t*} emitter emitter对象。
  * @param {event_t*} e 事件对象。
- * @return {ret_t}
- *  如果当前分发的回调函数返回RET_STOP，dispatch中断分发，并返回RET_STOP，否则返回RET_OK。
+ * @return {ret_t} 如果当前分发的回调函数返回RET_STOP，dispatch中断分发，并返回RET_STOP，否则返回RET_OK。
  */
 ret_t emitter_dispatch(emitter_t* emitter, event_t* e);
 
@@ -118,7 +119,7 @@ ret_t emitter_dispatch(emitter_t* emitter, event_t* e);
  * > 对emitter_dispatch的包装，分发一个简单的事件。
  * @annotation ["scriptable"]
  * @param {emitter_t*} emitter emitter对象。
- * @param {uint32_t} type 事件类型。
+ * @param {event_type_t} type 事件类型。
  * @return {ret_t}
  *  如果当前分发的回调函数返回RET_STOP，dispatch中断分发，并返回RET_STOP，否则返回RET_OK。
  */
@@ -129,13 +130,27 @@ ret_t emitter_dispatch_simple_event(emitter_t* emitter, uint32_t type);
  * 注册指定事件的处理函数。
  * @annotation ["scriptable:custom"]
  * @param {emitter_t*} emitter emitter对象。
- * @param {uint32_t} type 事件类型。
+ * @param {event_type_t} type 事件类型。
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  *
  * @return {uint32_t} 返回id，用于emitter_off。
  */
 uint32_t emitter_on(emitter_t* emitter, uint32_t etype, event_func_t handler, void* ctx);
+
+/**
+ * @method emitter_on_with_tag
+ * 注册指定事件的处理函数。
+ * @param {emitter_t*} emitter emitter对象。
+ * @param {event_type_t} type 事件类型。
+ * @param {event_func_t} on_event 事件处理函数。
+ * @param {void*} ctx 事件处理函数上下文。
+ * @param {uint32_t} tag tag。
+ *
+ * @return {uint32_t} 返回id，用于emitter_off。
+ */
+uint32_t emitter_on_with_tag(emitter_t* emitter, uint32_t etype, event_func_t handler, void* ctx,
+                             uint32_t tag);
 
 /**
  * @method emitter_off
@@ -152,7 +167,7 @@ ret_t emitter_off(emitter_t* emitter, uint32_t id);
  * @method emitter_off_by_func
  * 注销指定事件的处理函数。
  * @param {emitter_t*} emitter emitter对象。
- * @param {uint32_t} type 事件类型。
+ * @param {event_type_t} type 事件类型。
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  *
@@ -169,6 +184,16 @@ ret_t emitter_off_by_func(emitter_t* emitter, uint32_t etype, event_func_t handl
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t emitter_off_by_ctx(emitter_t* emitter, void* ctx);
+
+/**
+ * @method emitter_off_by_tag
+ * 注销指定事件的处理函数。
+ * @param {emitter_t*} emitter emitter对象。
+ * @param {uint32_t} tag tag。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t emitter_off_by_tag(emitter_t* emitter, uint32_t tag);
 
 /**
  * @method emitter_set_on_destroy

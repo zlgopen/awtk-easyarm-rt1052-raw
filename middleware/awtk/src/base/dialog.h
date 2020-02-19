@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dialog
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,8 +27,54 @@
 BEGIN_C_DECLS
 
 /**
+ * @enum dialog_quit_code_t
+ * @annotation ["scriptable"]
+ * @prefix DIALOG_QUIT_
+ * 对话框退出码。 
+ * 
+ * > 一般用作dialog_quit函数的参数。
+ */
+typedef enum _dialog_quit_code_t {
+  /**
+   * @const DIALOG_QUIT_NONE
+   * 对话框被强行关闭或不关心关闭原因。
+   */
+  DIALOG_QUIT_NONE = 0,
+
+  /**
+   * @const DIALOG_QUIT_OK
+   * 点击“OK”按钮关闭。
+   */
+  DIALOG_QUIT_OK = 1,
+
+  /**
+   * @const DIALOG_QUIT_YES
+   * 点击“YES”按钮关闭。
+   */
+  DIALOG_QUIT_YES = 1,
+
+  /**
+   * @const DIALOG_QUIT_CANCEL
+   * 点击“CANCEL”按钮关闭。
+   */
+  DIALOG_QUIT_CANCEL = 2,
+
+  /**
+   * @const DIALOG_QUIT_NO
+   * 点击“NO”按钮关闭。
+   */
+  DIALOG_QUIT_NO = 2,
+
+  /**
+   * @const DIALOG_QUIT_OTHER
+   * 点击其它按钮关闭。
+   */
+  DIALOG_QUIT_OTHER
+} dialog_quit_code_t;
+
+/**
  * @class dialog_t
- * @parent widget_t
+ * @parent window_base_t
  * @annotation ["scriptable","design","widget","window"]
  *
  * 对话框。 对话框是一种特殊的窗口，大小和位置可以自由设置。
@@ -110,7 +156,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [dialog.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/)
+ * [dialog.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
  *
  * > 完整C代码示例请参考：
  *
@@ -128,7 +174,7 @@ BEGIN_C_DECLS
  *
  * > 更多用法请参考：
  * [theme default]
- * (https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L324)
+ * (https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L324)
  *
  */
 typedef struct _dialog_t {
@@ -138,13 +184,15 @@ typedef struct _dialog_t {
    * @property {const char*} highlight
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * 对话框高亮策略。
+   * 
+   * > 请参考 [对话框高亮策略](https://github.com/zlgopen/awtk/blob/master/docs/dialog_highlight.md)
    */
   char* highlight;
 
   /*private*/
   widget_t* title;
   widget_t* client;
-  uint32_t quit_code;
+  dialog_quit_code_t quit_code;
   bool_t quited;
   bool_t is_model;
 } dialog_t;
@@ -238,9 +286,9 @@ ret_t dialog_set_title(widget_t* widget, const char* title);
  * @annotation ["scriptable"]
  * @param {widget_t*} widget dialog对象。
  *
- * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ * @return {dialog_quit_code_t} 返回退出吗。
  */
-uint32_t dialog_modal(widget_t* widget);
+dialog_quit_code_t dialog_modal(widget_t* widget);
 
 /**
  * @method dialog_quit
@@ -250,7 +298,7 @@ uint32_t dialog_modal(widget_t* widget);
  *
  * @annotation ["scriptable"]
  * @param {widget_t*} widget dialog对象。
- * @param {uint32_t} code 退出码，作为dialog_modal的返回值。
+ * @param {uint32_t} code 退出码，作为dialog_modal的返回值(参考：[dialog_quit_code_t](dialog_quit_code_t.md))。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */

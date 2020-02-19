@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  font manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -133,6 +133,12 @@ ret_t font_manager_unload_font(font_manager_t* fm, const char* name, font_size_t
   return_value_if_fail(font != NULL, RET_NOT_FOUND);
 
   return darray_remove(&(fm->fonts), &info);
+}
+
+ret_t font_manager_unload_all(font_manager_t* fm) {
+  return_value_if_fail(fm != NULL, RET_FAIL);
+
+  return darray_clear(&(fm->fonts));
 }
 
 ret_t font_manager_deinit(font_manager_t* fm) {

@@ -1,7 +1,6 @@
 ## event\_t
 ### 概述
- 事件基类。
-
+事件基类。
 ----------------------------------
 ### 函数
 <p id="event_t_methods">
@@ -25,11 +24,9 @@
 
 * 函数功能：
 
-> <p id="event_t_event_cast"> 转换为event对象。
+> <p id="event_t_event_cast">转换为event对象。
 
- > 供脚本语言使用
-
-
+> 供脚本语言使用
 
 * 函数原型：
 
@@ -48,16 +45,14 @@ event_t* event_cast (event_t* event);
 
 * 函数功能：
 
-> <p id="event_t_event_create"> 创建event对象。
+> <p id="event_t_event_create">创建event对象。
 
- 主要给脚本语言使用。
-
-
+主要给脚本语言使用。
 
 * 函数原型：
 
 ```
-event_t* event_create (uint32_t type, void* target);
+event_t* event_create (uint32_t type);
 ```
 
 * 参数说明：
@@ -66,17 +61,14 @@ event_t* event_create (uint32_t type, void* target);
 | -------- | ----- | --------- |
 | 返回值 | event\_t* | 返回事件对象。 |
 | type | uint32\_t | 事件类型。 |
-| target | void* | 目标对象。 |
 #### event\_destroy 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="event_t_event_destroy"> 销毁事件对象。
+> <p id="event_t_event_destroy">销毁事件对象。
 
- 主要给脚本语言使用。
-
-
+主要给脚本语言使用。
 
 * 函数原型：
 
@@ -95,9 +87,7 @@ ret_t event_destroy (event_t* event);
 
 * 函数功能：
 
-> <p id="event_t_event_init"> 初始化事件。
-
-
+> <p id="event_t_event_init">初始化事件。
 
 * 函数原型：
 
@@ -114,8 +104,7 @@ event_t event_init (uint32_t type, void* target);
 | target | void* | 目标对象。 |
 #### target 属性
 -----------------------
-> <p id="event_t_target"> 事件发生的目标对象。
-
+> <p id="event_t_target">事件发生的目标对象。
 
 * 类型：void*
 
@@ -126,8 +115,7 @@ event_t event_init (uint32_t type, void* target);
 | 可脚本化   | 是 |
 #### time 属性
 -----------------------
-> <p id="event_t_time"> 事件发生的时间。
-
+> <p id="event_t_time">事件发生的时间。
 
 * 类型：int32\_t
 
@@ -138,8 +126,7 @@ event_t event_init (uint32_t type, void* target);
 | 可脚本化   | 是 |
 #### type 属性
 -----------------------
-> <p id="event_t_type"> 类型。
-
+> <p id="event_t_type">类型。
 
 * 类型：int32\_t
 

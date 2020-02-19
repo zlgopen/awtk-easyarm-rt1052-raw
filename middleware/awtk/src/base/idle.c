@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  idle manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,10 @@
 
 uint32_t idle_add(idle_func_t on_idle, void* ctx) {
   return idle_manager_add(idle_manager(), on_idle, ctx);
+}
+
+bool_t idle_exist(idle_func_t on_idle, void* ctx) {
+  return idle_manager_exist(idle_manager(), on_idle, ctx);
 }
 
 ret_t idle_remove(uint32_t idle_id) {

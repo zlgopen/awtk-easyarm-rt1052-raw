@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  combo_box
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -74,9 +74,26 @@ typedef widget_t* (*combo_box_custom_open_popup_t)(widget_t* combobox);
  * </popup>
  * ```
  *
- * >
- * 更多用法请参考：[combo_box.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/combo_box.xml)
+ * > 更多用法请参考：[combo_box.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/combo_box.xml)
  *
+ * 
+ *
+ * 如果在文本比较长时，希望在获得焦点时文本自动滚动，可以放入一个hscroll_label为子控件，并命名为"value"。如：
+ * 
+ * ```xml
+ *   <combo_box left_margin="6" readonly="true" x="10" y="50" w="80" h="30" options="leftttttttttt;centerrrrrrrrrrrrrrrr;rightttttttttt;"
+ *   selected_index="1">
+ *   <hscroll_label x="0" y="0" w="-30" h="100%"
+ *     name="value"
+ *     lull="1000"
+ *     loop="true"
+ *     yoyo="true"
+ *     ellipses="true"
+ *     only_parent_focus="true"/> 
+ *   <button style="combobox_down" x="right:5" y="middle" w="20" h="20"/>
+ * </combo_box>
+ * ```
+ * 
  * 在c代码中使用函数combo\_box\_create创建下拉列表控件。如：
  *
  * ```c
@@ -107,8 +124,30 @@ typedef widget_t* (*combo_box_custom_open_popup_t)(widget_t* combobox);
  * </combo_box>
  * ```
  *
+ * * 1.combobox的下拉按钮的style名称为combobox_down，可以在主题文件中设置。
+ * 
+ * ```xml
+ * <button>
+ *  <style name="combobox_down" border_color="#a0a0a0">
+ *   <normal     bg_color="#f0f0f0" icon="arrow_down_n"/>
+ *   <pressed    bg_color="#c0c0c0" icon="arrow_down_p"/>
+ *   <over       bg_color="#e0e0e0" icon="arrow_down_o"/>
+ * </style>
+ * </button>
+ * ```
+ *
+ *  * 2.combobox的弹出popup窗口的style名称为combobox_popup，可以在主题文件中设置。
+ * 
+ * ```xml
+ * <popup>
+ * <style name="combobox_popup" border_color="red">
+ *   <normal bg_color="#808080"/>
+ * </style>
+ * </popup>
+ * ```
+ * 
  * > 更多用法请参考：[theme
- *default](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L422)
+ *default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L422)
  *
  */
 typedef struct _combo_box_t {
@@ -328,6 +367,7 @@ int32_t combo_box_get_value(widget_t* widget);
  * @method combo_box_get_text
  * 获取combo_box的文本。
  * @annotation ["scriptable"]
+ * @alias combo_box_get_text_value
  * @param {widget_t*} widget combo_box对象。
  *
  * @return {const char*} 返回文本。

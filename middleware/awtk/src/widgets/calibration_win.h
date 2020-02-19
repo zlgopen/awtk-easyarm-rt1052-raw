@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  touch screen calibration win
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,8 +40,8 @@ typedef ret_t (*calibration_win_on_click_t)(void* ctx, uint32_t index, point_t p
 
 /**
  * @class calibration_win_t
- * @parent widget_t
- * @annotation ["design", "widget", "window"]
+ * @parent window_base_t
+ * @annotation ["scriptable", "design", "widget", "window"]
  * 电阻屏校准窗口。
  *
  * calibration\_win\_t是[window\_base\_t](window_base_t.md)的子类控件，
@@ -55,7 +55,7 @@ typedef ret_t (*calibration_win_on_click_t)(void* ctx, uint32_t index, point_t p
  * ```
  *
  * > 更多用法请参考：
- * [window.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/calibration_win.xml)
+ * [window.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/calibration_win.xml)
  *
  * 在c代码中使用函数calibration\_win\_create创建窗口。如：
  *

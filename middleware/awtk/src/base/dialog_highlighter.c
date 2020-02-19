@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dialog_highlighter
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied highlighterrranty of
@@ -27,7 +27,7 @@ ret_t dialog_highlighter_clear_image(dialog_highlighter_t* h) {
     vg = canvas_get_vgcanvas(h->canvas);
     vgcanvas_destroy_fbo(vg, &(h->fbo));
     memset(&(h->fbo), 0x00, sizeof(h->fbo));
-  } else if (h->img.data != NULL) {
+  } else if (h->img.buffer != NULL) {
     bitmap_destroy(&(h->img));
     memset(&(h->img), 0x00, sizeof(h->img));
   }

@@ -1,22 +1,20 @@
 ## str\_t
 ### 概述
- 可变长度的UTF8字符串。
+可变长度的UTF8字符串。
 
- 示例：
+示例：
 
- ```c
-  str_t s;
-  str_init(&s, 0);
+```c
+str_t s;
+str_init(&s, 0);
 
-  str_append(&s, "abc");
-  str_append(&s, "123");
+str_append(&s, "abc");
+str_append(&s, "123");
 
-  str_reset(&s);
- ```
+str_reset(&s);
+```
 
- > 先调str\_init进行初始化，最后调用str\_reset释放内存。
-
-
+> 先调str\_init进行初始化，最后调用str\_reset释放内存。
 ----------------------------------
 ### 函数
 <p id="str_t_methods">
@@ -25,6 +23,7 @@
 | -------- | ------------ | 
 | <a href="#str_t_str_append">str\_append</a> | 追加字符串。 |
 | <a href="#str_t_str_append_char">str\_append\_char</a> | 追加一个字符。 |
+| <a href="#str_t_str_append_int">str\_append\_int</a> | 追加一个整数。 |
 | <a href="#str_t_str_append_with_len">str\_append\_with\_len</a> | 追加字符串。 |
 | <a href="#str_t_str_clear">str\_clear</a> | 清除字符串内容。 |
 | <a href="#str_t_str_decode_xml_entity">str\_decode\_xml\_entity</a> | 对XML基本的entity进行解码，目前仅支持&lt;&gt;&quota;&amp;。 |
@@ -37,6 +36,7 @@
 | <a href="#str_t_str_from_int">str\_from\_int</a> | 用整数初始化字符串。 |
 | <a href="#str_t_str_from_value">str\_from\_value</a> | 用value初始化字符串。 |
 | <a href="#str_t_str_from_wstr">str\_from\_wstr</a> | 用value初始化字符串。 |
+| <a href="#str_t_str_from_wstr_with_len">str\_from\_wstr\_with\_len</a> | 用value初始化字符串。 |
 | <a href="#str_t_str_init">str\_init</a> | 初始化字符串对象。 |
 | <a href="#str_t_str_insert">str\_insert</a> | 插入子字符串。 |
 | <a href="#str_t_str_insert_with_len">str\_insert\_with\_len</a> | 插入子字符串。 |
@@ -68,9 +68,7 @@
 
 * 函数功能：
 
-> <p id="str_t_str_append"> 追加字符串。
-
-
+> <p id="str_t_str_append">追加字符串。
 
 * 函数原型：
 
@@ -90,9 +88,7 @@ ret_t str_append (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_append_char"> 追加一个字符。
-
-
+> <p id="str_t_str_append_char">追加一个字符。
 
 * 函数原型：
 
@@ -107,14 +103,32 @@ ret_t str_append_char (str_t* str, char c);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | str | str\_t* | str对象。 |
 | c | char | 要追加的字符。 |
+#### str\_append\_int 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="str_t_str_append_int">追加一个整数。
+
+* 函数原型：
+
+```
+ret_t str_append_int (str_t* str, int32_t value);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| str | str\_t* | str对象。 |
+| value | int32\_t | 要追加的整数。 |
 #### str\_append\_with\_len 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="str_t_str_append_with_len"> 追加字符串。
-
-
+> <p id="str_t_str_append_with_len">追加字符串。
 
 * 函数原型：
 
@@ -135,9 +149,7 @@ ret_t str_append_with_len (str_t* str, char* text, uint32_t len);
 
 * 函数功能：
 
-> <p id="str_t_str_clear"> 清除字符串内容。
-
-
+> <p id="str_t_str_clear">清除字符串内容。
 
 * 函数原型：
 
@@ -156,9 +168,7 @@ ret_t str_clear (str_t* str);
 
 * 函数功能：
 
-> <p id="str_t_str_decode_xml_entity"> 对XML基本的entity进行解码，目前仅支持&lt;&gt;&quota;&amp;。
-
-
+> <p id="str_t_str_decode_xml_entity">对XML基本的entity进行解码，目前仅支持&lt;&gt;&quota;&amp;。
 
 * 函数原型：
 
@@ -178,9 +188,7 @@ ret_t str_decode_xml_entity (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_decode_xml_entity_with_len"> 对XML基本的entity进行解码，目前仅支持&lt;&gt;&quota;&amp;。
-
-
+> <p id="str_t_str_decode_xml_entity_with_len">对XML基本的entity进行解码，目前仅支持&lt;&gt;&quota;&amp;。
 
 * 函数原型：
 
@@ -201,9 +209,7 @@ ret_t str_decode_xml_entity_with_len (str_t* str, char* text, uint32_t len);
 
 * 函数功能：
 
-> <p id="str_t_str_end_with"> 判断字符串是否以指定的子串结尾。
-
-
+> <p id="str_t_str_end_with">判断字符串是否以指定的子串结尾。
 
 * 函数原型：
 
@@ -223,9 +229,7 @@ bool_t str_end_with (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_eq"> 判断两个字符串是否相等。
-
-
+> <p id="str_t_str_eq">判断两个字符串是否相等。
 
 * 函数原型：
 
@@ -245,16 +249,13 @@ bool_t str_eq (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_expand_vars"> 将字符串中的变量展开为obj中对应的属性值。
+> <p id="str_t_str_expand_vars">将字符串中的变量展开为obj中对应的属性值。
 
- 变量的格式为${xxx}：
+变量的格式为${xxx}：
 
- * xxx为变量名时，${xxx}被展开为obj的属性xxx的值。
- * xxx为表达式时，${xxx}被展开为表达式的值，表达式中可以用变量，$为变量的前缀，如${$x+$y}。
- * xxx为变量名时，而不存在obj的属性时，${xxx}被移出。
-
-
-
+* xxx为变量名时，${xxx}被展开为obj的属性xxx的值。
+* xxx为表达式时，${xxx}被展开为表达式的值，表达式中可以用变量，$为变量的前缀，如${$x+$y}。
+* xxx为变量名时，而不存在obj的属性时，${xxx}被移出。
 
 * 函数原型：
 
@@ -273,9 +274,7 @@ ret_t str_expand_vars (str_t* str);
 
 * 函数功能：
 
-> <p id="str_t_str_extend"> 扩展字符串到指定的容量。
-
-
+> <p id="str_t_str_extend">扩展字符串到指定的容量。
 
 * 函数原型：
 
@@ -295,9 +294,7 @@ ret_t str_extend (str_t* str, uint32_t capacity);
 
 * 函数功能：
 
-> <p id="str_t_str_from_float"> 用浮点数初始化字符串。
-
-
+> <p id="str_t_str_from_float">用浮点数初始化字符串。
 
 * 函数原型：
 
@@ -317,9 +314,7 @@ ret_t str_from_float (str_t* str, double v);
 
 * 函数功能：
 
-> <p id="str_t_str_from_int"> 用整数初始化字符串。
-
-
+> <p id="str_t_str_from_int">用整数初始化字符串。
 
 * 函数原型：
 
@@ -339,9 +334,7 @@ ret_t str_from_int (str_t* str, int32_t v);
 
 * 函数功能：
 
-> <p id="str_t_str_from_value"> 用value初始化字符串。
-
-
+> <p id="str_t_str_from_value">用value初始化字符串。
 
 * 函数原型：
 
@@ -361,9 +354,7 @@ ret_t str_from_value (str_t* str, value_t v);
 
 * 函数功能：
 
-> <p id="str_t_str_from_wstr"> 用value初始化字符串。
-
-
+> <p id="str_t_str_from_wstr">用value初始化字符串。
 
 * 函数原型：
 
@@ -377,15 +368,34 @@ ret_t str_from_wstr (str_t* str, wchar_t* wstr);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | str | str\_t* | str对象。 |
-| wstr | wchar\_t* | wstr。 |
+| wstr | wchar\_t* | Unicode字符串。 |
+#### str\_from\_wstr\_with\_len 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="str_t_str_from_wstr_with_len">用value初始化字符串。
+
+* 函数原型：
+
+```
+ret_t str_from_wstr_with_len (str_t* str, wchar_t* wstr, uint32_t len);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| str | str\_t* | str对象。 |
+| wstr | wchar\_t* | Unicode字符串 |
+| len | uint32\_t | Unicode字符串的长度。 |
 #### str\_init 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="str_t_str_init"> 初始化字符串对象。
-
-
+> <p id="str_t_str_init">初始化字符串对象。
 
 * 函数原型：
 
@@ -405,9 +415,7 @@ str_t* str_init (str_t* str, uint32_t capacity);
 
 * 函数功能：
 
-> <p id="str_t_str_insert"> 插入子字符串。
-
-
+> <p id="str_t_str_insert">插入子字符串。
 
 * 函数原型：
 
@@ -428,9 +436,7 @@ ret_t str_insert (str_t* str, uint32_t offset, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_insert_with_len"> 插入子字符串。
-
-
+> <p id="str_t_str_insert_with_len">插入子字符串。
 
 * 函数原型：
 
@@ -452,9 +458,7 @@ ret_t str_insert_with_len (str_t* str, uint32_t offset, char* text, uint32_t len
 
 * 函数功能：
 
-> <p id="str_t_str_pop"> 删除最后一个字符。
-
-
+> <p id="str_t_str_pop">删除最后一个字符。
 
 * 函数原型：
 
@@ -473,9 +477,7 @@ ret_t str_pop (str_t* str);
 
 * 函数功能：
 
-> <p id="str_t_str_remove"> 删除子字符串。
-
-
+> <p id="str_t_str_remove">删除子字符串。
 
 * 函数原型：
 
@@ -496,9 +498,7 @@ ret_t str_remove (str_t* str, uint32_t offset, uint32_t len);
 
 * 函数功能：
 
-> <p id="str_t_str_replace"> 字符串替换。
-
-
+> <p id="str_t_str_replace">字符串替换。
 
 * 函数原型：
 
@@ -519,9 +519,7 @@ ret_t str_replace (str_t* str, char* text, char* new_text);
 
 * 函数功能：
 
-> <p id="str_t_str_reset"> 重置字符串为空。
-
-
+> <p id="str_t_str_reset">重置字符串为空。
 
 * 函数原型：
 
@@ -540,9 +538,7 @@ ret_t str_reset (str_t* str);
 
 * 函数功能：
 
-> <p id="str_t_str_set"> 设置字符串。
-
-
+> <p id="str_t_str_set">设置字符串。
 
 * 函数原型：
 
@@ -562,9 +558,7 @@ ret_t str_set (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_set_with_len"> 设置字符串。
-
-
+> <p id="str_t_str_set_with_len">设置字符串。
 
 * 函数原型：
 
@@ -585,9 +579,7 @@ ret_t str_set_with_len (str_t* str, char* text, uint32_t len);
 
 * 函数功能：
 
-> <p id="str_t_str_start_with"> 判断字符串是否以指定的子串开头。
-
-
+> <p id="str_t_str_start_with">判断字符串是否以指定的子串开头。
 
 * 函数原型：
 
@@ -607,9 +599,7 @@ bool_t str_start_with (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_to_float"> 将字符串转成浮点数。
-
-
+> <p id="str_t_str_to_float">将字符串转成浮点数。
 
 * 函数原型：
 
@@ -629,9 +619,7 @@ ret_t str_to_float (str_t* str, double* v);
 
 * 函数功能：
 
-> <p id="str_t_str_to_int"> 将字符串转成整数。
-
-
+> <p id="str_t_str_to_int">将字符串转成整数。
 
 * 函数原型：
 
@@ -651,9 +639,7 @@ ret_t str_to_int (str_t* str, int32_t* v);
 
 * 函数功能：
 
-> <p id="str_t_str_to_lower"> 将字符串转成小写。
-
-
+> <p id="str_t_str_to_lower">将字符串转成小写。
 
 * 函数原型：
 
@@ -672,9 +658,7 @@ ret_t str_to_lower (str_t* str);
 
 * 函数功能：
 
-> <p id="str_t_str_to_upper"> 将字符串转成大写。
-
-
+> <p id="str_t_str_to_upper">将字符串转成大写。
 
 * 函数原型：
 
@@ -693,9 +677,7 @@ ret_t str_to_upper (str_t* str);
 
 * 函数功能：
 
-> <p id="str_t_str_trim"> 去除首尾指定的字符。
-
-
+> <p id="str_t_str_trim">去除首尾指定的字符。
 
 * 函数原型：
 
@@ -715,9 +697,7 @@ ret_t str_trim (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_trim_left"> 去除首部指定的字符。
-
-
+> <p id="str_t_str_trim_left">去除首部指定的字符。
 
 * 函数原型：
 
@@ -737,9 +717,7 @@ ret_t str_trim_left (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_trim_right"> 去除尾部指定的字符。
-
-
+> <p id="str_t_str_trim_right">去除尾部指定的字符。
 
 * 函数原型：
 
@@ -759,9 +737,7 @@ ret_t str_trim_right (str_t* str, char* text);
 
 * 函数功能：
 
-> <p id="str_t_str_unescape"> 对字符串进行反转义。如：把"\n"转换成'\n'。
-
-
+> <p id="str_t_str_unescape">对字符串进行反转义。如：把"\n"转换成'\n'。
 
 * 函数原型：
 
@@ -777,8 +753,7 @@ ret_t str_unescape (str_t* str);
 | str | str\_t* | str对象。 |
 #### capacity 属性
 -----------------------
-> <p id="str_t_capacity"> 容量。
-
+> <p id="str_t_capacity">容量。
 
 * 类型：uint32\_t
 
@@ -788,8 +763,7 @@ ret_t str_unescape (str_t* str);
 | 可直接修改 | 否 |
 #### size 属性
 -----------------------
-> <p id="str_t_size"> 长度。
-
+> <p id="str_t_size">长度。
 
 * 类型：uint32\_t
 
@@ -799,8 +773,7 @@ ret_t str_unescape (str_t* str);
 | 可直接修改 | 否 |
 #### str 属性
 -----------------------
-> <p id="str_t_str"> 字符串。
-
+> <p id="str_t_str">字符串。
 
 * 类型：char*
 

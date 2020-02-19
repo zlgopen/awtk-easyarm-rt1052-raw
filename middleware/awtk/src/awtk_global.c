@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   awtk.c
  * Author: AWTK Develop Team
  * Brief:  awtk
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -146,7 +146,7 @@ ret_t tk_init_internal(void) {
   font_loader = font_loader_bitmap();
 #endif /*WITH_TRUETYPE_FONT*/
 
-  return_value_if_fail(timer_init(time_now_ms) == RET_OK, RET_FAIL);
+  return_value_if_fail(timer_prepare(time_now_ms) == RET_OK, RET_FAIL);
   return_value_if_fail(idle_manager_set(idle_manager_create()) == RET_OK, RET_FAIL);
 #ifndef WITHOUT_INPUT_METHOD
   return_value_if_fail(input_method_set(input_method_create()) == RET_OK, RET_FAIL);
@@ -240,6 +240,18 @@ ret_t tk_deinit_internal(void) {
   input_method_set(NULL);
 #endif /*WITHOUT_INPUT_METHOD*/
 
+#ifndef WITHOUT_DIALOG_HIGHLIGHTER
+  dialog_highlighter_factory_destroy(dialog_highlighter_factory());
+  dialog_highlighter_factory_set(NULL);
+#endif /*WITHOUT_DIALOG_HIGHLIGHTER*/
+
+  timer_manager_destroy(timer_manager());
+  timer_manager_set(NULL);
+
+  idle_manager_dispatch(idle_manager());
+  idle_manager_destroy(idle_manager());
+  idle_manager_set(NULL);
+
 #ifndef WITHOUT_WINDOW_ANIMATORS
   window_animator_factory_destroy(window_animator_factory());
   window_animator_factory_set(NULL);
@@ -249,11 +261,6 @@ ret_t tk_deinit_internal(void) {
   widget_animator_manager_destroy(widget_animator_manager());
   widget_animator_manager_set(NULL);
 #endif /*WITHOUT_WIDGET_ANIMATORS*/
-
-#ifndef WITHOUT_DIALOG_HIGHLIGHTER
-  dialog_highlighter_factory_destroy(dialog_highlighter_factory());
-  dialog_highlighter_factory_set(NULL);
-#endif /*WITHOUT_DIALOG_HIGHLIGHTER*/
 
   theme_destroy(theme());
   theme_set(NULL);
@@ -266,12 +273,6 @@ ret_t tk_deinit_internal(void) {
 
   assets_manager_destroy(assets_manager());
   assets_manager_set(NULL);
-
-  idle_manager_destroy(idle_manager());
-  idle_manager_set(NULL);
-
-  timer_manager_destroy(timer_manager());
-  timer_manager_set(NULL);
 
   system_info_deinit();
 
@@ -292,7 +293,11 @@ ret_t tk_run() {
 }
 
 static ret_t tk_quit_idle(const timer_info_t* timer) {
-  return main_loop_quit(main_loop());
+  main_loop_t* loop = main_loop();
+
+  loop->app_quited = TRUE;
+
+  return main_loop_quit(loop);
 }
 
 ret_t tk_quit() {
@@ -307,10 +312,11 @@ ret_t tk_set_lcd_orientation(lcd_orientation_t orientation) {
 
   if (info->lcd_orientation != orientation) {
     orientation_event_t e;
-    orientation_event_init(&e, EVT_ORIENTATION_WILL_CHANGED, NULL, orientation);
-    widget_dispatch(window_manager(), (event_t*)&e);
 
     system_info_set_lcd_orientation(info, orientation);
+
+    orientation_event_init(&e, EVT_ORIENTATION_WILL_CHANGED, NULL, orientation);
+    widget_dispatch(window_manager(), (event_t*)&e);
   }
 
   return RET_OK;

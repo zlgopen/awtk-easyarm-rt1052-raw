@@ -2,9 +2,7 @@
 ### 概述
 ![image](images/idle_info_t_0.png)
 
-
- 单个idle的信息。
-
+单个idle的信息。
 ----------------------------------
 ### 函数
 <p id="idle_info_t_methods">
@@ -27,9 +25,7 @@
 
 * 函数功能：
 
-> <p id="idle_info_t_idle_info_cast"> 转换为idle_info对象(供脚本语言使用)。
-
-
+> <p id="idle_info_t_idle_info_cast">转换为idle_info对象(供脚本语言使用)。
 
 * 函数原型：
 
@@ -45,8 +41,7 @@ idle_info_t* idle_info_cast (idle_info_t* idle);
 | idle | idle\_info\_t* | idle\_info对象。 |
 #### ctx 属性
 -----------------------
-> <p id="idle_info_t_ctx"> idle回调函数上下文。
-
+> <p id="idle_info_t_ctx">idle回调函数上下文。
 
 * 类型：void*
 
@@ -57,10 +52,9 @@ idle_info_t* idle_info_cast (idle_info_t* idle);
 | 可脚本化   | 是 |
 #### id 属性
 -----------------------
-> <p id="idle_info_t_id"> idle的ID
+> <p id="idle_info_t_id">idle的ID
 
- > 为TK\_INVALID\_ID时表示无效idle。
-
+> 为TK\_INVALID\_ID时表示无效idle。
 
 * 类型：uint32\_t
 
@@ -71,8 +65,7 @@ idle_info_t* idle_info_cast (idle_info_t* idle);
 | 可脚本化   | 是 |
 #### on\_destroy 属性
 -----------------------
-> <p id="idle_info_t_on_destroy"> idle销毁时的回调函数。
-
+> <p id="idle_info_t_on_destroy">idle销毁时的回调函数。
 
 * 类型：tk\_destroy\_t
 
@@ -82,8 +75,7 @@ idle_info_t* idle_info_cast (idle_info_t* idle);
 | 可直接修改 | 否 |
 #### on\_destroy\_ctx 属性
 -----------------------
-> <p id="idle_info_t_on_destroy_ctx"> idle销毁时的回调函数的上下文。
-
+> <p id="idle_info_t_on_destroy_ctx">idle销毁时的回调函数的上下文。
 
 * 类型：tk\_destroy\_t
 
@@ -93,8 +85,7 @@ idle_info_t* idle_info_cast (idle_info_t* idle);
 | 可直接修改 | 否 |
 #### on\_idle 属性
 -----------------------
-> <p id="idle_info_t_on_idle"> idle回调函数。
-
+> <p id="idle_info_t_on_idle">idle回调函数。
 
 * 类型：idle\_func\_t
 

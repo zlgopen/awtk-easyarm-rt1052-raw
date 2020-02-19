@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  image base
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -86,6 +86,9 @@ ret_t image_base_get_prop(widget_t* widget, const char* name, value_t* v) {
   } else if (tk_str_eq(name, WIDGET_PROP_SELECTABLE)) {
     value_set_bool(v, image->selectable);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_SELECTED)) {
+    value_set_bool(v, image->selected);
+    return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_CLICKABLE)) {
     value_set_bool(v, image->clickable);
     return RET_OK;
@@ -118,6 +121,8 @@ ret_t image_base_set_prop(widget_t* widget, const char* name, const value_t* v) 
   } else if (tk_str_eq(name, WIDGET_PROP_SELECTABLE)) {
     image->selectable = value_bool(v);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_SELECTED)) {
+    return image_base_set_selected(widget, value_bool(v));
   } else if (tk_str_eq(name, WIDGET_PROP_CLICKABLE)) {
     image->clickable = value_bool(v);
     return RET_OK;
@@ -192,6 +197,12 @@ ret_t image_base_set_selected(widget_t* widget, bool_t selected) {
 
   image->selected = selected;
 
+  if (image->selected) {
+    widget_set_state(widget, WIDGET_STATE_SELECTED);
+  } else {
+    widget_set_state(widget, WIDGET_STATE_NORMAL);
+  }
+
   return widget_invalidate(widget, NULL);
 }
 
@@ -245,6 +256,23 @@ ret_t image_transform(widget_t* widget, canvas_t* c) {
   vgcanvas_rotate(vg, image_base->rotation);
   vgcanvas_scale(vg, image_base->scale_x, image_base->scale_y);
   vgcanvas_translate(vg, -anchor_x, -anchor_y);
+
+  return RET_OK;
+}
+
+ret_t image_base_on_copy(widget_t* widget, widget_t* other) {
+  image_base_t* image = IMAGE_BASE(widget);
+  image_base_t* image_other = IMAGE_BASE(other);
+
+  image->anchor_x = image_other->anchor_x;
+  image->anchor_y = image_other->anchor_y;
+  image->scale_x = image_other->scale_x;
+  image->scale_y = image_other->scale_y;
+  image->rotation = image_other->rotation;
+  image->clickable = image_other->clickable;
+  image->selectable = image_other->selectable;
+  image->selected = image_other->selected;
+  image->image = tk_str_copy(image->image, image_other->image);
 
   return RET_OK;
 }

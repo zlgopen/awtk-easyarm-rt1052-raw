@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  bitmap manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,12 +42,13 @@ static int bitmap_cache_cmp_name(bitmap_cache_t* a, bitmap_cache_t* b) {
 }
 
 static int bitmap_cache_cmp_data(bitmap_cache_t* a, bitmap_cache_t* b) {
-  return (char*)(a->image.data) - (char*)(b->image.data);
+  return (char*)(a->image.buffer) - (char*)(b->image.buffer);
 }
 
 static ret_t bitmap_cache_destroy(bitmap_cache_t* cache) {
   return_value_if_fail(cache != NULL, RET_BAD_PARAMS);
 
+  log_debug("unload image %s\n", cache->name);
   bitmap_destroy(&(cache->image));
   TKMEM_FREE(cache->name);
   TKMEM_FREE(cache);
@@ -136,7 +137,7 @@ ret_t image_manager_update_specific(image_manager_t* imm, bitmap_t* image) {
     imm = image->image_manager;
   }
 
-  info.image.data = image->data;
+  info.image.buffer = image->buffer;
   imm->images.compare = (tk_compare_t)bitmap_cache_cmp_data;
   iter = darray_find(&(imm->images), &info);
 
@@ -177,11 +178,13 @@ static ret_t image_manager_get_bitmap_impl(image_manager_t* imm, const char* nam
     image->flags = header->flags;
     image->format = header->format;
     image->name = res->name;
-    image->data = header->data;
     image->image_manager = imm;
-#if defined(WITH_NANOVG_GPU) || defined(WITH_NANOVG_SOFT)
+    bitmap_set_line_length(image, image->line_length);
+    image->buffer = GRAPHIC_BUFFER_CREATE_WITH_DATA(header->data, header->w, header->h,
+                                                    (bitmap_format_t)(header->format));
+
     image_manager_add(imm, name, image);
-#endif
+
     return RET_OK;
   } else if (res->subtype != ASSET_TYPE_IMAGE_BSVG) {
     ret_t ret = image_loader_load_image(res, image);
@@ -247,6 +250,13 @@ ret_t image_manager_get_bitmap(image_manager_t* imm, const char* name, bitmap_t*
   }
 }
 
+ret_t image_manager_preload(image_manager_t* imm, const char* name) {
+  bitmap_t image;
+  return_value_if_fail(imm != NULL && name != NULL && *name, RET_BAD_PARAMS);
+
+  return image_manager_get_bitmap(imm, name, &image);
+}
+
 ret_t image_manager_set_assets_manager(image_manager_t* imm, assets_manager_t* am) {
   return_value_if_fail(imm != NULL, RET_BAD_PARAMS);
 
@@ -261,17 +271,23 @@ ret_t image_manager_unload_unused(image_manager_t* imm, uint32_t time_delta_s) {
   return_value_if_fail(imm != NULL, RET_BAD_PARAMS);
 
   imm->images.compare = (tk_compare_t)bitmap_cache_cmp_time;
-  return darray_remove_all(&(imm->images), &b);
+  return darray_remove_all(&(imm->images), NULL, &b);
+}
+
+ret_t image_manager_unload_all(image_manager_t* imm) {
+  return_value_if_fail(imm != NULL, RET_BAD_PARAMS);
+
+  return darray_clear(&(imm->images));
 }
 
 ret_t image_manager_unload_bitmap(image_manager_t* imm, bitmap_t* image) {
   bitmap_cache_t b;
   return_value_if_fail(imm != NULL && image != NULL, RET_BAD_PARAMS);
 
-  b.image.data = image->data;
+  b.image.buffer = image->buffer;
   imm->images.compare = (tk_compare_t)bitmap_cache_cmp_data;
 
-  return darray_remove_all(&(imm->images), &b);
+  return darray_remove_all(&(imm->images), NULL, &b);
 }
 
 ret_t image_manager_deinit(image_manager_t* imm) {

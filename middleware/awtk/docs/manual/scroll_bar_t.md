@@ -2,44 +2,42 @@
 ### 概述
 ![image](images/scroll_bar_t_0.png)
 
- 滚动条控件。
+滚动条控件。
 
 > 目前只支持垂直滚动。
 
- scroll\_bar\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均适用于scroll\_bar\_t控件。
+scroll\_bar\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均适用于scroll\_bar\_t控件。
 
- 在xml中使用"scroll\_bar"或"scroll\_bar\_d"或"scroll\_bar\_m"标签创建滚动条控件。如：
+在xml中使用"scroll\_bar"或"scroll\_bar\_d"或"scroll\_bar\_m"标签创建滚动条控件。如：
 
- ```xml
- <list_view x="0"  y="30" w="100%" h="-80" item_height="60">
- <scroll_view name="view" x="0"  y="0" w="100%" h="100%">
- ...
- </scroll_view>
- <scroll_bar_m name="bar" x="right" y="0" w="6" h="100%" value="0"/>
- </list_view>
- ```
+```xml
+<list_view x="0"  y="30" w="100%" h="-80" item_height="60">
+<scroll_view name="view" x="0"  y="0" w="100%" h="100%">
+...
+</scroll_view>
+<scroll_bar_m name="bar" x="right" y="0" w="6" h="100%" value="0"/>
+</list_view>
+```
 
- > 更多用法请参考：[list\_view\_m.xml](
-https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/list_view_m.xml)
+> 更多用法请参考：[list\_view\_m.xml](
+https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/list_view_m.xml)
 
- 在c代码中使用函数scroll\_bar\_create创建列表项控件。如：
+在c代码中使用函数scroll\_bar\_create创建列表项控件。如：
 
- ```c
-  widget_t* scroll_bar = scroll_bar_create(list_view, 0, 0, 0, 0);
- ```
+```c
+widget_t* scroll_bar = scroll_bar_create(list_view, 0, 0, 0, 0);
+```
 
- ```xml
- <style name="default">
-   <normal bg_color="#c0c0c0" fg_color="#808080"/>
-   <over bg_color="#c0c0c0" fg_color="#808080"/>
-   <pressed bg_color="#c0c0c0" fg_color="#808080"/>
- </style>
- ```
+```xml
+<style name="default">
+<normal bg_color="#c0c0c0" fg_color="#808080"/>
+<over bg_color="#c0c0c0" fg_color="#808080"/>
+<pressed bg_color="#c0c0c0" fg_color="#808080"/>
+</style>
+```
 
- > 更多用法请参考：[theme default](
-https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L350)
-
-
+> 更多用法请参考：[theme default](
+https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L350)
 ----------------------------------
 ### 函数
 <p id="scroll_bar_t_methods">
@@ -71,9 +69,7 @@ https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_add_delta"> 在当前的值上增加一个值，并触发EVT_VALUE_CHANGED事件。
-
-
+> <p id="scroll_bar_t_scroll_bar_add_delta">在当前的值上增加一个值，并触发EVT_VALUE_CHANGED事件。
 
 * 函数原型：
 
@@ -93,9 +89,7 @@ ret_t scroll_bar_add_delta (widget_t* widget, int32_t delta);
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_cast"> 转换为scroll_bar对象(供脚本语言使用)。
-
-
+> <p id="scroll_bar_t_scroll_bar_cast">转换为scroll_bar对象(供脚本语言使用)。
 
 * 函数原型：
 
@@ -114,12 +108,9 @@ widget_t* scroll_bar_cast (widget_t* widget);
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_create"> 创建scroll_bar对象
+> <p id="scroll_bar_t_scroll_bar_create">创建scroll_bar对象
 
- > 根据宏WITH_DESKTOP_STYLE决定创建desktop风格还是mobile风格的滚动条
-
-
-
+> 根据宏WITH_DESKTOP_STYLE决定创建desktop风格还是mobile风格的滚动条
 
 * 函数原型：
 
@@ -142,9 +133,7 @@ widget_t* scroll_bar_create (widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_create_desktop"> 创建desktop风格的scroll_bar对象
-
-
+> <p id="scroll_bar_t_scroll_bar_create_desktop">创建desktop风格的scroll_bar对象
 
 * 函数原型：
 
@@ -167,9 +156,7 @@ widget_t* scroll_bar_create_desktop (widget_t* parent, xy_t x, xy_t y, wh_t w, w
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_create_mobile"> 创建mobile风格的scroll_bar对象
-
-
+> <p id="scroll_bar_t_scroll_bar_create_mobile">创建mobile风格的scroll_bar对象
 
 * 函数原型：
 
@@ -192,9 +179,7 @@ widget_t* scroll_bar_create_mobile (widget_t* parent, xy_t x, xy_t y, wh_t w, wh
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_is_mobile"> 判断是否是mobile风格的滚动条。
-
-
+> <p id="scroll_bar_t_scroll_bar_is_mobile">判断是否是mobile风格的滚动条。
 
 * 函数原型：
 
@@ -213,9 +198,7 @@ bool_t scroll_bar_is_mobile (widget_t* widget);
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_scroll_delta"> 在当前的值上增加一个值，并滚动到新的值，并触发EVT_VALUE_CHANGED事件。
-
-
+> <p id="scroll_bar_t_scroll_bar_scroll_delta">在当前的值上增加一个值，并滚动到新的值，并触发EVT_VALUE_CHANGED事件。
 
 * 函数原型：
 
@@ -235,9 +218,7 @@ ret_t scroll_bar_scroll_delta (widget_t* widget, int32_t delta);
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_scroll_to"> 滚动到指定的值。
-
-
+> <p id="scroll_bar_t_scroll_bar_scroll_to">滚动到指定的值。
 
 * 函数原型：
 
@@ -258,9 +239,7 @@ ret_t scroll_bar_scroll_to (widget_t* widget, int32_t value, int32_t duration);
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_set_params"> 设置参数。
-
-
+> <p id="scroll_bar_t_scroll_bar_set_params">设置参数。
 
 * 函数原型：
 
@@ -281,9 +260,7 @@ ret_t scroll_bar_set_params (widget_t* widget, int32_t virtual_size, int32_t row
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_set_value"> 设置值，并触发EVT_VALUE_CHANGED事件。
-
-
+> <p id="scroll_bar_t_scroll_bar_set_value">设置值，并触发EVT_VALUE_CHANGED事件。
 
 * 函数原型：
 
@@ -303,9 +280,7 @@ ret_t scroll_bar_set_value (widget_t* widget, int32_t value);
 
 * 函数功能：
 
-> <p id="scroll_bar_t_scroll_bar_set_value_only"> 设置值，但不触发EVT_VALUE_CHANGED事件。
-
-
+> <p id="scroll_bar_t_scroll_bar_set_value_only">设置值，但不触发EVT_VALUE_CHANGED事件。
 
 * 函数原型：
 
@@ -322,8 +297,7 @@ ret_t scroll_bar_set_value_only (widget_t* widget, int32_t value);
 | value | int32\_t | 值。 |
 #### animatable 属性
 -----------------------
-> <p id="scroll_bar_t_animatable"> 滚动时是否启用动画。
-
+> <p id="scroll_bar_t_animatable">滚动时是否启用动画。
 
 * 类型：bool\_t
 
@@ -339,8 +313,7 @@ ret_t scroll_bar_set_value_only (widget_t* widget, int32_t value);
 | 可通过widget\_set\_prop修改 | 是 |
 #### row 属性
 -----------------------
-> <p id="scroll_bar_t_row"> 行的高度。
-
+> <p id="scroll_bar_t_row">行的高度。
 
 * 类型：int32\_t
 
@@ -356,8 +329,7 @@ ret_t scroll_bar_set_value_only (widget_t* widget, int32_t value);
 | 可通过widget\_set\_prop修改 | 是 |
 #### value 属性
 -----------------------
-> <p id="scroll_bar_t_value"> 当前的值。
-
+> <p id="scroll_bar_t_value">当前的值。
 
 * 类型：int32\_t
 
@@ -373,8 +345,7 @@ ret_t scroll_bar_set_value_only (widget_t* widget, int32_t value);
 | 可通过widget\_set\_prop修改 | 是 |
 #### virtual\_size 属性
 -----------------------
-> <p id="scroll_bar_t_virtual_size"> 虚拟宽度或高度。
-
+> <p id="scroll_bar_t_virtual_size">虚拟宽度或高度。
 
 * 类型：int32\_t
 

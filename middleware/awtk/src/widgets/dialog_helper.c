@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   dialog_helper.c
  * Author: AWTK Develop Team
  * Brief:  dialogi helper
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -99,7 +99,9 @@ static widget_t* dialog_create_label(const char* text) {
   label = label_create(NULL, 0, 0, 0, 0);
   return_value_if_fail(label != NULL, NULL);
 
-  widget_set_text_utf8(label, text);
+  if (text != NULL) {
+    widget_set_tr_text(label, text);
+  }
   label_resize_to_content(label, r.x, r.w, r.y, r.h);
 
   return label;
@@ -161,6 +163,8 @@ ret_t dialog_info_ex(const char* text, const char* title_text, const char* theme
 
   ok = button_create(client, 0, 0, 0, 0);
   widget_set_tr_text(ok, "OK");
+  widget_set_focused(ok, TRUE);
+  widget_set_focusable(ok, TRUE);
   widget_set_self_layout(ok, "default(x=c, y=bottom:10, w=50%, h=30)");
   widget_on(ok, EVT_CLICK, on_ok_to_quit, dialog);
 
@@ -218,11 +222,14 @@ ret_t dialog_confirm(const char* stitle, const char* text) {
 
   ok = button_create(client, 0, 0, 0, 0);
   widget_set_tr_text(ok, "OK");
+  widget_set_focused(ok, TRUE);
+  widget_set_focusable(ok, TRUE);
   widget_use_style(ok, OK_STYLE_NAME);
   widget_set_self_layout(ok, "default(x=10%, y=bottom:10, w=30%, h=30)");
   widget_on(ok, EVT_CLICK, on_ok_to_quit, dialog);
 
   cancel = button_create(client, 0, 0, 0, 0);
+  widget_set_focusable(cancel, TRUE);
   widget_set_tr_text(cancel, "Cancel");
   widget_use_style(cancel, CANCEL_STYLE_NAME);
   widget_set_self_layout(cancel, "default(x=r:10%, y=bottom:10, w=30%, h=30)");

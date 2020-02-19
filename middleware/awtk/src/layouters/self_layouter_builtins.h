@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  builts self_layouter
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied highlighterrranty of
@@ -28,6 +28,9 @@ BEGIN_C_DECLS
 
 /**
  * @method self_layouter_register_builtins
+ * @of_class self_layouter_t
+ * @annotation ["private"]
+ *
  * 注册内置的控件自身布局算法。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。

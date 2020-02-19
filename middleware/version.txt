@@ -1,6 +1,6 @@
-awtk-v1.2+rc.2@aworks.2
+awtk-v1.3+rc.2+fix.2@aworks.2
 ====================
-awtk:1.2+sha.b7d54af
-awtk-examples:1.0.0+sha.af05b77
-awtk-aworks-rt1052:1.2.0+sha.372248c
-awtk-linux-fb:1.0.0+sha.ad6fc34
+awtk:1.3+sha.366ff52
+awtk-examples:1.2.0+sha.a50fae1
+awtk-aworks-rt1052:1.3.0+sha.b434892
+awtk-linux-fb:1.1.0+sha.dea20ea

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  output stream interface
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,11 +22,11 @@
 #include "tkc/time_now.h"
 #include "tkc/ostream.h"
 
-int32_t tk_ostream_write(tk_ostream_t* stream, const uint8_t* buff, uint32_t max_size) {
+int32_t tk_ostream_write(tk_ostream_t* stream, const void* buff, uint32_t max_size) {
   return_value_if_fail(stream != NULL && stream->write != NULL, -1);
   return_value_if_fail(buff != NULL, 0);
 
-  return stream->write(stream, buff, max_size);
+  return stream->write(stream, (const uint8_t*)buff, max_size);
 }
 
 ret_t tk_ostream_seek(tk_ostream_t* stream, uint32_t offset) {
@@ -36,20 +36,21 @@ ret_t tk_ostream_seek(tk_ostream_t* stream, uint32_t offset) {
   return stream->seek(stream, offset);
 }
 
-int32_t tk_ostream_write_len(tk_ostream_t* stream, const uint8_t* buff, uint32_t max_size,
+int32_t tk_ostream_write_len(tk_ostream_t* stream, const void* buff, uint32_t max_size,
                              uint32_t timeout_ms) {
   uint32_t now = 0;
   uint32_t end = 0;
   int32_t offset = 0;
   int32_t write_bytes = 0;
   int32_t remain_bytes = max_size;
+  const uint8_t* p = (const uint8_t*)buff;
   return_value_if_fail(stream != NULL && stream->write != NULL, -1);
   return_value_if_fail(buff != NULL, 0);
 
   now = time_now_ms();
   end = now + timeout_ms;
   do {
-    write_bytes = tk_ostream_write(stream, buff + offset, remain_bytes);
+    write_bytes = tk_ostream_write(stream, p + offset, remain_bytes);
 
     if (write_bytes <= 0) {
       break;
@@ -83,5 +84,5 @@ ret_t tk_ostream_flush(tk_ostream_t* stream) {
 }
 
 ret_t tk_ostream_write_byte(tk_ostream_t* stream, uint8_t byte) {
-  return tk_ostream_write_len(stream, &byte, 1, 1000);
+  return tk_ostream_write_len(stream, &byte, 1, 1000) == 1 ? RET_OK : RET_FAIL;
 }

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event source interface.
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -52,6 +52,7 @@ struct _event_source_t {
   event_source_dispatch_t dispatch;
   event_source_get_wakeup_time_t get_wakeup_time;
 
+  void* tag;
   event_source_manager_t* manager;
 };
 
@@ -78,6 +79,19 @@ int32_t event_source_get_fd(event_source_t* source);
  *
  */
 ret_t event_source_dispatch(event_source_t* source);
+
+/**
+ * @method event_source_set_tag
+ *
+ * 设置tag，方便通过tag一次移除多个事件源。
+ *
+ * @param {event_source_t*} source event_source对象。
+ * @param {void*} tag tag。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ *
+ */
+ret_t event_source_set_tag(event_source_t* source, void* tag);
 
 /**
  * @method event_source_check

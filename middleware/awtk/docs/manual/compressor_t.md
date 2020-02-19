@@ -1,29 +1,21 @@
 ## compressor\_t
 ### 概述
-
- compressor interface
-
-
+压缩解压接口。
 ----------------------------------
 ### 函数
 <p id="compressor_t_methods">
 
 | 函数名称 | 说明 | 
 | -------- | ------------ | 
-| <a href="#compressor_t_compressor_compress">compressor\_compress</a> |  |
-| <a href="#compressor_t_compressor_destroy">compressor\_destroy</a> |  |
-| <a href="#compressor_t_compressor_uncompress">compressor\_uncompress</a> |  |
+| <a href="#compressor_t_compressor_compress">compressor\_compress</a> | 压缩数据。 |
+| <a href="#compressor_t_compressor_destroy">compressor\_destroy</a> | 销毁compressor对象。 |
+| <a href="#compressor_t_compressor_uncompress">compressor\_uncompress</a> | 解压数据。 |
 #### compressor\_compress 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="compressor_t_compressor_compress">
- 压缩数据。
-
-
-
-
+> <p id="compressor_t_compressor_compress">压缩数据。
 
 * 函数原型：
 
@@ -45,12 +37,7 @@ ret_t compressor_compress (compressor_t* compressor, const void* data, uint32_t 
 
 * 函数功能：
 
-> <p id="compressor_t_compressor_destroy">
- 销毁compressor对象。
-
-
-
-
+> <p id="compressor_t_compressor_destroy">销毁compressor对象。
 
 * 函数原型：
 
@@ -69,12 +56,7 @@ ret_t compressor_destroy (compressor_t* compressor);
 
 * 函数功能：
 
-> <p id="compressor_t_compressor_uncompress">
- 解压数据。
-
-
-
-
+> <p id="compressor_t_compressor_uncompress">解压数据。
 
 * 函数原型：
 

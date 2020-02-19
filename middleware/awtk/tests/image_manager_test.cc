@@ -45,8 +45,6 @@ TEST(ImageManager, add) {
 
   bmp.w = 10;
   bmp.h = 10;
-  bmp.data = NULL;
-  bmp.destroy = NULL;
 
   ASSERT_EQ(image_manager_add(image_manager(), "checked", &bmp), RET_OK);
   ASSERT_EQ(image_manager_lookup(image_manager(), "checked", &bmp), RET_OK);
@@ -82,7 +80,7 @@ TEST(ImageManager, locale) {
 #ifdef WITH_FS_RES
 TEST(ImageManager, fs) {
   bitmap_t bmp;
-  const char* filename = "file://./demos/assets/raw/images/xx/flag_CN.png";
+  const char* filename = "file://./demos/assets/default/raw/images/xx/flag_CN.png";
 
   memset(&bmp, 0x00, sizeof(bmp));
   ASSERT_EQ(image_manager_get_bitmap(image_manager(), filename, &bmp), RET_OK);

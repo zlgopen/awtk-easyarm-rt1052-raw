@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  pixel format definitions
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -177,6 +177,7 @@ static inline void pixel_rgba8888_blend_rgba_dark(void* pixel, uint8_t a) {
   p[0] = (p[0] * a) >> 8;
   p[1] = (p[1] * a) >> 8;
   p[2] = (p[2] * a) >> 8;
+  p[3] = 0xff;
 }
 
 static inline void pixel_rgba8888_blend_rgba_premulti(void* pixel, rgba_t rgba) {
@@ -186,6 +187,7 @@ static inline void pixel_rgba8888_blend_rgba_premulti(void* pixel, rgba_t rgba) 
   p[0] = ((p[0] * a) >> 8) + rgba.r;
   p[1] = ((p[1] * a) >> 8) + rgba.g;
   p[2] = ((p[2] * a) >> 8) + rgba.b;
+  p[3] = 0xff;
 }
 
 typedef struct _pixel_abgr8888_t {
@@ -206,7 +208,7 @@ typedef struct _pixel_abgr8888_t {
   { a, b, g, r }
 static inline void pixel_abgr8888_blend_rgba_dark(void* pixel, uint8_t a) {
   uint8_t* p = (uint8_t*)pixel;
-
+  p[0] = 0xff;
   p[1] = (p[1] * a) >> 8;
   p[2] = (p[2] * a) >> 8;
   p[3] = (p[3] * a) >> 8;
@@ -215,7 +217,7 @@ static inline void pixel_abgr8888_blend_rgba_dark(void* pixel, uint8_t a) {
 static inline void pixel_abgr8888_blend_rgba_premulti(void* pixel, rgba_t rgba) {
   uint8_t a = rgba.a;
   uint8_t* p = (uint8_t*)pixel;
-
+  p[0] = 0xff;
   p[1] = ((p[1] * a) >> 8) + rgba.b;
   p[2] = ((p[2] * a) >> 8) + rgba.g;
   p[3] = ((p[3] * a) >> 8) + rgba.r;
@@ -243,6 +245,7 @@ static inline void pixel_bgra8888_blend_rgba_dark(void* pixel, uint8_t a) {
   p[0] = (p[0] * a) >> 8;
   p[1] = (p[1] * a) >> 8;
   p[2] = (p[2] * a) >> 8;
+  p[3] = 0xff;
 }
 
 static inline void pixel_bgra8888_blend_rgba_premulti(void* pixel, rgba_t rgba) {
@@ -252,6 +255,7 @@ static inline void pixel_bgra8888_blend_rgba_premulti(void* pixel, rgba_t rgba) 
   p[0] = ((p[0] * a) >> 8) + rgba.b;
   p[1] = ((p[1] * a) >> 8) + rgba.g;
   p[2] = ((p[2] * a) >> 8) + rgba.r;
+  p[3] = 0xff;
 }
 
 typedef struct _pixel_argb8888_t {
@@ -272,7 +276,7 @@ typedef struct _pixel_argb8888_t {
   { 0xff, r, g, b }
 static inline void pixel_argb8888_blend_rgba_dark(void* pixel, uint8_t a) {
   uint8_t* p = (uint8_t*)pixel;
-
+  p[0] = 0xff;
   p[1] = (p[1] * a) >> 8;
   p[2] = (p[2] * a) >> 8;
   p[3] = (p[3] * a) >> 8;
@@ -281,13 +285,23 @@ static inline void pixel_argb8888_blend_rgba_dark(void* pixel, uint8_t a) {
 static inline void pixel_argb8888_blend_rgba_premulti(void* pixel, rgba_t rgba) {
   uint8_t a = rgba.a;
   uint8_t* p = (uint8_t*)pixel;
-
+  p[0] = 0xff;
   p[1] = ((p[1] * a) >> 8) + rgba.r;
   p[2] = ((p[2] * a) >> 8) + rgba.g;
   p[3] = ((p[3] * a) >> 8) + rgba.b;
 }
 
-#define color_to_mono(c) (((c).rgba.r) & 0x01)
+typedef uint8_t pixel_gray_t;
+
+#define pixel_gray_BPP 1
+#define pixel_gray_a(p) 0xff
+#define pixel_gray_format BITMAP_FMT_GRAY
+#define pixel_gray_to_rgba(p) \
+  { p * 0.2989, p * 0.5870, p * 0.1140, 0xff }
+#define pixel_gray_from_rgba(r, g, b, a) (((r)*30 + (g)*59 + (b)*11) / 100)
+#define pixel_gray_from_rgb(r, g, b) (((r)*30 + (g)*59 + (b)*11) / 100)
+
+#define color_to_mono(c) (((c).rgba.r))
 #define color_from_mono(p) color_init(p, 0, 0, 0xff)
 
 #pragma pack(pop)

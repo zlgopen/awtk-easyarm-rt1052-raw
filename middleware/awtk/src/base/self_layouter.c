@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  self layouter
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -97,6 +97,14 @@ ret_t self_layouter_destroy(self_layouter_t* layouter) {
   return_value_if_fail(layouter->vt != NULL && layouter->vt->destroy != NULL, RET_OK);
 
   return layouter->vt->destroy(layouter);
+}
+
+self_layouter_t* self_layouter_clone(self_layouter_t* layouter) {
+  if (layouter != NULL && layouter->vt != NULL && layouter->vt->clone != NULL) {
+    return layouter->vt->clone(layouter);
+  }
+
+  return NULL;
 }
 
 #ifdef WITHOUT_LAYOUTER

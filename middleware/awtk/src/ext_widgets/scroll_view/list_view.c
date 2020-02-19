@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  list_view
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,6 +50,14 @@ static ret_t list_view_get_prop(widget_t* widget, const char* name, value_t* v) 
   return RET_NOT_FOUND;
 }
 
+static ret_t list_view_on_pointer_up(list_view_t* list_view, pointer_event_t* e) {
+  scroll_bar_t* scroll_bar = (scroll_bar_t*)list_view->scroll_bar;
+  if (scroll_bar_is_mobile(list_view->scroll_bar) && scroll_bar->wa_opactiy == NULL &&
+      list_view->scroll_bar->visible) {
+    widget_set_visible(list_view->scroll_bar, FALSE, TRUE);
+  }
+  return RET_OK;
+}
 static ret_t list_view_set_prop(widget_t* widget, const char* name, const value_t* v) {
   list_view_t* list_view = LIST_VIEW(widget);
   return_value_if_fail(list_view != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
@@ -69,6 +77,7 @@ static ret_t list_view_set_prop(widget_t* widget, const char* name, const value_
 }
 
 static ret_t list_view_on_event(widget_t* widget, event_t* e) {
+  ret_t ret = RET_OK;
   list_view_t* list_view = LIST_VIEW(widget);
   return_value_if_fail(list_view != NULL, RET_BAD_PARAMS);
 
@@ -80,12 +89,29 @@ static ret_t list_view_on_event(widget_t* widget, event_t* e) {
         scroll_bar_add_delta(list_view->scroll_bar, delta);
         log_debug("wheel: %d\n", delta);
       }
+
+      ret = RET_STOP;
       break;
     }
+    case EVT_KEY_DOWN: {
+      key_event_t* evt = (key_event_t*)e;
+      if (evt->key == TK_KEY_PAGEDOWN) {
+        scroll_view_scroll_delta_to(list_view->scroll_view, 0, widget->h, TK_ANIMATING_TIME);
+        ret = RET_STOP;
+      } else if (evt->key == TK_KEY_PAGEUP) {
+        scroll_view_scroll_delta_to(list_view->scroll_view, 0, -widget->h, TK_ANIMATING_TIME);
+        ret = RET_STOP;
+      }
+      break;
+    }
+    case EVT_POINTER_UP: {
+      pointer_event_t* evt = (pointer_event_t*)e;
+      list_view_on_pointer_up(list_view, evt);
+    } break;
     default:
       break;
   }
-  return RET_OK;
+  return ret;
 }
 
 TK_DECL_VTABLE(list_view) = {.type = WIDGET_TYPE_LIST_VIEW,

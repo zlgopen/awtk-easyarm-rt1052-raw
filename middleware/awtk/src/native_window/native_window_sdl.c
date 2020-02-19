@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  native window sdl
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -67,21 +67,16 @@ static ret_t native_window_sdl_move(native_window_t* win, xy_t x, xy_t y) {
 }
 
 static ret_t native_window_sdl_resize(native_window_t* win, wh_t w, wh_t h) {
-  int oldw = 0;
-  int oldh = 0;
   native_window_info_t info;
   native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(win);
 
   native_window_get_info(win, &info);
 
-  w = info.w;
-  h = info.h;
   win->rect.w = w;
   win->rect.h = h;
 
 #ifndef ANDROID
-  SDL_GetWindowSize(sdl->window, &oldw, &oldh);
-  if (w != oldw || h != oldh) {
+  if (w != info.w || h != info.h) {
     SDL_SetWindowSize(sdl->window, w, h);
   }
 #endif /*ANDROID*/
@@ -139,9 +134,8 @@ static ret_t native_window_sdl_gl_make_current(native_window_t* win) {
 }
 
 static ret_t native_window_sdl_swap_buffer(native_window_t* win) {
-  native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(win);
-
 #ifdef WITH_NANOVG_GL
+  native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(win);
   SDL_GL_SwapWindow(sdl->window);
 #else
 #endif /*WITH_NANOVG_GL*/
@@ -267,13 +261,13 @@ static ret_t native_window_sdl_on_destroy(object_t* obj) {
 }
 
 static ret_t native_window_sdl_exec(object_t* obj, const char* cmd, const char* args) {
-  native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(obj);
-
 #ifdef WITH_NANOVG_GPU
+  native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(obj);
   if (tk_str_eq(cmd, "reset_canvas")) {
     canvas_t* c = &(sdl->canvas);
-    lcd_destroy(c->lcd);
-    c->lcd = lcd_nanovg_init(NATIVE_WINDOW(sdl));
+    vgcanvas_t* vg = canvas_get_vgcanvas(c);
+
+    vgcanvas_reset(vg);
 
     return RET_OK;
   }
@@ -376,6 +370,10 @@ native_window_t* native_window_create(widget_t* widget) {
 
 #ifdef WITH_NANOVG_GL
 static ret_t sdl_init_gl(void) {
+  SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+  SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+  SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+  SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");

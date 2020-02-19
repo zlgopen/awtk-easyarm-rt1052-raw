@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   event_source.c
  * Author: AWTK Develop Team
  * Brief:  event source interface.
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,4 +43,12 @@ uint32_t event_source_get_wakeup_time(event_source_t* source) {
   return_value_if_fail(source != NULL, 0);
 
   return source->get_wakeup_time != NULL ? source->get_wakeup_time(source) : 0;
+}
+
+ret_t event_source_set_tag(event_source_t* source, void* tag) {
+  return_value_if_fail(source != NULL, RET_BAD_PARAMS);
+
+  source->tag = tag;
+
+  return RET_OK;
 }

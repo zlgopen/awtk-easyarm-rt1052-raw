@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   input_method_default.c
  * Author: AWTK Develop Team
  * Brief:  input method default
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,6 +20,7 @@
  */
 
 #include "tkc/mem.h"
+#include "tkc/utils.h"
 #include "base/idle.h"
 #include "base/enums.h"
 #include "base/window.h"
@@ -77,6 +78,8 @@ static const char* input_type_to_keyboard_name(int32_t input_type) {
 
 static ret_t on_push_window(void* ctx, event_t* e) {
   input_method_t* im = (input_method_t*)ctx;
+
+  im->win_old_y = im->win->y;
   im->win->y -= im->win_delta_y;
   widget_invalidate_force(im->win, NULL);
 
@@ -85,7 +88,7 @@ static ret_t on_push_window(void* ctx, event_t* e) {
 
 static ret_t input_method_default_restore_win_position(input_method_t* im) {
   if (im->win != NULL) {
-    im->win->y += im->win_delta_y;
+    im->win->y = im->win_old_y;
     widget_invalidate_force(im->win, NULL);
     im->win = NULL;
   }
@@ -94,17 +97,20 @@ static ret_t input_method_default_restore_win_position(input_method_t* im) {
 }
 
 static ret_t input_method_on_win_close(void* ctx, event_t* e) {
+  value_t v;
   input_method_t* im = (input_method_t*)ctx;
-
   input_method_default_restore_win_position(im);
 
   if (im->keyboard != NULL) {
-    window_manager_close_window_force(im->keyboard->parent, im->keyboard);
-    im->keyboard = NULL;
+    /* 用来区分 keyboard 切换类型时候调用的 window_close */
+    widget_get_prop(im->keyboard, WIDGET_PROP_CLOSE_ANIM_HINT, &v);
+    if (tk_str_cmp(value_str(&v), "") != 0) {
+      im->keyboard = NULL;
+      im->widget = NULL;
+      im->win = NULL;
+    }
   }
 
-  im->widget = NULL;
-  im->win = NULL;
   (void)e;
 
   return RET_REMOVE;
@@ -166,7 +172,7 @@ static ret_t input_type_open_keyboard(input_method_t* im, int32_t input_type, bo
   value_set_str(&v, close_anim_hint);
   widget_set_prop(im->keyboard, WIDGET_PROP_CLOSE_ANIM_HINT, &v);
 
-  widget_on(win, EVT_WINDOW_CLOSE, input_method_on_win_close, im);
+  widget_on(win->parent, EVT_WINDOW_CLOSE, input_method_on_win_close, im);
 
   return RET_OK;
 }

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  timer manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,7 +22,7 @@
 #include "tkc/mem.h"
 #include "base/timer.h"
 
-ret_t timer_init(timer_get_time_t get_time) {
+ret_t timer_prepare(timer_get_time_t get_time) {
   return_value_if_fail(get_time != NULL, RET_BAD_PARAMS);
   return_value_if_fail(timer_manager() == NULL, RET_FAIL);
 

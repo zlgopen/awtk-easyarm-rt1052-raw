@@ -1,7 +1,6 @@
 ## font\_loader\_t
 ### 概述
- 字体加载接口。
-
+字体加载接口。
 ----------------------------------
 ### 函数
 <p id="font_loader_t_methods">
@@ -14,10 +13,7 @@
 
 * 函数功能：
 
-> <p id="font_loader_t_font_loader_load"> 加载字体。
-
-
-
+> <p id="font_loader_t_font_loader_load">加载字体。
 
 * 函数原型：
 

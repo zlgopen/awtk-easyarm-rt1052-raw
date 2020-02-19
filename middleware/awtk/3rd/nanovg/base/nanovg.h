@@ -388,6 +388,9 @@ void nvgImageSize(NVGcontext* ctx, int image, int* w, int* h);
 // Deletes created image.
 void nvgDeleteImage(NVGcontext* ctx, int image);
 
+// Deletes font's assets for font's name.
+void nvgDeleteFontByName(NVGcontext* ctx, const char* name);
+
 //
 // Paints
 //
@@ -658,6 +661,7 @@ struct NVGparams {
 	void (*setLineJoin)(void* uptr, int lineJoin);
 
 	int (*renderCreate)(void* uptr);
+	int (*findTexture)(void* uptr, const void* data);
 	int (*renderCreateTexture)(void* uptr, int type, int w, int h, int imageFlags, const unsigned char* data);
 	int (*renderDeleteTexture)(void* uptr, int image);
 	int (*renderUpdateTexture)(void* uptr, int image, int x, int y, int w, int h, const unsigned char* data);
@@ -689,6 +693,8 @@ void nvgDebugDumpPathCache(NVGcontext* ctx);
 
 NVGparams* nvgGetParams(NVGcontext* ctx);
 int nvgCreateImageRaw(NVGcontext* ctx, int w, int h, int format, int imageFlags, const unsigned char* data);
+
+int nvgFindTextureRaw(NVGcontext* ctx, const void* data);
 
 #ifdef __cplusplus
 }

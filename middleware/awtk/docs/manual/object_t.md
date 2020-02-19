@@ -2,10 +2,7 @@
 ### 概述
 ![image](images/object_t_0.png)
 
-
- 对象接口。
-
-
+对象接口。
 ----------------------------------
 ### 函数
 <p id="object_t_methods">
@@ -62,10 +59,7 @@
 
 * 函数功能：
 
-> <p id="object_t_object_can_exec"> 检查是否可以执行指定的命令。
-
-
-
+> <p id="object_t_object_can_exec">检查是否可以执行指定的命令。
 
 * 函数原型：
 
@@ -86,10 +80,7 @@ bool_t object_can_exec (object_t* obj, const char* name, const char* args);
 
 * 函数功能：
 
-> <p id="object_t_object_compare"> 比较两个对象。
-
-
-
+> <p id="object_t_object_compare">比较两个对象。
 
 * 函数原型：
 
@@ -109,10 +100,7 @@ int object_compare (object_t* obj, object_t* other);
 
 * 函数功能：
 
-> <p id="object_t_object_copy_prop"> 拷贝指定的属性。
-
-
-
+> <p id="object_t_object_copy_prop">拷贝指定的属性。
 
 * 函数原型：
 
@@ -133,12 +121,9 @@ ret_t object_copy_prop (object_t* obj, object_t* src, const char* name);
 
 * 函数功能：
 
-> <p id="object_t_object_create"> 创建对象。
+> <p id="object_t_object_create">创建对象。
 
- > 仅供子类调用。
-
-
-
+> 仅供子类调用。
 
 * 函数原型：
 
@@ -157,10 +142,7 @@ ret_t object_create (const object_vtable_t* vt);
 
 * 函数功能：
 
-> <p id="object_t_object_eval"> 计算一个表达式，表达式中引用的变量从prop中获取。
-
-
-
+> <p id="object_t_object_eval">计算一个表达式，表达式中引用的变量从prop中获取。
 
 * 函数原型：
 
@@ -181,9 +163,7 @@ ret_t object_eval (object_t* obj, const char* expr, value_t* v);
 
 * 函数功能：
 
-> <p id="object_t_object_exec"> 执行指定的命令。
-
-
+> <p id="object_t_object_exec">执行指定的命令。
 
 * 函数原型：
 
@@ -204,10 +184,7 @@ ret_t object_exec (object_t* obj, const char* name, const char* args);
 
 * 函数功能：
 
-> <p id="object_t_object_foreach_prop"> 遍历所有属性。
-
-
-
+> <p id="object_t_object_foreach_prop">遍历所有属性。
 
 * 函数原型：
 
@@ -228,10 +205,7 @@ ret_t object_foreach_prop (object_t* obj, tk_visit_t on_prop, void* ctx);
 
 * 函数功能：
 
-> <p id="object_t_object_get_desc"> 获取对象的描述信息。
-
-
-
+> <p id="object_t_object_get_desc">获取对象的描述信息。
 
 * 函数原型：
 
@@ -250,10 +224,7 @@ const char* object_get_desc (object_t* obj);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop"> 获取指定属性的值。
-
-
-
+> <p id="object_t_object_get_prop">获取指定属性的值。
 
 * 函数原型：
 
@@ -274,10 +245,7 @@ ret_t object_get_prop (object_t* obj, const char* name, value_t* v);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_bool"> 获取指定属性的bool类型的值。
-
-
-
+> <p id="object_t_object_get_prop_bool">获取指定属性的bool类型的值。
 
 * 函数原型：
 
@@ -298,10 +266,7 @@ bool_t object_get_prop_bool (object_t* obj, const char* name, bool_t defval);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_bool_by_path"> 获取指定属性的bool类型的值。
-
-
-
+> <p id="object_t_object_get_prop_bool_by_path">获取指定属性的bool类型的值。
 
 * 函数原型：
 
@@ -322,10 +287,7 @@ bool_t object_get_prop_bool_by_path (object_t* obj, const char* path, bool_t def
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_by_path"> 获取指定path属性的值。
-
-
-
+> <p id="object_t_object_get_prop_by_path">获取指定path属性的值。
 
 * 函数原型：
 
@@ -346,10 +308,7 @@ ret_t object_get_prop_by_path (object_t* obj, const char* path, value_t* v);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_float"> 获取指定属性的浮点数类型的值。
-
-
-
+> <p id="object_t_object_get_prop_float">获取指定属性的浮点数类型的值。
 
 * 函数原型：
 
@@ -370,10 +329,7 @@ float_t object_get_prop_float (object_t* obj, const char* name, float_t defval);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_float_by_path"> 获取指定属性的浮点数类型的值。
-
-
-
+> <p id="object_t_object_get_prop_float_by_path">获取指定属性的浮点数类型的值。
 
 * 函数原型：
 
@@ -394,10 +350,7 @@ float_t object_get_prop_float_by_path (object_t* obj, const char* path, float_t 
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_int"> 获取指定属性的整数类型的值。
-
-
-
+> <p id="object_t_object_get_prop_int">获取指定属性的整数类型的值。
 
 * 函数原型：
 
@@ -418,10 +371,7 @@ int32_t object_get_prop_int (object_t* obj, const char* name, int32_t defval);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_int_by_path"> 获取指定属性的整数类型的值。
-
-
-
+> <p id="object_t_object_get_prop_int_by_path">获取指定属性的整数类型的值。
 
 * 函数原型：
 
@@ -442,10 +392,7 @@ int32_t object_get_prop_int_by_path (object_t* obj, const char* path, int32_t de
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_object"> 获取指定属性的object类型的值。
-
-
-
+> <p id="object_t_object_get_prop_object">获取指定属性的object类型的值。
 
 * 函数原型：
 
@@ -465,10 +412,7 @@ object_t* object_get_prop_object (object_t* obj, const char* name);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_object_by_path"> 获取指定属性的object类型的值。
-
-
-
+> <p id="object_t_object_get_prop_object_by_path">获取指定属性的object类型的值。
 
 * 函数原型：
 
@@ -488,10 +432,7 @@ object_t* object_get_prop_object_by_path (object_t* obj, const char* path);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_pointer"> 获取指定属性的指针类型的值。
-
-
-
+> <p id="object_t_object_get_prop_pointer">获取指定属性的指针类型的值。
 
 * 函数原型：
 
@@ -511,10 +452,7 @@ void* object_get_prop_pointer (object_t* obj, const char* name);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_pointer_by_path"> 获取指定属性的指针类型的值。
-
-
-
+> <p id="object_t_object_get_prop_pointer_by_path">获取指定属性的指针类型的值。
 
 * 函数原型：
 
@@ -534,10 +472,7 @@ void* object_get_prop_pointer_by_path (object_t* obj, const char* path);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_str"> 获取指定属性的字符串类型的值。
-
-
-
+> <p id="object_t_object_get_prop_str">获取指定属性的字符串类型的值。
 
 * 函数原型：
 
@@ -557,10 +492,7 @@ const char* object_get_prop_str (object_t* obj, const char* name);
 
 * 函数功能：
 
-> <p id="object_t_object_get_prop_str_by_path"> 获取指定属性的字符串类型的值。
-
-
-
+> <p id="object_t_object_get_prop_str_by_path">获取指定属性的字符串类型的值。
 
 * 函数原型：
 
@@ -580,10 +512,7 @@ const char* object_get_prop_str_by_path (object_t* obj, const char* path);
 
 * 函数功能：
 
-> <p id="object_t_object_get_size"> 获取对象占用内存的大小。
-
-
-
+> <p id="object_t_object_get_size">获取对象占用内存的大小。
 
 * 函数原型：
 
@@ -602,10 +531,7 @@ uint32_t object_get_size (object_t* obj);
 
 * 函数功能：
 
-> <p id="object_t_object_get_type"> 获取对象的类型名称。
-
-
-
+> <p id="object_t_object_get_type">获取对象的类型名称。
 
 * 函数原型：
 
@@ -624,10 +550,7 @@ const char* object_get_type (object_t* obj);
 
 * 函数功能：
 
-> <p id="object_t_object_has_prop"> 检查是否存在指定的属性。
-
-
-
+> <p id="object_t_object_has_prop">检查是否存在指定的属性。
 
 * 函数原型：
 
@@ -647,10 +570,7 @@ bool_t object_has_prop (object_t* obj, const char* name);
 
 * 函数功能：
 
-> <p id="object_t_object_is_collection"> 判断对象是否是集合。
-
-
-
+> <p id="object_t_object_is_collection">判断对象是否是集合。
 
 * 函数原型：
 
@@ -669,10 +589,7 @@ bool_t object_is_collection (object_t* obj);
 
 * 函数功能：
 
-> <p id="object_t_object_notify_changed"> 触发EVT_PROPS_CHANGED事件。
-
-
-
+> <p id="object_t_object_notify_changed">触发EVT_PROPS_CHANGED事件。
 
 * 函数原型：
 
@@ -691,10 +608,7 @@ ret_t object_notify_changed (object_t* obj);
 
 * 函数功能：
 
-> <p id="object_t_object_ref"> 引用计数加1。
-
-
-
+> <p id="object_t_object_ref">引用计数加1。
 
 * 函数原型：
 
@@ -713,10 +627,7 @@ object_t* object_ref (object_t* obj);
 
 * 函数功能：
 
-> <p id="object_t_object_remove_prop"> 删除指定属性。
-
-
-
+> <p id="object_t_object_remove_prop">删除指定属性。
 
 * 函数原型：
 
@@ -736,10 +647,7 @@ ret_t object_remove_prop (object_t* obj, const char* name);
 
 * 函数功能：
 
-> <p id="object_t_object_set_name"> 设置对象的名称。
-
-
-
+> <p id="object_t_object_set_name">设置对象的名称。
 
 * 函数原型：
 
@@ -759,10 +667,7 @@ ret_t object_set_name (object_t* obj, const char* name);
 
 * 函数功能：
 
-> <p id="object_t_object_set_prop"> 设置指定属性的值。
-
-
-
+> <p id="object_t_object_set_prop">设置指定属性的值。
 
 * 函数原型：
 
@@ -783,10 +688,7 @@ ret_t object_set_prop (object_t* obj, const char* name, value_t* value);
 
 * 函数功能：
 
-> <p id="object_t_object_set_prop_bool"> 设置指定属性的bool类型的值。
-
-
-
+> <p id="object_t_object_set_prop_bool">设置指定属性的bool类型的值。
 
 * 函数原型：
 
@@ -807,10 +709,7 @@ ret_t object_set_prop_bool (object_t* obj, const char* name, bool_t value);
 
 * 函数功能：
 
-> <p id="object_t_object_set_prop_float"> 设置指定属性的浮点数类型的值。
-
-
-
+> <p id="object_t_object_set_prop_float">设置指定属性的浮点数类型的值。
 
 * 函数原型：
 
@@ -831,10 +730,7 @@ ret_t object_set_prop_float (object_t* obj, const char* name, float_t value);
 
 * 函数功能：
 
-> <p id="object_t_object_set_prop_int"> 设置指定属性的整数类型的值。
-
-
-
+> <p id="object_t_object_set_prop_int">设置指定属性的整数类型的值。
 
 * 函数原型：
 
@@ -855,10 +751,7 @@ ret_t object_set_prop_int (object_t* obj, const char* name, int32_t value);
 
 * 函数功能：
 
-> <p id="object_t_object_set_prop_object"> 设置指定属性的object类型的值。
-
-
-
+> <p id="object_t_object_set_prop_object">设置指定属性的object类型的值。
 
 * 函数原型：
 
@@ -879,10 +772,7 @@ ret_t object_set_prop_object (object_t* obj, const char* name, object_t* value);
 
 * 函数功能：
 
-> <p id="object_t_object_set_prop_pointer"> 设置指定属性的指针类型的值。
-
-
-
+> <p id="object_t_object_set_prop_pointer">设置指定属性的指针类型的值。
 
 * 函数原型：
 
@@ -903,10 +793,7 @@ ret_t object_set_prop_pointer (object_t* obj, const char* name, void* value);
 
 * 函数功能：
 
-> <p id="object_t_object_set_prop_str"> 设置指定属性的字符串类型的值。
-
-
-
+> <p id="object_t_object_set_prop_str">设置指定属性的字符串类型的值。
 
 * 函数原型：
 
@@ -927,10 +814,7 @@ ret_t object_set_prop_str (object_t* obj, const char* name, const char* value);
 
 * 函数功能：
 
-> <p id="object_t_object_unref"> 引用计数减1。引用计数为0时，销毁对象。
-
-
-
+> <p id="object_t_object_unref">引用计数减1。引用计数为0时，销毁对象。
 
 * 函数原型：
 
@@ -946,8 +830,7 @@ ret_t object_unref (object_t* obj);
 | obj | object\_t* | object对象。 |
 #### name 属性
 -----------------------
-> <p id="object_t_name"> 对象的名称。
-
+> <p id="object_t_name">对象的名称。
 
 * 类型：char*
 
@@ -958,8 +841,7 @@ ret_t object_unref (object_t* obj);
 | 可脚本化   | 是 |
 #### ref\_count 属性
 -----------------------
-> <p id="object_t_ref_count"> 引用计数。
-
+> <p id="object_t_ref_count">引用计数。
 
 * 类型：int32\_t
 

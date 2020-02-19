@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event manager manager implement with default
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,15 @@
 #include "tkc/event_source_manager.h"
 
 BEGIN_C_DECLS
+
+/**
+ * @class event_source_manager_default_t
+ * @parent event_source_manager_t
+ * @annotation ["fake"]
+ *
+ * 缺省的事件源管理器。
+ *
+ */
 
 /**
  * @method event_source_manager_default_create

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  basic types definitions.
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,7 @@
 
 /**
  * @enum lcd_orientation_t
- * LCD旋转角度(XXX:目前仅支持0度和90度，逆时针方向)。
+ * LCD旋转角度。
  */
 typedef enum _lcd_orientation_t {
   /**
@@ -174,12 +174,18 @@ typedef enum _icon_at_type_t {
    * @const ICON_AT_BOTTOM
    * 水平居中，垂直低部(not used now)。
    */
-  ICON_AT_BOTTOM = 4
+  ICON_AT_BOTTOM = 4,
+  /**
+   * @const ICON_AT_CENTRE
+   * 水平居中，垂直居中。
+   */
+  ICON_AT_CENTRE = 5,
 } icon_at_type_t;
 
 /**
  * @enum app_type_t
  * @prefix APP_
+ * @annotation ["scriptable"]
  * 应用程序类型。
  */
 typedef enum _app_type_t {
@@ -227,10 +233,14 @@ typedef enum _app_type_t {
 #endif
 #endif /*TK_MAX_FPS*/
 
+/* alpha 大于 TK_OPACITY_ALPHA 的颜色认为是不透明颜色，不进行alpha混合。*/
 #define TK_OPACITY_ALPHA 0xfa
+
+/* alpha 小于 TK_OPACITY_ALPHA 的颜色认为是透明颜色，不进行alpha混合，直接丢弃。*/
 #define TK_TRANSPARENT_ALPHA 0x02
 
 #define TK_DRAG_THRESHOLD 10
+#define TK_CLICK_TOLERANCE 10
 #define TK_ANIMATING_TIME 500
 
 struct _widget_t;
@@ -278,12 +288,8 @@ typedef struct _widget_animator_t widget_animator_t;
 #endif /*WITH_VGCANVAS*/
 
 #ifndef TK_KEY_MOVE_FOCUS_NEXT
-#define TK_KEY_MOVE_FOCUS_NEXT TK_KEY_TAB
+#define TK_KEY_MOVE_FOCUS_NEXT "tab"
 #endif /*TK_KEY_MOVE_FOCUS_NEXT*/
-
-#ifndef TK_KEY_MOVE_FOCUS_PREV
-#define TK_KEY_MOVE_FOCUS_PREV TK_KEY_UNKNOWN
-#endif /*TK_KEY_MOVE_FOCUS_PREV*/
 
 struct _locale_info_t;
 typedef struct _locale_info_t locale_info_t;
@@ -320,10 +326,7 @@ typedef struct _system_info_t system_info_t;
 #endif /*WITH_STB_FONT or WITH_FT_FONT*/
 
 #if defined(WITH_LCD_MONO)
-#undef WITH_FS_RES
 #undef WITH_VGCANVAS
-#undef WITH_STB_IMAGE
-#undef WITH_TRUETYPE_FONT
 #undef WITH_WINDOW_ANIMATORS
 #define WITH_BITMAP_FONT 1
 #endif /*WITH_LCD_MONO*/
@@ -338,5 +341,115 @@ typedef struct _system_info_t system_info_t;
 #define WITHOUT_WIDGET_ANIMATORS 1
 #define WITHOUT_DIALOG_HIGHLIGHTER 1
 #endif /*AWTK_LITE*/
+
+/**
+ * @enum bitmap_format_t
+ * @prefix BITMAP_FMT_
+ * @annotation ["scriptable"]
+ * 位图格式常量定义。
+ */
+typedef enum _bitmap_format_t {
+  /**
+   * @const BITMAP_FMT_NONE
+   * 无效格式。
+   */
+  BITMAP_FMT_NONE = 0,
+  /**
+   * @const BITMAP_FMT_RGBA8888
+   * 一个像素占用4个字节，RGBA占一个字节，按内存地址递增。
+   */
+  BITMAP_FMT_RGBA8888,
+  /**
+   * @const BITMAP_FMT_ABGR8888
+   * 一个像素占用4个字节，ABGR占一个字节，按内存地址递增。
+   */
+  BITMAP_FMT_ABGR8888,
+  /**
+   * @const BITMAP_FMT_BGRA8888
+   * 一个像素占用4个字节，BGRA占一个字节，按内存地址递增。
+   */
+  BITMAP_FMT_BGRA8888,
+  /**
+   * @const BITMAP_FMT_ARGB8888
+   * 一个像素占用4个字节，ARGB占一个字节，按内存地址递增。
+   */
+  BITMAP_FMT_ARGB8888,
+  /**
+   * @const BITMAP_FMT_RGB565
+   * 一个像素占用2个字节，RGB分别占用5,6,5位, 按内存地址递增。
+   */
+  BITMAP_FMT_RGB565,
+  /**
+   * @const BITMAP_FMT_BGR565
+   * 一个像素占用2个字节，BGR分别占用5,6,5位, 按内存地址递增。
+   */
+  BITMAP_FMT_BGR565,
+  /**
+   * @const BITMAP_FMT_RGB888
+   * 一个像素占用3个字节，RGB占一个字节，按内存地址递增。
+   */
+  BITMAP_FMT_RGB888,
+  /**
+   * @const BITMAP_FMT_BGR888
+   * 一个像素占用3个字节，RGB占一个字节，按内存地址递增。
+   */
+  BITMAP_FMT_BGR888,
+  /**
+   * @const BITMAP_FMT_GRAY
+   * 一个像素占用1个字节。
+   */
+  BITMAP_FMT_GRAY,
+  /**
+   * @const BITMAP_FMT_MONO
+   * 一个像素占用1比特。
+   */
+  BITMAP_FMT_MONO,
+} bitmap_format_t;
+
+/**
+ * @enum bitmap_flag_t
+ * @annotation ["scriptable"]
+ * @prefix BITMAP_FLAG_
+ * 位图标志常量定义。
+ */
+typedef enum _bitmap_flag_t {
+  /**
+   * @const BITMAP_FLAG_NONE
+   * 无特殊标志。
+   */
+  BITMAP_FLAG_NONE = 0,
+  /**
+   * @const BITMAP_FLAG_OPAQUE
+   * 不透明图片。
+   */
+  BITMAP_FLAG_OPAQUE = 1,
+  /**
+   * @const BITMAP_FLAG_IMMUTABLE
+   * 图片内容不会变化。
+   */
+  BITMAP_FLAG_IMMUTABLE = 2,
+  /**
+   * @const BITMAP_FLAG_TEXTURE
+   * OpenGL Texture, bitmap的id是有效的texture id。
+   */
+  BITMAP_FLAG_TEXTURE = 4,
+  /**
+   * @const BITMAP_FLAG_CHANGED
+   * 如果是MUTABLE的图片，更新时需要设置此标志，底层可能会做特殊处理，比如更新图片到GPU。
+   */
+  BITMAP_FLAG_CHANGED = 8,
+  /**
+   * @const BITMAP_FLAG_PREMULTI_ALPHA
+   * 预乘alpha。
+   */
+  BITMAP_FLAG_PREMULTI_ALPHA = 16
+} bitmap_flag_t;
+
+#ifndef BITMAP_ALIGN_SIZE
+#define BITMAP_ALIGN_SIZE 32
+#endif /*BITMAP_ALIGN_SIZE*/
+
+struct _bitmap_t;
+typedef struct _bitmap_t bitmap_t;
 
 #endif /*TK_TYPES_DEF_H*/

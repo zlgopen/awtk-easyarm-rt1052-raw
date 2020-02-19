@@ -20,7 +20,7 @@
 * [window](manual/window_t.md) 普通窗口。
 * [system\_bar](manual/system_bar_t.md) 系统状态窗口。
 * [calibration\_win](manual/calibration_win_t.md) 电阻屏校准窗口。
-* [overlay](manual/overlay_t.md) 悬浮窗口窗口。
+* [overlay](manual/overlay_t.md) 悬浮窗口。
 
 #### 基本控件
 * [button](manual/button_t.md) 按钮控件。
@@ -28,11 +28,13 @@
 * [edit](manual/edit_t.md) 单行编辑器控件。
 * [image](manual/image_t.md) 图片控件。
 * [dragger](manual/dragger_t.md) dragger控件。
+* [draggable](manual/draggable_t.md) draggable控件。
 * [image\_base](manual/image_base_t.md) 图片控件基类。
 * [check\_button](manual/check_button_t.md) 多选按钮。
 * [radio\_button](manual/check_button_t.md) 单选按钮。
 * [spin\_box](manual/spin_box_t.md) 数值编辑器控件。
 * [combo\_box](manual/combo_box_t.md) 下拉列表控件。
+* [combo\_box\_ex](manual/combo_box_ex_t.md) 可滚动的下拉列表控件。
 * [combo\_box\_item](manual/combo_box_item_t.md) 下拉列表项控件。
 * [color\_tile](manual/color_tile_t.md) 色块控件。
 * [dialog\_title](manual/dialog_title_t.md) 对话框标题控件。
@@ -54,6 +56,7 @@
 * [button\_group](manual/button_group_t.md) 按钮分组控件。
 
 #### 扩展控件
+* [candidates](manual/candidates_t.md) 软键盘候选字控件。
 * [canvas\_widget](manual/canvas_widget_t.md) 画布控件。
 * [color\_picker](manual/color_picker_t.md) 颜色选择器控件。
 * [gif\_image](manual/gif_image_t.md) gif\_image控件。
@@ -177,9 +180,9 @@
 
 ### 布局器
   
-![self\_layouter](../docs/images/layout_self_layouter.png)
+![self\_layouter](images/layout_self_layouter.png)
 
-![children\_layouter](../docs/images/layout_children_layouter.png)
+![children\_layouter](images/layout_children_layouter.png)
 
 * [self\_layouter](manual/self_layouter_t.md) 控件自身排版布局器的接口
 
@@ -203,88 +206,123 @@
 
 ## 二、基本函数库
 
+### 容器与基本数据结构
+
 * [darray](manual/darray_t.md) 动态数组。
 * [slist](manual/slist_t.md) 单向链表。
-* [memory](manual/tk_mem_t.md) 内存管理相关函数和宏。
-* [rgba](manual/rgba_t.md) RGBA颜色值。
-
-* [color\_parse](manual/color_parser_t.md) 颜色解析对象。
-* [value](manual/value_t.md) 通用值对象。
-* [str](manual/str_t.md) UTF-8字符串对象。
-* [wstr](manual/wstr_t.md) Unicode字符串对象。
-
-* [date\_time](manual/date_time_t.md) 时间日期函数。
-* [event](manual/event_t.md) 事件基类。
-* [tk\_thread](manual/tk_thread_t.md) 线程。
-* [tk\_mutex](manual/tk_mutex_t.md) 互斥锁。
-。
---------------------------
-
-* [asset_info](manual/asset_info_t.md) 资源类型定义。
 * [wbuffer](manual/wbuffer_t.md) Write Buffer。
 * [rbuffer](manual/rbuffer_t.md) Read Buffer。
+* [ring\_buffer](manual/ring_buffer_t.md) 循环缓存区。
+* [str](manual/str_t.md) 可变长度的 UTF8 字符串。
+* [wstr](manual/wstr_t.md) 可变长度的宽字符字符串。
+* [object](manual/object_t.md) 对象接口。
+* [object\_default](manual/object_default_t.md) 对象接口的缺省实现。
+* [object\_array](manual/object_array_t.md) 简单的动态数组，内部存放 value 对象。
+
+* [point](manual/point_t.md) 点。
+* [rect](manual/rect_t.md) 矩形。
 * [color](manual/color_t.md) 颜色对象。
-* [color\_parse](manual/color_parser_t.md) 颜色解析器。
-* [tk\_cond\_var](manual/tk_cond_var_t.md) 简化版条件变量。
-* [darray](manual/darray_t.md) 动态数组。
-
-* [date\_time](manual/date_time_t.md) 时间日期函数。
-* [easing](manual/easing_type_t.md) 缓动作常量定义。
+* [pointf](manual/pointf_t.md) 点(浮点数格式)。
+* [int\_str](manual/int_str_t.md) 数字-字符串类型
+* [str\_str](manual/str_str_t.md) 字符串-字符串类型
+* [named\_value](manual/named_value_t.md) 命名的值。
+* [value](manual/value_t.md) 一个通用数据类型，用来存放整数、浮点数、字符串和其它对象。
 * [emitter](manual/emitter_t.md)事件分发器, 用于实现观察者模式。
+* [rgba](manual/rgba_t.md) RGBA颜色值。
+* [asset\_info](manual/asset_info_t.md) 资源类型定义。
 
-* endian 大端/小端相关函数。
+### 流
+
+* [istream](manual/tk_istream_t.md) 输入流的接口。
+* [ostream](manual/tk_ostream_t.md) 输出流的接口。
+* [iostream](manual/tk_iostream_t.md) 输入/出流的接口。
+
+* [iostream\_mem](manual/tk_iostream_mem_t.md) 内存输入输出流。
+* [istream\_mem](manual/tk_istream_mem_t.md) 内存输入流。
+* [ostream\_mem](manual/tk_ostream_mem_t.md) 内存输出流。
+
+* [istream\_file](manual/tk_istream_file_t.md) 文件输入流。
+* [ostream\_file](manual/tk_ostream_file_t.md) 文件输出流。
+
+* [iostream\_tcp](manual/tk_iostream_tcp_t.md) TCP输入输出流。
+* [istream\_tcp](manual/tk_istream_tcp_t.md) TCP输入流。
+* [ostream\_tcp](manual/tk_ostream_tcp_t.md) TCP输出流。
+
+* [iostream\_udp](manual/tk_iostream_udp_t.md) UDP输入输出流。
+* [istream\_udp](manual/tk_istream_udp_t.md) UDP输入流。
+* [ostream\_udp](manual/tk_ostream_udp_t.md) UDP输出流。
+
+* [iostream\_serial](manual/tk_iostream_serial_t.md) 串口输入输出流。
+* [istream\_serial](manual/tk_istream_serial_t.md) 串口输入流。
+* [ostream\_serial](manual/tk_ostream_serial_t.md) 串口输出流。
+
+* [istream\_buffered](manual/tk_istream_buffered_t.md) 缓冲输入流。
+* [ostream\_buffered](manual/tk_ostream_buffered_t.md) 缓冲输出流。
+
+* [iostream\_noisy](manual/tk_iostream_noisy_t.md) 故障注入流。
+* [ostream\_noisy](manual/tk_ostream_noisy_t.md) 故障注入输出流。
+
+* [iostream\_shdlc](manual/tk_iostream_shdlc_t.md) SHDLC输入输出流。
+* [istream\_shdlc](manual/tk_istream_shdlc_t.md) SHDLC输入流。
+* [ostream\_shdlc](manual/tk_ostream_shdlc_t.md) SHDLC输出流。
+
+* [ostream\_retry](manual/tk_ostream_retry_t.md) 重传输出流。
+
+### 并发
+
+* [mutex](manual/tk_mutex_t.md) 互斥锁。
+* [thread](manual/tk_thread_t.md) 线程。
+* [semaphor](manual/tk_semaphore_t.md) 信号量。
+* [cond\_var](manual/tk_cond_var_t.md) 简化版条件变量。
+
+### 事件与事件源
 
 * [event](manual/emitter_t.md) 事件基类。
+* [timer\_info](manual/timer_info_t.md) 单个定时器的信息。
+* [timer\_manager](manual/timer_manager_t.md) 定时器管理器
+* [idle\_info](manual/idle_info_t.md) 单个 idle 的信息。
+* [idle\_manager](manual/idle_manager_t.md) idle_manager_t管理器
+* [event\_source](manual/event_source_t.md) 事件源接口。
+* [event\_source\_fd](manual/event_source_fd_t.md) 基于文件描述符的事件源实现。
+* [event\_source\_idle](manual/event_source_idle_t.md) 基于IDLE的事件源实现。
+* [event\_source\_timer](manual/event_source_timer_t.md) 基于Time的事件源实现。
+* [event\_source\_manager](manual/event_source_manager_t.md) 事件源管理器的接口。
+* [event\_source\_manager\_default](manual/event_source_manager_default_t.md) 创建事件源管理器。
 
-* [event_source](manual/event_source_t.md) 事件源接口。
+### 压缩解压
 
-* [event_source_fd](manual/event_source_fd_t.md) 基于文件描述符的事件源实现。
+* [compressor](manual/compressor_t.md) 压缩解压接口。
+* [compressor\_miniz](manual/compressor_miniz_t.md) 基于miniz实现的压缩解压接口。
 
-* [event_source_idle](manual/event_source_idle_t.md) 基于IDLE的事件源实现。
 
-* [event_source_manager](manual/event_source_manager_t.md) 事件源管理器的接口。
+### 平台相关
 
-* [event_source_manager_default](manual/event_source_manager_default_t.md) 事件源管理器的缺省实现。
+* [fs](manual/fs_t.md) 文件系统
+* [fs\_dir](manual/fs_dir_t.md) 目录
+* [fs\_file](manual/fs_file_t.md) 文件
+* [fs\_item](manual/fs_item_t.md) 目录或目录。
+* [path](manual/path_t.md) 路径相关的工具函数。
+* [memory](manual/tk_mem_t.md) 内存管理相关函数和宏。
+* [date\_time](manual/date_time_t.md) 时间日期函数。
+* [time\_now](manual/time_now_t.md) 获取当前时间的函数。
+* [platform](manual/platform_t.md) 平台接口，包括：获取时间、休眠等函数
+* [socket\_pair](manual/socketpair_t.md) 生成两个可以互相通信的socket句柄。
 
-* [event_source_timer](manual/event_source_timer_t.md) 基于Time的事件源实现。
+### 数据格式
+ 
+* [ubjson\_parser](manual/ubjson_parser_t.md)
+* [ubjson\_writer](manual/ubjson_writer_t.md)
+* [xml\_parser](manual/XmlParser.md)
 
-* fs.h
-* func_call_parser.h
-* func_desc.h
-* idle_info.h
-* idle_manager.h
-* int_str.h
-* iostream.h
-* istream.h
-* matrix.h
-* mem.h
-* mime_types.h
-* mutex.h
-* named_value.h
-* object.h
-* object_array.h
-* object_default.h
-* ostream.h
-* path.h
-* platform.h
-* rect.h
-* ring_buffer.h
-* rom_fs.h
-* slist.h
-* socket_pair.h
-* str.h
-* str_str.h
-* stream_const.h
-* thread.h
-* time_now.h
-* timer_info.h
-* timer_manager.h
-* tokenizer.h
-* types_def.h
-* utf8.h
-* utils.h
-* value.h
-* value_desc.h
-* wstr.h
+### 工具类
 
+* [easing](manual/easing_type_t.md) 缓动作常量定义。
+* [utils](manual/utils_t.md) 工具类
+* [utf8](manual/utf8_t.md) wchar_t和char类型转换接口
+* [matrix](manual/matrix_t.md) 2D阵变换。
+* [func\_desc](manual/func_desc_t.md) 函数描述。
+* [value\_desc](manual/value_desc_t.md) 属性描述。
+* [func\_call\_parser](manual/func_call_parser_t.md) 从字符串中解析出函数调用需要的参数。
+* [tokenizer](manual/tokenizer_t.md) 从字符串中解析出一个一个的 token。
+* [color\_parse](manual/color_parser_t.md) 颜色解析对象。
 

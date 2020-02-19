@@ -2,28 +2,20 @@
 ### 概述
 ![image](images/tk_ostream_mem_t_0.png)
 
-
- output stream base on memory
-
-
+基于内存实现的输出流。
 ----------------------------------
 ### 函数
 <p id="tk_ostream_mem_t_methods">
 
 | 函数名称 | 说明 | 
 | -------- | ------------ | 
-| <a href="#tk_ostream_mem_t_tk_ostream_mem_create">tk\_ostream\_mem\_create</a> |  |
+| <a href="#tk_ostream_mem_t_tk_ostream_mem_create">tk\_ostream\_mem\_create</a> | 创建ostream对象。 |
 #### tk\_ostream\_mem\_create 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="tk_ostream_mem_t_tk_ostream_mem_create">
- 创建ostream对象。
-
-
-
-
+> <p id="tk_ostream_mem_t_tk_ostream_mem_create">创建ostream对象。
 
 * 函数原型：
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dynamic darray.
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -153,11 +153,43 @@ ret_t darray_remove_index(darray_t* darray, uint32_t index);
  * @method darray_remove_all
  * 删除全部满足条件的元素。
  * @param {darray_t*} darray 数组对象。
+ * @param {tk_compare_t} cmp 比较函数，为NULL则使用内置的比较函数。
  * @param {void*} ctx 比较函数的上下文。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t darray_remove_all(darray_t* darray, void* ctx);
+ret_t darray_remove_all(darray_t* darray, tk_compare_t cmp, void* ctx);
+
+/**
+ * @method darray_sort
+ * 排序。
+ * @param {darray_t*} darray 数组对象。
+ * @param {tk_compare_t} cmp 比较函数，为NULL则使用内置的比较函数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t darray_sort(darray_t* darray, tk_compare_t cmp);
+
+/**
+ * @method darray_find_all
+ * 查找全部满足条件的元素。
+ *
+ * ```
+ * darray_t matched;
+ * darray_init(&matched, 0, NULL, NULL);
+ * darray_find_all(darray, mycmp, myctx, &matched);
+ * ...
+ * darray_deinit(&matched);
+ *
+ * ```
+ * @param {darray_t*} darray 数组对象。
+ * @param {tk_compare_t} cmp 比较函数，为NULL则使用内置的比较函数。
+ * @param {void*} ctx 比较函数的上下文。
+ * @param {darray_t*} matched 返回满足条件的元素。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t darray_find_all(darray_t* darray, tk_compare_t cmp, void* ctx, darray_t* matched);
 
 /**
  * @method darray_pop

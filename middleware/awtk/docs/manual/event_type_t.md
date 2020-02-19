@@ -1,7 +1,6 @@
 ## event\_type\_t
 ### 概述
- 类型常量定义。
-### 常量
+类型常量定义。### 常量
 <p id="event_type_t_consts">
 
 | 名称 | 说明 | 
@@ -13,6 +12,7 @@
 | EVT\_POINTER\_UP | 指针抬起事件名(pointer\_event\_t)。 |
 | EVT\_POINTER\_UP\_BEFORE\_CHILDREN | 指针抬起事件名，在子控件处理之前触发(pointer\_event\_t)。 |
 | EVT\_WHEEL | 滚轮事件名(pointer\_event\_t)。 |
+| EVT\_WHEEL\_BEFORE\_CHILDREN | 鼠标滚轮事件名，在子控件处理之前触发(key\_event\_t)。 |
 | EVT\_POINTER\_DOWN\_ABORT | 取消前一个指针按下事件名(pointer\_event\_t)。 |
 | EVT\_CONTEXT\_MENU | 右键/长按弹出上下文菜单的事件名(pointer\_event\_t)。 |
 | EVT\_POINTER\_ENTER | 指针进入事件名(pointer\_event\_t)。 |
@@ -46,10 +46,11 @@
 | EVT\_ANIM\_ONCE | 控件动画yoyo/repeat时，完成一次的事件(event\_t)。 |
 | EVT\_ANIM\_END | 控件动画完成事件(event\_t)。 |
 | EVT\_WINDOW\_LOAD | 窗口加载完成事件(event\_t)。 |
-| EVT\_WINDOW\_WILL\_OPEN | 窗口即将打开事件(event\_t)。 如果有窗口动画，在窗口动画开始前触发。如果没有窗口动画，在窗口被加载后的下一次循环中触发。 |
-| EVT\_WINDOW\_OPEN | 窗口打开事件(event\_t)。 如果有窗口动画，在窗口动画完成时触发。如果没有窗口动画，在窗口被加载后的下一次循环中触发。 |
-| EVT\_WINDOW\_TO\_BACKGROUND | 窗口被切换到后台事件(event\_t)。 打开新窗口时，当前窗口被切换到后台时，对当前窗口触发本事件。 |
-| EVT\_WINDOW\_TO\_FOREGROUND | 窗口被切换到前台事件(event\_t)。 关闭当前窗口时，前一个窗口被切换到前台时，对前一个窗口触发本事件。 |
+| EVT\_WIDGET\_LOAD | 控件加载完成事件(event\_t)。 |
+| EVT\_WINDOW\_WILL\_OPEN | 窗口即将打开事件(event\_t)。如果有窗口动画，在窗口动画开始前触发。如果没有窗口动画，在窗口被加载后的下一次循环中触发。 |
+| EVT\_WINDOW\_OPEN | 窗口打开事件(event\_t)。如果有窗口动画，在窗口动画完成时触发。如果没有窗口动画，在窗口被加载后的下一次循环中触发。 |
+| EVT\_WINDOW\_TO\_BACKGROUND | 窗口被切换到后台事件(event\_t)。打开新窗口时，当前窗口被切换到后台时，对当前窗口触发本事件。 |
+| EVT\_WINDOW\_TO\_FOREGROUND | 窗口被切换到前台事件(event\_t)。关闭当前窗口时，前一个窗口被切换到前台时，对前一个窗口触发本事件。 |
 | EVT\_WINDOW\_CLOSE | 窗口关闭事件。 |
 | EVT\_REQUEST\_CLOSE\_WINDOW | 请求关闭窗口的事件(event\_t)。 |
 | EVT\_TOP\_WINDOW\_CHANGED | 顶层窗口改变的事件(window\_event\_t)。 |
@@ -61,11 +62,22 @@
 | EVT\_DRAG | 拖动(event\_t)。 |
 | EVT\_DRAG\_END | 结束拖动(event\_t)。 |
 | EVT\_SCREEN\_SAVER | 在指定的时间内(WITH\_SCREEN\_SAVER\_TIME)，没有用户输入事件，由窗口管理器触发。 |
-| EVT\_LOW\_MEMORY | 内存不足。 |
-| EVT\_OUT\_OF\_MEMORY | 内存耗尽。 |
-| EVT\_ORIENTATION\_WILL\_CHANGED | 屏幕即将旋转。 |
-| EVT\_ORIENTATION\_CHANGED | 屏幕旋转。 |
-| EVT\_WIDGET\_CREATED | 控件创建事件。 |
-| EVT\_REQUEST\_QUIT\_APP | 请求退出应用程序事件。 点击原生窗口关闭按钮时，通过窗口管理器触发，注册该事件并返回RET\_STOP，可以阻止窗口关闭。 |
+| EVT\_LOW\_MEMORY | 内存不足(event\_t)。 |
+| EVT\_OUT\_OF\_MEMORY | 内存耗尽(event\_t)。 |
+| EVT\_ORIENTATION\_WILL\_CHANGED | 屏幕即将旋转(event\_t)。 |
+| EVT\_ORIENTATION\_CHANGED | 屏幕旋转(event\_t)。 |
+| EVT\_WIDGET\_CREATED | 控件创建事件(event\_t)。 |
+| EVT\_REQUEST\_QUIT\_APP | 请求退出应用程序事件。点击原生窗口关闭按钮时，通过窗口管理器触发，注册该事件并返回RET\_STOP，可以阻止窗口关闭。 |
+| EVT\_THEME\_CHANGED | 主题变化(event\_t)。 |
+| EVT\_WIDGET\_ADD\_CHILD | 控件加载新的子控件(event\_t)。 |
+| EVT\_WIDGET\_REMOVE\_CHILD | 控件移除子控件(event\_t)。 |
 | EVT\_REQ\_START | event queue其它请求编号起始值。 |
 | EVT\_USER\_START | 用户定义事件起始值。 |
+| EVT\_NONE | 无效事件名称。 |
+| EVT\_PROP\_WILL\_CHANGE | 对象的属性即将改变的事件名(prop\_change\_event\_t)。 |
+| EVT\_PROP\_CHANGED | 对象的属性改变的事件名(prop\_change\_event\_t)。 |
+| EVT\_ITEMS\_WILL\_CHANGE | 即将增加和删除集合中的项目(event\_t)。 |
+| EVT\_ITEMS\_CHANGED | 完成增加和删除集合中的项目(event\_t)。 |
+| EVT\_PROPS\_CHANGED | 对象的属性改变的事件名(props\_event\_t)。 |
+| EVT\_PROGRESS | 进度状态(progress\_event\_t)。 |
+| EVT\_DESTROY | 对象销毁事件名(event\_t)。 |

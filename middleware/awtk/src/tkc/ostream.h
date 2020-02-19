@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  output stream interface
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,7 +38,7 @@ typedef ret_t (*tk_ostream_seek_t)(tk_ostream_t* stream, uint32_t offset);
  * @class tk_ostream_t
  * @parent object_t
  *
- * input stream interface
+ * 输出流的接口。
  *
  */
 struct _tk_ostream_t {
@@ -55,13 +55,13 @@ struct _tk_ostream_t {
  * 写入数据。
  *
  * @param {tk_ostream_t*} stream ostream对象。
- * @param {const uint8_t*} buff 返回数据的缓冲区。
+ * @param {const void*} buff 返回数据的缓冲区。
  * @param {uint32_t} max_size 缓冲区的大小。
  *
  * @return {int32_t} 返回负数表示写入失败，否则返回实际写入数据的长度。
  *
  */
-int32_t tk_ostream_write(tk_ostream_t* stream, const uint8_t* buff, uint32_t max_size);
+int32_t tk_ostream_write(tk_ostream_t* stream, const void* buff, uint32_t max_size);
 
 /**
  * @method tk_ostream_seek
@@ -82,14 +82,14 @@ ret_t tk_ostream_seek(tk_ostream_t* stream, uint32_t offset);
  * 写入指定长度的数据。
  *
  * @param {tk_ostream_t*} stream ostream对象。
- * @param {const uint8_t*} buff 数据的缓冲区。
+ * @param {const void*} buff 数据的缓冲区。
  * @param {uint32_t} max_size 缓冲区的大小。
  * @param {uint32_t} timeout_ms timeout.
  *
  * @return {int32_t} 返回负数表示写入失败，否则返回实际写入数据的长度。
  *
  */
-int32_t tk_ostream_write_len(tk_ostream_t* stream, const uint8_t* buff, uint32_t max_size,
+int32_t tk_ostream_write_len(tk_ostream_t* stream, const void* buff, uint32_t max_size,
                              uint32_t timeout_ms);
 
 /**

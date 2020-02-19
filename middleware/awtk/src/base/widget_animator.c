@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget animator interface
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -140,7 +140,8 @@ ret_t widget_animator_start(widget_animator_t* animator) {
   }
 
   if (animator->state == ANIMATOR_DONE) {
-    return RET_FAIL;
+    animator->yoyo_times = animator->total_yoyo_times;
+    animator->repeat_times = animator->total_repeat_times;
   }
 
   animator->state = ANIMATOR_RUNNING;
@@ -182,9 +183,14 @@ ret_t widget_animator_pause(widget_animator_t* animator) {
 }
 
 static ret_t widget_animator_update(widget_animator_t* animator, float_t percent) {
+  ret_t ret = RET_OK;
   return_value_if_fail(animator != NULL && animator->update != NULL, RET_BAD_PARAMS);
 
-  return animator->update(animator, percent);
+  widget_invalidate_force(animator->widget, NULL);
+  ret = animator->update(animator, percent);
+  widget_invalidate_force(animator->widget, NULL);
+
+  return ret;
 }
 
 ret_t widget_animator_set_yoyo(widget_animator_t* animator, uint32_t yoyo_times) {
@@ -196,6 +202,7 @@ ret_t widget_animator_set_yoyo(widget_animator_t* animator, uint32_t yoyo_times)
   if (animator->forever) {
     animator->yoyo_times = TK_UINT32_MAX;
   }
+  animator->total_yoyo_times = animator->yoyo_times;
 
   return RET_OK;
 }
@@ -217,6 +224,7 @@ ret_t widget_animator_set_repeat(widget_animator_t* animator, uint32_t repeat_ti
   if (animator->forever) {
     animator->repeat_times = TK_UINT32_MAX;
   }
+  animator->total_repeat_times = animator->repeat_times;
 
   return RET_OK;
 }

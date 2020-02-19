@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  combo_box_ex
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,14 +19,8 @@
  *
  */
 
-#include "tkc/mem.h"
-#include "tkc/utils.h"
 #include "base/layout.h"
-#include "base/window.h"
-#include "widgets/button.h"
 #include "widgets/popup.h"
-#include "widgets/combo_box.h"
-#include "tkc/tokenizer.h"
 #include "widgets/combo_box_item.h"
 #include "ext_widgets/scroll_view/list_view.h"
 #include "ext_widgets/scroll_view/scroll_view.h"
@@ -42,7 +36,11 @@ static ret_t combo_box_create_popup_items(combo_box_t* combo_box, widget_t* pare
     widget_t* item = combo_box_item_create(parent, 0, 0, 0, 0);
 
     widget_set_value(item, iter->value);
-    widget_set_tr_text(item, iter->text);
+    if (combo_box->localize_options) {
+      widget_set_tr_text(item, iter->text);
+    } else {
+      widget_set_text_utf8(item, iter->text);
+    }
 
     iter = iter->next;
   }
@@ -80,6 +78,7 @@ static widget_t* combo_box_create_scroll_popup(combo_box_t* combo_box) {
   widget_t* scroll_bar = scroll_bar_create(list_view, 0, 0, 0, 0);
   widget_set_self_layout(scroll_bar, "default(x=right, y=0,w=12, h=100%%)");
 
+  widget_use_style(win, "combobox_popup");
   combo_box_create_popup_items(combo_box, scroll_view);
   widget_layout(win);
 

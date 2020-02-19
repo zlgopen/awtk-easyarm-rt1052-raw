@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  pinyin input method engine
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,7 +51,7 @@ static ret_t input_engine_pinyin_add_candidate(input_engine_t* engine, wbuffer_t
   }
   wstr[i] = 0;
 
-  utf8_from_utf16(wstr, str, sizeof(str) - 1);
+  tk_utf8_from_utf16(wstr, str, sizeof(str) - 1);
 
   if ((wb->cursor + strlen(str) + 1) >= wb->capacity) {
     return RET_FAIL;

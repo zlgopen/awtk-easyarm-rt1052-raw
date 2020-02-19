@@ -867,6 +867,15 @@ void nvgImageSize(NVGcontext* ctx, int image, int* w, int* h)
 	ctx->params.renderGetTextureSize(ctx->params.userPtr, image, w, h);
 }
 
+void nvgDeleteFontByName(NVGcontext* ctx, const char* name)
+{
+#ifdef WITH_NANOVG_GPU
+	if (ctx->fs) {
+		fontsDeleteFontByName(ctx->fs, name);
+	}
+#endif
+} 
+
 void nvgDeleteImage(NVGcontext* ctx, int image)
 {
 	ctx->params.renderDeleteTexture(ctx->params.userPtr, image);
@@ -3191,6 +3200,14 @@ NVGparams* nvgGetParams(NVGcontext* ctx) {
 int nvgCreateImageRaw(NVGcontext* ctx, int w, int h, int format, int imageFlags, const unsigned char* data)
 {
 	return ctx->params.renderCreateTexture(ctx->params.userPtr, format, w, h, imageFlags, data);
+}
+
+int nvgFindTextureRaw(NVGcontext* ctx, const void* data)
+{
+	if(ctx->params.findTexture != NULL) {
+		return ctx->params.findTexture(ctx->params.userPtr, data);
+	}
+	return -1;
 }
 
 // vim: ft=c nu noet ts=4

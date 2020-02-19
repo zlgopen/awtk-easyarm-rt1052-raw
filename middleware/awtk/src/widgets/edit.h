@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  edit
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -60,7 +60,7 @@ typedef bool_t (*edit_is_valid_char_t)(widget_t* widget, wchar_t c);
  * > XXX：需要在min/max/step之前设置input\_type。
  *
  * >更多用法请参考：
- * [edit.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/edit.xml)
+ * [edit.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/edit.xml)
  *
  * 在c代码中使用函数edit\_create创建编辑器控件。如：
  *
@@ -88,7 +88,7 @@ typedef bool_t (*edit_is_valid_char_t)(widget_t* widget, wchar_t c);
  *
  * > 更多用法请参考：
  * [theme
- *default](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L104)
+ *default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L104)
  *
  */
 typedef struct _edit_t {
@@ -112,6 +112,22 @@ typedef struct _edit_t {
    * 输入无效时，是否自动改正。
    */
   bool_t auto_fix;
+  /**
+   * @property {bool_t} select_none_when_focused
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 获得焦点时不选中文本。
+   *
+   * > 主要用于没有指针设备的情况，否则软键盘无法取消选中文本。
+   */
+  bool_t select_none_when_focused;
+  /**
+   * @property {bool_t} open_im_when_focused
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 获得焦点时打开输入法。
+   *
+   * > 主要用于没有指针设备的情况，否则每次切换焦点时都打开输入法。
+   */
+  bool_t open_im_when_focused;
   /**
    * @property {uint8_t} top_margin
    * @annotation ["set_prop","get_prop","readable"]
@@ -275,7 +291,7 @@ ret_t edit_set_text_limit(widget_t* widget, uint32_t min, uint32_t max);
  * @param {widget_t*} widget widget对象。
  * @param {int32_t} min 最小值。
  * @param {int32_t} max 最大值。
- * @param {int32_t} step 步长。
+ * @param {uint32_t} step 步长。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -315,6 +331,28 @@ ret_t edit_set_readonly(widget_t* widget, bool_t readonly);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t edit_set_auto_fix(widget_t* widget, bool_t auto_fix);
+
+/**
+ * @method edit_set_select_none_when_focused
+ * 设置编辑器是否在获得焦点时不选中文本。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} select_none_when_focused 是否在获得焦点时不选中文本。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_select_none_when_focused(widget_t* widget, bool_t select_none_when_focused);
+
+/**
+ * @method edit_set_open_im_when_focused
+ * 设置编辑器是否在获得焦点时打开输入法。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} open_im_when_focused 是否在获得焦点时打开输入法。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_open_im_when_focused(widget_t* widget, bool_t open_im_when_focused);
 
 /**
  * @method edit_set_input_type
@@ -361,6 +399,17 @@ ret_t edit_set_password_visible(widget_t* widget, bool_t password_visible);
 ret_t edit_set_focus(widget_t* widget, bool_t focus);
 
 /**
+ * @method edit_set_cursor
+ * 设置输入框的光标坐标。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {uint32_t} cursor 是否为焦点。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_cursor(widget_t* widget, uint32_t cursor);
+
+/**
  * @method edit_set_is_valid_char
  * 设置输入字符检查函数。
  *> 如果内置检查函数不能满足需求时，可以设置自定义的检查函数。
@@ -378,6 +427,7 @@ ret_t edit_set_is_valid_char(widget_t* widget, edit_is_valid_char_t is_valid_cha
 TK_EXTERN_VTABLE(edit);
 
 /*public for spinbox and other controls*/
+ret_t edit_on_copy(widget_t* widget, widget_t* other);
 ret_t edit_on_destroy(widget_t* widget);
 ret_t edit_on_paint_self(widget_t* widget, canvas_t* c);
 ret_t edit_on_event(widget_t* widget, event_t* e);

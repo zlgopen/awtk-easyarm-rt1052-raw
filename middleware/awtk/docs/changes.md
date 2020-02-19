@@ -1,93 +1,526 @@
 # 最新动态
+
+* 2020/01/03
+  * 修复了画圆角矩形边框的 BUG。（感谢智明提供下列补丁）
+  * 完善 widget.h 注释（感谢大恒提供补丁）。 
+  * 完善 ui loader xml（感谢大恒提供补丁）。 
+  * 完善 guage pointer（感谢尧燊提供补丁）
+  * 增加 widget\_take\_snapshot 目前仅在非 OpenGL 下有效。
+  * 完善 popup 窗口动画（感谢智明提供补丁）
+  * 完善修改 locale 的处理。
+  * 修复 clip_view 剪裁区域计算有误的问题（感谢大恒提供补丁）。
+  * 修复 scroll_bar_m 在拖动后没有自动隐藏的问题（感谢大恒提供补丁）。
+
+* 2020/01/02
+  * 修改 kb_default.xml 解决中文状态下无法输入空格。
+  * 支持软键盘选择候选字。
+  * 增加 dirty\_rect\_tolerance 属性。表示脏矩形超出控件本身大小的最大范围。缺省为 4，一般不用指定。如果 border 太粗或 offset 太大等原因，导致脏矩形超出控件本身大小太多（大于缺省值）时，才需要指定。
+  * tab\_button 和 combo\_box\_item 增加类型检查（感谢钟伟提供补丁）。
+  * 增加支持图片中间部分平铺绘图方法（解决很小的图片使用 patch3_xxxx 的 draw_type，在启用鼠标后鼠标滑过图片会出现没有办法重画的问题）（感谢智明提供下列补丁）
+  * 修复 agge 支持字体透明度（感谢智明提供下列补丁）
+  * 新增了 window_manager_resize() 用于调整原生窗口的大小（感谢朝泽提供补丁）
+  * 修复了画圆角矩形边框，边框为 1 的情况导致 agge 的 cache 不正常为难题。（感谢智明提供下列补丁）
+  * 修改圆角矩形填充前景色和背景色叠加的显示效果（感谢智明提供补丁）
+
+* 2020/01/01
+  * 优化 widget\_clone
+  * （感谢智明提供下列补丁）
+    * 修复对话框再弹出对话框时，前一个窗口的截图的显示问题
+    * 修复 agge 的填充颜色半透效果
+    * 增加 agge 对 image 支持半透效果
+    * 增加 nanovg 查找 nvgFindTextureRaw 函数，用来判断 agge 的时候图片是否在 nanovg 图片数组中（lcd 的 resize 函数释放 nanovg 的图片会把图片数组释放，导致下次调用崩毁）
+    * 修复画部分边框并且宽度大于 1 的情况显示问题。
+    * 修改一下警告地方
+
+* 2019/12/31
+  * 完善 RichText（感谢尧燊提供补丁）
+
+* 2019/12/30
+  * assset\_info 相关函数移到到 tkc/asset\_info.c 中。
+  * asset manager 支持自定义资源加载。
+  * 输入法候选字支持数字选择候选字
+  * 输入法候选字支持左右键切换候选字的焦点
+  * 修改 calibration 窗口内存泄露问题（感谢培煌提供补丁）。
+  * 完善 RichText（感谢尧燊提供补丁）
+  * 完善 children layout（感谢尧燊提供补丁）
+  * 输入法候选字支持脚本化（感谢大恒提供补丁）。
+  * （感谢智明提供下列补丁）
+    * 播放窗口动画前查找 prev\_win 不正确的问题
+    * 修复了 slide\_view 控件在 agge 的状态下，无法裁剪使用 vg 绘制的控件问题
+    * 修复 asset\_info\_create 函数在没有开启 WITH\_FS\_RES 宏下编译出错的问题
+    * 修复 window 在切换为后台的时候，保存 save\_focus\_widget 为自己的时候，就会导致引用计数出错，导致出现一棵无主的窗口树。
+    * 修复控件动画在播放的时候退出程序，导致控件动画内存泄漏问题
+    * 修复主题切换后，新的主题的引用计数出错，导致内存泄漏问题
+    * 修复了弹出输入法中只增加 EVT\_WINDOW\_CLOSE 事件，却不触发的事件问题，导致消息分发器内存泄漏的问题
+    * 修复 opengles 的 fbo 退出程序时候释放内存
+    * 修复 gpinying 拼音退出程序时候内存泄漏的问题
+    *调整了 tk\_deinit\_internal 函数让 widget 等资源可以顺利通过 idle 来释放。
+
+* 2019/12/29
+  * 使用 event\_source\_manager 实现主循环。
+  * iostream 增加几个包装函数。
+
+* 2019/12/27
+  * 增加 str\_from\_wstr\_with\_len
+  * 增加 tk\_utf8\_from\_utf16\_ex
+  * 感谢福明提供以下补丁： 
+    * hscroll\_label 的修改：默认情况下鼠标移入控件时文本停止滚动，鼠标离开控件时开始滚动。
+    * 使用 label 控件的文本太长时会出现不显示的情况，主要是因为 lcd\_vgcanvas.inc 里面定义的一个文本长度限制。
+
+* 2019/12/26
+  * 完善 mem 中的计数（感谢大恒提供补丁）。
+  * 增加 widget\_close\_window
+  * 修改了 lcd 的宽高被修改后脏矩形的宽高不修改导致裁剪去有问题（感谢智明提供补丁）
+  * 增加了把一个资源 data 加载到 awtk 的资源管理器的函数（感谢智明提供补丁）
+  * 完善 window\_base\_on\_event（感谢尧燊提供补丁）
+
+* 2019/12/25
+  * 完善 line number（感谢大恒提供补丁）。
+  * 感谢瑞安提供以下补丁
+    * 打包工具对中文路径的支持
+    * imagegen.exe 不用断言判断图片尺寸超出范围而是直接返回错误码，避免程序因断言失败而崩溃。
+    * 为了与加载 bin 文件时的资源名保持一致，所以路径也将作为资源名的一部分。
+    * 在 xml\_to\_ui.exe 增加第四个传入参数（资源名），在生成、*.data 填入资源名时作为参考。
+
+* 2019/12/24
+  * 完善 SVG（感谢钟伟提供补丁）
+
+* 2019/12/23
+  * 完善 edit（感谢尧燊提供补丁）
+
+* 2019/12/19
+  * 完善 emitter\_off\_ex（感谢尧燊提供补丁）
+  * 修复 clone 的 widget 没有拷贝到 feedback 属性（感谢智明提供补丁）
+  * 完善部分控件的事件处理（感谢大恒提供补丁）。
+  * calibration win 支持脚本化。
+
+* 2019/12/18
+  * 完善窗口管理器支持 dialog 叠加（感谢尧燊提供补丁）。
+  * utf8 中内部函数改为 static。
+  * 完善 str\_unescape。
+  * 修复了 gles 在部分系统上面颜色显示不正常的问题（感谢智明提供补丁）
+  * 修复了 svg 工具生成 bsvg 的时候对 svg 的默认颜色取值问题（感谢智明提供补丁）
+  * 完善 widget\_set\_tr\_text
+  * 完善 color component 事件处理（感谢大恒提供补丁）。
+  * 完善 combobox ex 的 style 处理（感谢大恒提供补丁）。
+  * 完善 tab button，支持动态加载指定页面（感谢智明提供补丁）
+  * 增加函数 window\_create\_default
+  * 完善 emitter\_off\_ex（感谢尧燊提供补丁）
+
+* 2019/12/17
+  * 完善 dialog\_confirm/dialog\_info 等函数。
+  * 增加 widget\_set\_focusable 函数。
+  * 重命名：utf8\_to\_utf16 to tk\_utf8\_to\_utf16 （感谢智明提供补丁）
+  * 重命名：utf8\_from\_utf16 to tk\_utf8\_from\_utf16 （感谢智明提供补丁）
+
+* 2019/12/13
+  * 修改窗口切到 FOREGROUND 把焦点设回去会导致如果当前页面有滚动控件时，页面会滚动的问题（感谢大恒提供补丁）。
+  * 修改 widget 在 point_down 少发了个 leave 事件的问题（感谢大恒提供补丁）。
+  * 完善 set tr text （感谢尧燊提供补丁）
+
+* 2019/12/12
+  * WIDGET LOAD 事件改在子控件加载完成时触发。
+  * hscroll label 在文本改变时重置 xoffset。
+  * 完善 combobox 使用 hscroll label 的处理。
+  * set key target 时触发 focus 事件。
+  * 修复圆角巨型在 gles 的时候，设置 vg 的 Scale 显示不正常的问题（感谢智明提供补丁） 
+  * 修改了 border_width 为 0 还是绘制边框的问题（感谢智明提供补丁） 
+  * 完善 rich text 控件（感谢尧燊提供补丁）。 
+  * 完善动画脏矩形（感谢培煌提供补丁）。 
+  * 增加 clip view 控件（感谢智明提供） 
+
+* 2019/12/11
+  * 增加 WIDGET LOAD 事件和状态。
+  * 修复 text edit 中一些警告。
+  * 入选码云最有价值开源项目，根据要求修改 READMEM 中的链接。
+  * 增加文档 [如何在主题文件中写控件布局参数](how_to_write_layout_params_in_style.md)
+  * 完善窗口切换的处理，窗口切换到前台时，重新设置原来的焦点控件为焦点。
+  * combobox 支持 hscroll label 作为子控。
+  * 修改 mledit tips 泄露的问题（感谢尧燊提供补丁）。 
+  * switch 增加对 image name 为空串的检查（感谢尧燊提供补丁）。 
+  * 修复 scroll_view 拖动时计算有误的问题（感谢大恒提供补丁）。 
+  * 增加 TK\_CLEAR\_IMAGE\_ALPHA 用于填充 framebuffer 时，同时设置 framebuffer 的 alpha 值。
+
+> 主题数据格式变化，请使用资源生成脚本，重新生成资源数据！！！
+
+* 2019/12/10
+  * 更新文档（感谢陈谭提供补丁）。
+  * 完善 style const （感谢尧燊提供补丁）。 
+  * 优化主题数据的存储方式，控件减少 30%。
+  * 主题支持 self layout/children layout
+  * 修复画圆角矩形在画布的 line_lenght != w*bpp 时候打点不正常的 bug（感谢智明提供补丁）  
+  * 修复 mledit 显示 bug（感谢智明提供补丁）。  
+  * 修复 fbo 脏矩形和裁减区不重叠的显示不正常 bug（感谢智明提供补丁）。  
+  * 修改 lcd_men.inc 文件的每次获取 vg 的时候都会设置裁减区为全屏的问题（感谢智明提供补丁）。  
+  * 更新文档。
+
+> 主题数据格式变化，请使用资源生成脚本，重新生成资源数据！！！
+
+* 2019/12/09
+  * 完善 dialog ex 的文本翻译。
+  * 支持设置 combobox popup 的 style。
+  * edit 增加 input type "custom_password"类型。
+  * 完善 text selector （感谢大恒提供补丁）。
+  
+* 2019/12/07
+  * 修改 widget\_set\_state 脚本绑定时的问题（感谢大恒提供补丁）。
+  * switch 控件：修正 max_xoffset_ratio 属性修改后 xoffset 没有更新的问题；（感谢朝泽提供补丁）。 
+  * slider 控件：（感谢朝泽提供补丁）。 
+    *（1）修正当控件的值比较小时滑块与前景部分之间有空白的问题（修改为始终在滑块的中间）；
+    *（2）修改控件的背景和前景没有贴合的问题；
+    *（3）修改 dragger_size 属性允许设置，以便修改滑块的宽度或高度；
+    *（4）添加 dragger_adapt_to_icon 属性，用于标识滑块大小是否与 icon 适应
+    *（5）添加 slide_with_bar 属性，用于标识是否允许在轴上滑动来改变滑块位置
+
+* 2019/12/06
+  * 完善脚本绑定。
+
+* 2019/12/05
+  * 修改了 image_animation 控件的 format、sequence 属性设置，为空字符串时设为空，避免显示有误（感谢朝泽提供补丁）。 
+  * 增加文档 how\_to\_use\_mutable\_image.md（感谢智明提供补丁）。  
+
+* 2019/12/04
+  * awtk 增加对 lcd 为 rgb888 的支持 （感谢智明提供补丁）。 
+  * 修改了 bitmap 设置不透明度的标志（感谢智明提供补丁）。  
+  * awtk 增加图标所在的位置支持垂直水平居中功能 （感谢智明提供补丁）。  
+  * 完善增加了 scroll_view 控件可以调节控件自动播放的速度比例接口 （感谢智明提供补丁）。  
+  * 完善 tk\_mem\_stat （感謝王程提供补丁）。  
+  * 完善 assset_manager 关于自定义路径的处理（感谢大恒提供补丁）。
+  * 完善 scroll view 的注释（感谢大恒提供补丁）。
+  * 增加函数 window\_manager\_back\_to 回到指定的窗口。
+  
+* 2019/12/03
+  * 完善 widget\\_destroy（感谢尧燊提供补丁）。 
+  * 上次 EVT\_POINTER\_DOWN\_ABORT 触发多次，破坏了 grab\_widget 链的问题还是有点问题，改成在 widget\_ungrab 时限制；（感谢朝泽提供补丁）。 
+  * 由于 scroll\_view 的 EVT\_POINTER\_UP 响应没有判断 scroll\_view->pressed，导致在外部点击鼠标并拖动到 scroll\_view 内部释放时可能引起视图滚动；（感谢朝泽提供补丁）。 
+  * idle\_manager\_exist 判断条件有误（感谢朝泽提供补丁）。  
+  * 完善 widget\_create\_animator（感谢培煌提供补丁）。  
+  * 在窗口打开时递归 update style。
+  * 完善输入避免 google pinyin 崩溃
+  * 更新 stb truetype.h
+  * slide\_menu 的 children 为空，点击会崩溃的问题（感谢大恒提供补丁）。 
+  * slide\_view 在 set\_active 时判断 foused 为 false，不进行焦点的切换 （感谢大恒提供补丁）。 
+  * 完善 dragger 事件处理（感谢大恒提供补丁）。 
+  * 完善 text selector 事件处理（感谢大恒提供补丁）。 
+  * 修改 dialog/window/popup/calibration 里的注释问题。（感谢温宇飞 <wenyufei@aliyun.com>提供补丁）。 
+
+* 2019/12/02
+  * 完整 list item 支持 return/space 激活 （感谢 [jianmin zhuang](https://github.com/zjm1060) 提供补丁）。
+  * 比如一个控件（比如 edit）的父控件响应 EVT\_POINTER\_DOWN\_ABORT 并 widget\_ungrab，在 edit 内按下鼠标，拖到控件外后释放鼠标，edit 控件没有收到 EVT\_POINTER\_UP，导致状态没复位。原因是 EVT\_POINTER\_DOWN\_ABORT 触发多次，破坏了 grab\_widget 链；（感谢朝泽提供补丁）。
+  * 修正在 scroll\_view 外部按下鼠标之后移动到 scroll\_view 内，scroll\_view 会跟随滚动的问题（感谢朝泽提供补丁）。
+
+* 2019/11/30
+  * 修改 widget\_on\_attach\_parent 为 widget\_on\_attach\_parent\_t，widget\_on\_detach\_parent 为 widget\_on\_detach\_parent\_t （感谢朝泽提供补丁）。
+  * 完善 slide\_view：（感谢朝泽提供补丁）。
+    （1）切换页面过程中由于脏矩形或裁剪区域计算错误导致会有残影的问题，比如内部 view 有背景、内部控件有边框、或者控件超出 slide_view 范围；
+    （2）修改 overlap 方式切换过程中如果拖动距离超出单页的宽或高时，则停留在上一页或下一页
+
+* 2019/11/29
+  * 修改定制软键盘密码不能隐藏的问题。
+  * 修改 widget\_unref/object\_unref 的问题。
+  * 修复 nanovg 画举行边框时候边框大小不为 1 的问题（是之前修复高分屏填充问题引起的）（感谢智明提供补丁）。
+  * 修改 widget 透明度为 0 的显示问题，如果 widget 的 opacity 低于 8 的时候，就视为不可见，就跳出 widget\_paint 函数的执行（感谢智明提供补丁）。
+  * 修改 native\_window\_fb\_gl 和 native\_window\_sdl 在编译 agge 的时候出现的警告（感谢智明提供补丁）。
+  * 修复了 mledit 设置 margin 后不会马上刷新界面的问题（感谢智明提供补丁）。
+
+* 2019/11/28
+  * 修复 preview ui 预览 dialog 时，拖动 dialog 出现残影的问题。
+  * 引入引用计数协助管理 widget 的生命周期。
+  * 完善 combobox 弹出对话框位置的问题。
+  * 完善 圆角矩形绘制（感谢智明提供补丁）。
+  * 完善 vgcanvas（感谢智明提供补丁）。
+  * 完善 scroll view（感谢朝泽提供补丁）。
+  * 完善 销毁子控件的处理（感谢培煌提供补丁）。
+  * 完善 native\_window\_sdl\_resize （感谢 [qianfan-Zhao](https://github.com/qianfan-Zhao) 提供补丁）。 
+  * 完善 set need relayout children。
+
+* 2019/11/27
+  * 完善 edit/mledit （感谢智明提供补丁）。
+  * 完善 agge （感谢智明提供补丁）。
+
+* 2019/11/26
+  * 完善 log （感谢大恒提供补丁）。
+  * 完善 combo\_box\_ex（感谢大恒提供补丁）。
+  * 完善 edit/mledit 在不可见时的事件处理（感谢大恒提供补丁）。
+  * 完善 list view（感谢朝泽提供补丁）。
+  * 增加 progress event。
+  * 增加 dialog\_quit\_code\_t。
+  * 增加 file transfer 用于将资源下载到外部 flash（未完成）。
+  * window\_manager\_back/window\_manager\_back\_to\_home 允许关闭对话框，DIALOG\_QUIT\_NONE 退出码表示对话框可能是被强行关闭。
+
+* 2019/11/24
+  * 增加函数 str\_append\_int。
+
+* 2019/11/22
+  * 完善 log 函数。
+  * 完善 list item（感谢朝泽提供补丁）。
+  * 完善 emitter（感谢朝泽提供补丁）。
+  * edit 增加属性 open\_im\_when\_focused （感谢 [qianfan-Zhao](https://github.com/qianfan-Zhao) 提供补丁）。
+  * 完善和优化绘图函数（感谢智明提供补丁）。
+
+* 2019/11/21
+  * 完善 edit 焦点处理。
+  * 完善 keyboard 焦点处理。
+  * 完善 combobox （感谢大恒提供补丁）。
+  * edit 增加属性 select\_none\_when\_focused。
+
+* 2019/11/20
+  * 更新生态文档（感谢陈谭提供补丁）。
+  * 更新资源生成脚本文档（感谢俊杰提供补丁）。
+  * 完善 [控件焦点](widget_focus.md)
+  * 完善 keyboard，切换 page 时设置第一个 focusable 控件为焦点。
+  * 修改 combobox 焦点问题（感谢大恒提供补丁）。
+
+* 2019/11/19
+  * 完善 darray\_sort。
+  * 完善 widget\_calc\_icon\_text\_rect （感谢大恒提供补丁）。
+  * 完善 WIDGET\_PROP\_TEXT 先从控件获取，控件没有特殊处理，最后才取默认值。
+  * 完善 image（感谢朝泽提供补丁）。
+  * 完善 list item （感谢朝泽提供补丁）。
+
+* 2019/11/18
+  * 完善 hscroll label，在 only\_parent\_focus 为 TRUE 时，根据父控件设置自己的 focus 状态。
+  * 完善 list item （感谢朝泽提供补丁）。
+  * 完善 awtk\_ecology.md
+
+* 2019/11/16
+  * 完善文档。
+
+* 2019/11/15
+  * 完善文档。
+  * 完善 image 绘制（感谢大恒提供补丁）。
+  * hscroll label 支持在父控件获得焦点是滚动。
+
+* 2019/11/14
+  * 完善进度条（感谢朝泽提供补丁）。
+  * 修改 edit 注释问题（感谢朝泽提供补丁）。
+  * 增加键值 TK\_KEY\_BACK。
+  * 增加 lcd\_mem\_fragment。
+  * 增加 graphic\_buffer\_attach。
+  * 重构 lcd\_mem
+  * 完善 tkc 的文档（感谢俊杰提供补丁）。
+  * 完善 medit（感谢智明提供补丁）。
+  * 完善 vgcanvas fill rect（感谢智明提供补丁）。
+
+* 2019/11/13
+  * 把部分变量修改为常量，以减少内存使用。
+  * 更新 IDL 修复脚本绑定的问题。
+  * 增加 ICON\_AT\_BOTTOM 的处理（感谢朝泽提供补丁）。
+  * 修改 android 编译问题（感谢智明提供补丁）。
+  * 完善 medit（感谢智明提供补丁）。
+
+* 2019/11/12
+  * 修复了 vg 旋转显示 bug 和修改了贴图兼容性（感谢智明提供补丁）。
+  * digit clock 移到 widgets 目录。
+  * 增加 demo\_basic 用于在低端平台演示使用 UI 文件。
+
+* 2019/11/11
+  * 完善 list item click 事件处理（感谢培煌提供补丁）。
+  * 完善部分控件的类型检查（感谢尧燊提供补丁）。
+  * 更新生态文档（感谢陈谭提供补丁）。
+  * 简化 tab\_button\_group 边框处理。
+
+* 2019/11/10
+  * 增加 darray\_sort。
+
+* 2019/11/09
+  * 完善 combo\_box 按键处理。
+  * AWTK\_ecology.md（感谢陈谭提供补丁）。
+
+* 2019/11/08
+  * 完善 rich text （感谢大恒提供补丁）。
+  * 完善 text edit（感谢尧燊提供补丁）。
+
+* 2019/11/07
+  * 完善 cmsis\_os 移植。
+  * 支持重新启动已经完成的动画。
+  * 完善 event source/event source manager。
+  * 修改输入法中，软键盘弹出时，保存窗口位置的问题。
+  * OpenGL 模式支持脏矩形（感谢智明提供补丁）。
+  * 修改 slider 在 list view 中 grab 的问题（感谢培煌提供补丁）。
+  * 增加 WIDGET\_PROP\_EXEC 方便 MVVM 通过属性来控制动画的状态。
+  * 增加 indicator\_default\_paint\_t 枚举类型导出（感谢大恒提供补丁）。
+  * 修改动态设置 default\_paint 属性为 auto 时没有效果的问题（感谢大恒提供补丁）。
+  * slide\_view 增加/删除，或者改变位置/大小时，没有同步更新的问题（感谢朝泽提供补丁）。
+  * auto\_hide 动画时间设置错误，以及 auto\_hide 之后设置 visible 不能显示的问题（感谢朝泽提供补丁）。
+  * 完善 assets\_manager\_set\_theme（感谢朝泽提供补丁）。
+
+* 2019/11/06
+  * 修改 emitter 中的错误（感谢朝泽提供补丁）。
+  * 修改 image manager 对 raw image 的处理，增加 graphic buffer 之后，raw image 也需要由 image manager 管理。
+  * 增加 scripts/release.sh 脚本，用于将运行时需要的文件拷贝到 release 目录。
+  * 允许在 XML 文件中指定 combobox 按钮的位置大小和样式。
+
+* 2019/11/05
+  * list\_view/list\_view\_h 增加 pageup/pagedown 按键处理。
+  * 修复 native window resize 时没有更新 system info 中 lcd 大小的问题（感谢朝泽提供补丁）。
+  * 修复文档中的错误（感谢朝泽提供补丁）。
+  * 完善旋转的处理（感谢智明提供补丁）。
+  * 增加键值映射功能，请参考 [map\_key.md](map_key.md)
+  * 优化 lcd\_mem（感谢智明提供补丁）。
+
+* 2019/11/04
+  * 完善字体和文字绘制。
+
+* 2019/11/03
+  * 修改 graphic\_buffer 改动引入的问题。
+  * 完善 close window force 的流程。
+  * 完善 back/back_to_home 的处理。
+  * 完善 text selector 数据绑定的问题。
+  * 增加 date_time_set 函数和初始化函数。请使用 date\_time\_global\_init 初始化时间函数。
+  
+* 2019/10/31
+  * 增加 graphic\_buffer，用于管理 bitmap 的内存。
+  * 完善 vgcanvas，兼容 JZ\_GPU。
+  * 完善 darray，增加 darray\_find\_all。
+  * lcd nanovg 支持 LCD 旋转（感谢智明提供补丁）。
+  * 增加 native\_window\_fb\_gl （感谢智明提供补丁）。
+  * 修改 valgrind 发现的问题。
+
+> 如果有支持访问 bitmap-\>data 的代码，请使用 bitmap\_lock\_buffer\_for\_write/read 函数。
+
+* 2019/10/30
+  * 增加 system\_bar\_bottom，支持 system_bar 在顶部、底部和两者。
+
+* 2019/10/29
+  * 公开函数 image\_animation\_next。
+  * 修改 SDL 输入按键事件的问题（感谢智明提供补丁）。
+
+* 2019/10/29
+  * 完善 slideview indicator（感谢朝泽提供补丁）。
+  * 修改 svg 路径太长的问题（感谢尧燊提供补丁）。
+  * 修改 popup 支持点击外部关闭的问题（感谢尧燊提供补丁）。
+  * 完善 vgcanvas\_nanovg\_set\_font（感谢俊杰提供补丁）。
+  * 修改 semaphore.c 在 im28x 上编译的问题（感谢俊杰提供补丁）。
+  * 修改 build\_asset\_filename\_custom 的问题（感谢瑞安提供补丁）。
+
+* 2019/10/27
+  * 增加 ostream\_retry。
+
+* 2019/10/26
+  * 完善 ring buffer。
+
+* 2019/10/25
+  * widget\_off\_by_\ctx/on\_detach\_parent/on\_attach\_parent
+  * 增加 draggable 控件。
+  * 修改文档中的错误（感谢俊杰提供补丁）。
+  * 完善主题切换，字体卸载的问题（感谢智明提供补丁）。
+
+* 2019/10/24
+  * 优化 fragment frame buffer，在 STM32F103 等低端平台，内存不足以实现 framebuffer 时，性能大幅提高（感谢智明提供补丁）。
+  * 修改文档中的错误（感谢俊杰提供补丁）。
+  * 更新 awtk config sample。
+  * 修改软键盘弹出时出现屏保的问题。
+  * 完善 new.cpp/new.hpp （感谢陈谭提供补丁）。
+  * 修改 windows 中文件名的问题（感谢大恒提供补丁）
+  * assets\_manager\_set\_custom\_build\_dir 增加回调函数上下文。
+
+* 2019/10/23
+  * 修改 clone 出来的 edit 的显示问题。
+  * 增加 widget\_on\_with\_tag 和 widget\_off\_by\_tag，方便一次注销多个同类事件。
+  * 完善 list view 对 wheel 事件的处理。
+  * 完善 text selector 处理 up/down 按键和 wheel 事件。
+  * 修改 SVG 无效图片崩溃的 BUG。
+  * 增加函数 assets\_manager\_set\_custom\_build\_asset\_dir，有时我们需要优先加载用户自定义的资源，加载失败才加载系统缺省的，可用设置一个函数去实现这类功能。
+  
+* 2019/10/19
+  * 完善主题切换功能。
+  * 增加文档 [资源目录变更通知](assets_dir_changed.md)
+  * 增加文档 [主题实时切换](theme_switch.md)
+  * 修改 edit 在 listview 中时，处理 Wheel 事件的问题。
+
+* 2019/10/18
+  * 增加主题切换功能。
+
 * 2019/10/17
   * 修改文档中的错误（感谢俊杰提供补丁）。
-  * 完善streams。
-
+  * 完善 streams。
+  
 * 2019/10/16
   * 更新文档。
   * 修改文档中的错误（感谢俊杰提供补丁）。
 
 * 2019/10/15
-  * 增加fs\_file\_eof。
-  * 增加tk\_iostream\_noisy。
+  * 增加 fs\_file\_eof。
+  * 增加 tk\_iostream\_noisy。
   * 完善窗口管理器（感谢大恒提供补丁）
-  * 前一个窗口为normal window时才支持窗口动画。
-  * glyph的x/y/w/h改为16位，以防超大字体溢出问题。
+  * 前一个窗口为 normal window 时才支持窗口动画。
+  * glyph 的 x/y/w/h 改为 16 位，以防超大字体溢出问题。
 
 * 2019/10/14
-  * 修改widget\_set\_value把value当uint32的BUG.
-  * 完善label换行（感谢俊杰提供补丁）。
-  * edit\_set\_int/double后调用text layout（感谢俊杰提供补丁）。
-  * 窗口被切换到后台后更新grab\_widget（感谢尧燊提供补丁）。
-  * 完善combo box（感谢尧燊提供补丁）。
-  * 完善layouters（感谢尧燊提供补丁）。
-  * 修改edit在slide view中的问题（感谢培煌提供补丁）。
-  * keyboard 增加 scriptable属性。
+  * 修改 widget\_set\_value 把 value 当 uint32 的 BUG.
+  * 完善 label 换行（感谢俊杰提供补丁）。
+  * edit\_set\_int/double 后调用 text layout（感谢俊杰提供补丁）。
+  * 窗口被切换到后台后更新 grab\_widget（感谢尧燊提供补丁）。
+  * 完善 combo box（感谢尧燊提供补丁）。
+  * 完善 layouters（感谢尧燊提供补丁）。
+  * 修改 edit 在 slide view 中的问题（感谢培煌提供补丁）。
+  * keyboard 增加 scriptable 属性。
 
 * 2019/10/13
-  * 增加stream\_shdlc文档。
+  * 增加 stream\_shdlc 文档。
 
 * 2019/10/12
-  * 增加stream\_shdlc。
+  * 增加 stream\_shdlc。
   
 * 2019/10/11
-  * 合并君正提供的屏幕旋转补丁(感谢君正提供补丁，感谢智明在各个平台验证）。
-  * 合并君正提供的popup支持highlight补丁(感谢君正提供补丁，感谢智明在各个平台验证）。
-  * 合并君正提供的bitmap使用line\_length补丁(感谢君正提供补丁，感谢智明在各个平台验证）。
-  * 修改dialog上面的combox弹出时焦点的问题。
-
+  * 合并君正提供的屏幕旋转补丁（感谢君正提供补丁，感谢智明在各个平台验证）。
+  * 合并君正提供的 popup 支持 highlight 补丁（感谢君正提供补丁，感谢智明在各个平台验证）。
+  * 合并君正提供的 bitmap 使用 line\_length 补丁（感谢君正提供补丁，感谢智明在各个平台验证）。
+  * 修改 dialog 上面的 combox 弹出时焦点的问题。
+  
 * 2019/10/10
-  * 修改canvas draw image repeatx/repeaty的问题（感谢俊杰提供补丁）。
-  * canvas增加repeat\_y\_inverse图片绘制方式。
-  * 完善widget\_invalidate（感谢培煌提供补丁）。
+  * 修改 canvas draw image repeatx/repeaty 的问题（感谢俊杰提供补丁）。
+  * canvas 增加 repeat\_y\_inverse 图片绘制方式。
+  * 完善 widget\_invalidate（感谢培煌提供补丁）。
 
 * 2019/10/09
-  * slider 的min/max/value/step使用浮动数。
-  * combo\_box 增加item\_height属性(感谢朝泽提供补丁)。
-  * 修改mledit软键盘回车的问题（感谢俊杰提供补丁）。
+  * slider 的 min/max/value/step 使用浮动数。
+  * combo\_box 增加 item\_height 属性（感谢朝泽提供补丁）。
+  * 修改 mledit 软键盘回车的问题（感谢俊杰提供补丁）。
 
 * 2019/10/08
-  * 增加istream buffered。
+  * 增加 istream buffered。
 
 * 2019/10/07
-  * 增加ostream\_buffered。
-  * 按issue 241，把get\_time\_ms改名为get\_time\_ms64。
+  * 增加 ostream\_buffered。
+  * 按 issue 241，把 get\_time\_ms 改名为 get\_time\_ms64。
 
 * 2019/10/06
-  * 增加ring buffer。
+  * 增加 ring buffer。
 
 * 2019/10/03
-  * 完善stream serial。
+  * 完善 stream serial。
 
 * 2019/10/02
-  * 完善ubjson。
+  * 完善 ubjson。
 
 * 2019/09/30
-  * 修改文档的BUG（感谢俊杰提供补丁）。
-  * edit/mledit的margin从style中获取，从属性获取仍然保留（但不支持在IDE中设置）。
-  * 使用sokol库中的函数获取时间。
-  * 增加event source。
+  * 修改文档的 BUG（感谢俊杰提供补丁）。
+  * edit/mledit 的 margin 从 style 中获取，从属性获取仍然保留（但不支持在 IDE 中设置）。
+  * 使用 sokol 库中的函数获取时间。
+  * 增加 event source。
 
 * 2019/09/29
-  * 修改combo\_box\_ex获取type的问题（感谢尧燊提供补丁）。
+  * 修改 combo\_box\_ex 获取 type 的问题（感谢尧燊提供补丁）。
 
 * 2019/09/27
-  * time clock支持指针支持锚点（感谢智明提供补丁）。
+  * time clock 支持指针支持锚点（感谢智明提供补丁）。
   * edit/mledit 获得焦点时选中文本。
-  * combo\_box 增加localize\_options选项
-  * edit min/max/step/type支持脚本绑定。
-  * progress bar支持max属性。
+  * combo\_box 增加 localize\_options 选项
+  * edit min/max/step/type 支持脚本绑定。
+  * progress bar 支持 max 属性。
 
 * 2019/09/26
   * rename stream\_socket to stream\_tcp。
-  * 修改switch的BUG（感谢朝泽提供补丁）。
+  * 修改 switch 的 BUG（感谢朝泽提供补丁）。
 
 * 2019/09/24
   * 合并君正提供的部分补丁。
 
 * 2019/09/23
-  * 完善ubjson/value
-  * 修改前几天修改widget\_update\_style留下的问题。
+  * 完善 ubjson/value
+  * 修改前几天修改 widget\_update\_style 留下的问题。
 
 * 2019/09/19
   * 修改"color\_component" "digit\_clock" "mutable\_image"的注释，支持 designer 编辑（感谢大恒提供补丁）。
@@ -95,7 +528,7 @@
   * 增加 object\_get\_prop\_by\_path
   * 完善 children\_layouter\_list\_view（感谢尧燊提供补丁）。
   * 完善 children\_layouter\_default（感谢尧燊提供补丁）。
-  * 增加 EVT\_REQUEST\_QUIT\_APP 事件，点击原生窗口关闭按钮时，通过窗口管理器触发，注册该事件并返回RET_STOP，可以阻止窗口关闭。
+  * 增加 EVT\_REQUEST\_QUIT\_APP 事件，点击原生窗口关闭按钮时，通过窗口管理器触发，注册该事件并返回 RET_STOP，可以阻止窗口关闭。
   
 * 2019/09/18
   * 增加 iostream\_mem。
@@ -444,12 +877,10 @@
    * 添加 slide\_indicator 控件，默认作为 slide\_view 的指示器
    * 修复 scroll\_view 的 bug（scroll\_bar\_m 不会自动隐藏的问题，比如 list\_view 中拖动单位高度后）
    * 修复 scroll\_view 的 fix\_end\_offset 失败的问题（比如在 list\_view 中上下拖动直到有空白后，横向移动，松开鼠标 list\_view 不会恢复）
-
-> 感谢朝泽提供以上补丁。
-    
-    * 增加 main\_loop\_step，方便与 IOTJS 集成。
-    * 修改 ui\_loader\_xml 中的昨天引入的 BUG。
-    * 修改 stm32 编译警告。
+   > 感谢朝泽提供以上补丁。
+   * 增加 main\_loop\_step，方便与 IOTJS 集成。
+   * 修改 ui\_loader\_xml 中的昨天引入的 BUG。
+   * 修改 stm32 编译警告。
 
 * 2019/06/4
   * 修改 widget\_clone 支持拷贝 mutable style。

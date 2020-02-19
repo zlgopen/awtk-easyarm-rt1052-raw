@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  iostream base on mem
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,7 +34,7 @@ typedef struct _tk_iostream_mem_t tk_iostream_mem_t;
  * @class tk_iostream_mem_t
  * @parent tk_iostream_t
  *
- * iostream base on mem
+ * 基于内存实现的输入输出流。
  *
  */
 struct _tk_iostream_mem_t {

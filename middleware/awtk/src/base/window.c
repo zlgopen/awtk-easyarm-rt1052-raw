@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -88,6 +88,10 @@ TK_DECL_VTABLE(window) = {.type = WIDGET_TYPE_NORMAL_WINDOW,
 
 widget_t* window_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   return window_base_create(parent, TK_REF_VTABLE(window), x, y, w, h);
+}
+
+widget_t* window_create_default(void) {
+  return window_create(NULL, 0, 0, 0, 0);
 }
 
 widget_t* window_cast(widget_t* widget) {

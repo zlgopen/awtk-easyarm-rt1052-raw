@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  demo main
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -80,7 +80,8 @@ int main(int argc, char* argv[]) {
   system_info_set_default_font(system_info(), "default_full");
 #endif /*WITH_FS_RES*/
 
-  log_debug("Build at: %s %s\n", __DATE__, __TIME__);
+  log_set_log_level(LOG_LEVEL_INFO);
+  log_info("Build at: %s %s\n", __DATE__, __TIME__);
   assets_init();
   application_init();
 

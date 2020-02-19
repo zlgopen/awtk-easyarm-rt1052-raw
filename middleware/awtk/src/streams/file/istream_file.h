@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input stream base on file
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,7 +34,7 @@ typedef struct _tk_istream_file_t tk_istream_file_t;
  * @class tk_istream_file_t
  * @parent tk_istream_t
  *
- * input stream base on file
+ * 基于文件实现的输入流。
  *
  */
 struct _tk_istream_file_t {

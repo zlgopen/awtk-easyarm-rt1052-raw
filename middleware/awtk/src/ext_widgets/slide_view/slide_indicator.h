@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  slide_indicator
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,6 +29,7 @@ BEGIN_C_DECLS
 /**
  * @enum indicator_default_paint_t
  * @prefix INDICATOR_DEFAULT_PAINT_
+ * @annotation ["scriptable"]
  * 指示器默认绘制的类型。
  */
 typedef enum _indicator_default_paint_t {
@@ -79,7 +80,7 @@ typedef enum _indicator_default_paint_t {
  * ```
  *
  * > 更多用法请参考：[slide\_view.xml](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/slide_view.xml)
+ *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/slide_view.xml)
  *
  * 在c代码中使用函数slide\_indicator\_create创建指示器控件。如：
  *
@@ -94,7 +95,7 @@ typedef enum _indicator_default_paint_t {
  * ```
  *
  * > 更多用法请参考：[theme default](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L350)
+ *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L350)
  *
  */
 typedef struct _slide_indicator_t {
@@ -171,9 +172,10 @@ typedef struct _slide_indicator_t {
   char* indicated_target;
 
   /*private*/
-  bool_t inited;
-  bool_t anchor_x_fixed;
-  bool_t anchor_y_fixed;
+  uint8_t inited : 1;
+  uint8_t anchor_x_fixed : 1;
+  uint8_t anchor_y_fixed : 1;
+  uint8_t chilren_indicated : 1;
   widget_animator_t* wa_opactiy;
   widget_t* indicated_widget;
 } slide_indicator_t;

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  path
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -221,14 +221,4 @@ ret_t path_replace_basename(char* result, int32_t size, const char* filename,
 
   dirname[MAX_PATH] = '\0';
   return path_build(result, size, dirname, basename, NULL);
-}
-
-ret_t path_create(const char* path) {
-  /*TODO*/
-  return RET_FAIL;
-}
-
-ret_t path_remove(const char* path) {
-  /*TODO*/
-  return RET_FAIL;
 }

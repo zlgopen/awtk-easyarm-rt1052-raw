@@ -1,29 +1,31 @@
-
 # AWTK = Toolkit AnyWhere
 
 ![zlg](docs/images/zlg_adv.jpeg)
 
 ## 一、介绍
 
-[AWTK](https://github.com/zlgopen/awtk) 全称 Toolkit AnyWhere，是 [ZLG](http://www.zlg.cn/) 开发的开源 GUI 引擎，旨在为嵌入式系统、WEB、各种小程序、手机和 PC 打造的通用 GUI 引擎，为用户提供一个功能强大、高效可靠、简单易用、可轻松做出炫酷效果的 GUI 引擎。
+[AWTK](README.md) 全称 Toolkit AnyWhere，是 [ZLG](http://www.zlg.cn/) 开发的开源 GUI 引擎，旨在为嵌入式系统、WEB、各种小程序、手机和 PC 打造的通用 GUI 引擎，为用户提供一个功能强大、高效可靠、简单易用、可轻松做出炫酷效果的 GUI 引擎。
 
-> 欢迎广大开发者一起参与开发：[生态共建计划](docs/AWTK_ecology.md)。
+> 欢迎广大开发者一起参与开发：[生态共建计划](docs/awtk_ecology.md)。
 
-#### [AWTK](https://github.com/zlgopen/awtk) 寓意有两个方面：
+#### [AWTK](README.md) 寓意有两个方面：
 
 * Toolkit AnyWhere。 
 * ZLG 物联网操作系统 AWorks 内置 GUI。
 
-#### [AWTK](https://github.com/zlgopen/awtk) 源码仓库：
+#### [AWTK](README.md) 源码仓库：
 
 * 主源码仓库：[https://github.com/zlgopen/awtk](https://github.com/zlgopen/awtk)
 * 镜像源码仓库：[https://gitee.com/zlgopen/awtk](https://gitee.com/zlgopen/awtk)
+* 稳定版整合包：https://pan.baidu.com/s/1_oRgj67M-I4kivk-YzwFWA   提取码: 1cmi
 
 #### 运行效果截图：
 
 ![Chart-Demo](docs/images/chart_main.png)
 
 ![MusicPlayer-Demo](docs/images/musicplayer_main.png)
+
+![Watch](docs/images/smartwatch_main.png)
 
 ## 二、最终目标：
 
@@ -32,18 +34,18 @@
 * 支持开发 MacOS 应用程序。
 * 支持开发 Windows 应用程序。
 * 支持开发 Web APP。
+* 支持开发 Android 应用程序。
+* 支持开发 iOS 应用程序。
 * 支持开发微信小程序。
 * 支持开发支付宝小程序。
 * 支持开发百度小程序。
-* 支持开发 Android 应用程序。
-* 支持开发 iOS 应用程序。
 * 支持开发 2D 小游戏。
 
 ## 三、主要特色
 
 ### 1. 跨平台
 
-[AWTK](https://github.com/zlgopen/awtk) 是跨平台的，这有两个方面的意思：
+[AWTK](README.md) 是跨平台的，这有两个方面的意思：
 
 * AWTK 本身是跨平台的。目前支持的平台有 ZLG AWorks、Windows、Linux、MacOS、嵌入式 Linux、Android、Web 和嵌入式裸系统，可以轻松的移植到各种 RTOS 上。AWTK 以后也可以运行在各种小程序和 iOS 等平台上运行。
 
@@ -51,7 +53,7 @@
 
 ### 2. 高效
 
-[AWTK](https://github.com/zlgopen/awtk) 通过一系列的手段保证 AWTK 应用程序高效运行：
+[AWTK](README.md) 通过一系列的手段保证 AWTK 应用程序高效运行：
 
 * 通过脏矩算法只更新变化的部分。
 * 支持 3 FrameBuffer 让界面以最高帧率运行 （可选）。
@@ -61,7 +63,7 @@
 
 ### 3. 稳定
 
-[AWTK](https://github.com/zlgopen/awtk) 通过下列方式极力让代码稳定可靠：
+[AWTK](README.md) 通过下列方式极力让代码稳定可靠：
 
 * 使用 cppcheck 和 facebook infer 进行静态检查。
 * 使用 valgrind 进行动态内存检查。
@@ -83,6 +85,7 @@
 * 支持高清屏。
 * 支持界面描述文件。
 * 支持主题描述文件。
+* 主题切换实时生效。
 * 支持控件布局策略。
 * 支持对话框高亮策略。
 * 丰富的辅助工具。
@@ -115,12 +118,13 @@
 
 ### 7. 多种开发语言
 
-[AWTK](https://github.com/zlgopen/awtk) 本身是用 C 语言开发的，可以通过 IDL 生成各种脚本语言的绑定。生成的绑定代码不是简单的把 C 语言的 API 映射到脚本语言，而是生成脚本语言原生代码风格的 API。目前支持以下语言 （以后根据需要增加）：
+[AWTK](README.md) 本身是用 C 语言开发的，可以通过 IDL 生成各种脚本语言的绑定。生成的绑定代码不是简单的把 C 语言的 API 映射到脚本语言，而是生成脚本语言原生代码风格的 API。目前支持以下语言 （以后根据需要增加）：
 
 * C
 * Lua
 * Javascript on jerryscript
 * Javascript on nodejs
+* Javascript on quickjs
 
 ### 8. 国际化
 
@@ -191,49 +195,29 @@ pip install Pillow
 
 ## 五、在线演示
 
+* [基本控件在线演示](http://zlgawtk.bceapp.com/awtk/demos/demoui/index.html)
+
 * [图表演示](http://zlgawtk.bceapp.com/awtk/demos/Chart-Demo/index.html)
-
-* [仪表演示](http://zlgawtk.bceapp.com/awtk/demos/Meter-Demo/index.html)
-
-* [智能手表演示](http://zlgawtk.bceapp.com/awtk/demos/SmartWatch-Demo/index.html)
-
-* [清风系统演示](http://zlgawtk.bceapp.com/awtk/demos/CleanAir-Demo/index.html)
 
 * [音乐播放器演示](http://zlgawtk.bceapp.com/awtk/demos/MusicPlayer-Demo/index.html)
 
-* [基本控件在线演示](http://zlgawtk.bceapp.com/awtk/demos/demoui/index.html)
+* [智能手表演示](http://zlgawtk.bceapp.com/awtk/demos/SmartWatch-Demo/index.html)
 
 ## 六、各个平台的移植
 
-#### 官方支持平台 
-
-* [awtk-web](https://github.com/zlgopen/awtk-web)
-
-* [awtk-android](https://github.com/zlgopen/awtk-android)
-
-* [awtk-aworks-rt1052](https://github.com/zlgopen/awtk-aworks-rt1052)
-
-#### 移植示例 （不定期更新）
-
-* [awtk-sylixos](https://github.com/zlgopen/awtk-sylixos)
-
-* [stm32f103ze](https://github.com/zlgopen/awtk-stm32f103ze-raw)
-
-* [stm32f429igtx](https://github.com/zlgopen/awtk-stm32f429igtx-raw)
-
-* [stm32f767igtx](https://github.com/zlgopen/awtk-stm32f767igtx-raw)
-
-* [linux-framebuffer （嵌入式 Linux 请用本项目）](https://github.com/zlgopen/awtk-linux-fb)
-
-#### 芯片原厂移植
-
-* [君正](https://github.com/zlgopen/awtk-port-ingenic`)
+* [详见 AWTK 生态共建计划](docs/awtk_ecology.md)
 
 ## 七、各语言的绑定
 
 * [AWTK 绑定代码生成器](https://github.com/zlgopen/awtk-binding)
 
 * [LUA 绑定](https://github.com/zlgopen/awtk-lua)
+
+* [C++ 绑定](https://github.com/zlgopen/awtk-cpp)
+
+* [JAVA 绑定](https://github.com/zlgopen/awtk-java)
+
+* [MiniJVM 绑定](https://github.com/zlgopen/awtk-minijvm)
 
 * [JS 绑定之 QuickJS](https://github.com/zlgopen/awtk-quickjs)
 
@@ -261,6 +245,11 @@ pip install Pillow
 
 * [任务完成情况](TODO.md)
 
+* [入门指南与手册](https://github.com/zlgopen/awtk-docs)
+
 ## 十、生态共建计划
 
-* [生态共建计划](docs/AWTK_ecology.md)
+* [生态共建计划](docs/awtk_ecology.md)
+* 深度合作伙伴
+
+[![](docs/images/logo_nxp.svg)](https://www.nxp.com)　[![](docs/images/logo_anyka.jpg)](http://www.anyka.com)　[![](docs/images/logo_ingenic.jpg)](http://www.ingenic.com.cn)　[![](docs/images/logo_mindmotion.png)](http://www.mindmotion.com.cn)

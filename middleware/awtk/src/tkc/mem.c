@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  simple memory manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,11 +51,21 @@ static void* tk_alloc_impl(uint32_t size) {
 }
 
 static void* tk_realloc_impl(void* ptr, uint32_t size) {
+  bool_t need_count = FALSE;
   if (size > MAX_BLOCK_SIZE) {
     return NULL;
   }
 
-  return realloc(ptr, size);
+  if (ptr == NULL) {
+    need_count = TRUE;
+  }
+
+  void* temp = realloc(ptr, size);
+  if (temp != NULL && need_count) {
+    s_mem_stat.used_block_nr++;
+  }
+
+  return temp;
 }
 
 static void tk_free_impl(void* ptr) {
@@ -246,6 +256,10 @@ static void* tk_realloc_impl(void* ptr, uint32_t size) {
 ret_t tk_mem_init(void* buffer, uint32_t size) {
   return_value_if_fail(buffer != NULL && size > MIN_SIZE, RET_BAD_PARAMS);
 
+  if (s_mem_info.buffer != NULL) {
+    return RET_FAIL;
+  }
+
   memset(buffer, 0x00, size);
   s_mem_info.buffer = (char*)buffer;
   s_mem_info.size = size;
@@ -261,7 +275,7 @@ ret_t tk_mem_init(void* buffer, uint32_t size) {
 mem_stat_t tk_mem_stat() {
   mem_stat_t st;
 
-  st.used_bytes = s_mem_info.size;
+  st.used_bytes = s_mem_info.used_bytes;
   st.used_block_nr = s_mem_info.used_block_nr;
 
   return st;

@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   window_manager_simple.c
  * Author: AWTK Develop Team
  * Brief:  default window manager
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -48,7 +48,7 @@ static bool_t window_is_fullscreen(widget_t* widget) {
 static bool_t window_is_opened(widget_t* widget) {
   int32_t stage = widget_get_prop_int(widget, WIDGET_PROP_STAGE, WINDOW_STAGE_NONE);
 
-  return stage == WINDOW_STAGE_OPENED;
+  return stage == WINDOW_STAGE_OPENED || stage == WINDOW_STAGE_SUSPEND;
 }
 
 static ret_t window_manager_dispatch_top_window_changed(widget_t* widget) {
@@ -516,13 +516,21 @@ ret_t window_manager_paint_system_bar(widget_t* widget, canvas_t* c) {
 }
 
 static ret_t window_manager_native_native_window_resized(widget_t* widget, void* handle) {
-  native_window_info_t info;
+  uint32_t w = 0;
+  uint32_t h = 0;
+  system_info_t* info = system_info();
   native_window_t* nw = WINDOW_MANAGER_SIMPLE(widget)->native_window;
 
-  return_value_if_fail(native_window_get_info(nw, &info) == RET_OK, RET_BAD_PARAMS);
+  if (info->lcd_orientation == LCD_ORIENTATION_90 || info->lcd_orientation == LCD_ORIENTATION_270) {
+    w = info->lcd_h;
+    h = info->lcd_w;
+  } else {
+    w = info->lcd_w;
+    h = info->lcd_h;
+  }
 
-  window_manager_simple_resize(widget, info.w, info.h);
-  native_window_on_resized(nw, info.w, info.h);
+  window_manager_simple_resize(widget, w, h);
+  native_window_on_resized(nw, w, h);
 
   return RET_OK;
 }
@@ -546,6 +554,7 @@ static window_manager_vtable_t s_window_manager_self_vtable = {
     .close_window_force = window_manager_simple_close_window_force,
     .dispatch_input_event = window_manager_simple_dispatch_input_event,
     .dispatch_native_window_event = window_manager_native_dispatch_native_window_event,
+    .resize = window_manager_simple_resize,
 };
 
 static const widget_vtable_t s_window_manager_vtable = {

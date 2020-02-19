@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  guage_pointer
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [guage.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/guage.xml)
+ * [guage.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/guage.xml)
  *
  * 在c代码中使用函数guage\_pointer\_create创建仪表指针控件。如：
  *
@@ -79,18 +79,18 @@ typedef struct _guage_pointer_t {
   char* image;
 
   /**
-   * @property {float_t} anchor_x
+   * @property {char*} anchor_x
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 旋转锚点x坐标。
+   * 图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
    */
-  float_t anchor_x;
+  char* anchor_x;
 
   /**
-   * @property {float_t} anchor_y
+   * @property {char*} anchor_y
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 旋转锚点y坐标。
+   * 图片旋转锚点x坐标。(后面加上px为像素点，不加px为相对百分比坐标0.0f到1.0f)
    */
-  float_t anchor_y;
+  char* anchor_y;
 
   /*private*/
   const asset_info_t* bsvg_asset;

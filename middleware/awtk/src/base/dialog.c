@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   dialog.c
  * Author: AWTK Develop Team
  * Brief:  dialog
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,13 +42,13 @@ static ret_t dialog_on_add_child(widget_t* widget, widget_t* child) {
   return RET_CONTINUE;
 }
 
-static const char* s_dialog_properties[] = {WIDGET_PROP_ANIM_HINT,
-                                            WIDGET_PROP_OPEN_ANIM_HINT,
-                                            WIDGET_PROP_MOVE_FOCUS_PREV_KEY,
-                                            WIDGET_PROP_MOVE_FOCUS_NEXT_KEY,
-                                            WIDGET_PROP_CLOSE_ANIM_HINT,
-                                            WIDGET_PROP_THEME,
-                                            NULL};
+static const char* const s_dialog_properties[] = {WIDGET_PROP_ANIM_HINT,
+                                                  WIDGET_PROP_OPEN_ANIM_HINT,
+                                                  WIDGET_PROP_MOVE_FOCUS_PREV_KEY,
+                                                  WIDGET_PROP_MOVE_FOCUS_NEXT_KEY,
+                                                  WIDGET_PROP_CLOSE_ANIM_HINT,
+                                                  WIDGET_PROP_THEME,
+                                                  NULL};
 
 static ret_t dialog_set_prop(widget_t* widget, const char* name, const value_t* v) {
   dialog_t* dialog = DIALOG(widget);
@@ -136,14 +136,14 @@ widget_t* dialog_get_client(widget_t* widget) {
   return dialog->client;
 }
 
-uint32_t dialog_modal(widget_t* widget) {
+dialog_quit_code_t dialog_modal(widget_t* widget) {
 #ifdef AWTK_WEB
   log_debug("awtk web not support dialog_modal\n");
-  return 0;
+  return DIALOG_QUIT_NONE;
 #else
   bool_t running = FALSE;
   dialog_t* dialog = DIALOG(widget);
-  return_value_if_fail(dialog != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(dialog != NULL, DIALOG_QUIT_NONE);
 
   log_debug("%s run\n", __FUNCTION__);
 
@@ -157,7 +157,7 @@ uint32_t dialog_modal(widget_t* widget) {
   log_debug("%s quit\n", __FUNCTION__);
   idle_add(dialog_idle_close, widget);
 
-  return dialog->quit_code;
+  return (dialog_quit_code_t)(dialog->quit_code);
 #endif /*AWTK_WEB*/
 }
 
@@ -177,7 +177,7 @@ ret_t dialog_quit(widget_t* widget, uint32_t code) {
   return_value_if_fail(dialog != NULL && !(dialog->quited), RET_BAD_PARAMS);
 
   dialog->quited = TRUE;
-  dialog->quit_code = code;
+  dialog->quit_code = (dialog_quit_code_t)code;
   main_loop_quit(main_loop());
 #endif /*AWTK_WEB*/
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event manager manager
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -118,6 +118,19 @@ ret_t event_source_manager_add(event_source_manager_t* manager, event_source_t* 
  *
  */
 ret_t event_source_manager_remove(event_source_manager_t* manager, event_source_t* source);
+
+/**
+ * @method event_source_manager_remove_by_tag
+ *
+ * 移除所有tag相同的事件源对象。
+ *
+ * @param {event_source_manager_t*} manager event_source_manager对象。
+ * @param {void*} tag tag。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ *
+ */
+ret_t event_source_manager_remove_by_tag(event_source_manager_t* manager, void* tag);
 
 /**
  * @method event_source_manager_destroy

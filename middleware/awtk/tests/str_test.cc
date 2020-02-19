@@ -173,6 +173,10 @@ TEST(Str, unescap) {
   str_t str;
   str_t* s = str_init(&str, 0);
 
+  ASSERT_EQ(str_set(s, "\\"), RET_OK);
+  ASSERT_EQ(str_unescape(s), RET_OK);
+  ASSERT_EQ(string(s->str), "\\");
+
   ASSERT_EQ(str_set(s, "abc"), RET_OK);
   ASSERT_EQ(str_unescape(s), RET_OK);
   ASSERT_EQ(string(s->str), "abc");
@@ -251,5 +255,23 @@ TEST(Str, expand_vars) {
   ASSERT_STREQ(s->str, "123456");
 
   object_unref(vars);
+  str_reset(s);
+}
+
+TEST(Str, from_wstr) {
+  str_t str;
+  str_t* s = NULL;
+  s = str_init(&str, 0);
+
+  ASSERT_EQ(s->size, 0);
+  str_from_wstr(s, L"123456");
+  ASSERT_STREQ(s->str, "123456");
+
+  str_from_wstr_with_len(s, L"123456", 3);
+  ASSERT_STREQ(s->str, "123");
+
+  str_from_wstr_with_len(s, L"123456", 0);
+  ASSERT_STREQ(s->str, "");
+
   str_reset(s);
 }

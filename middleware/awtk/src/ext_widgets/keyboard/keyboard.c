@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  keyboard
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -72,19 +72,40 @@ widget_t* keyboard_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   return widget;
 }
 
+static ret_t on_visit_widget_to_focus_first(void* ctx, const void* data) {
+  widget_t* w = WIDGET(data);
+
+  if (w->focusable) {
+    widget_set_focused(w, TRUE);
+
+    return RET_STOP;
+  }
+
+  return RET_OK;
+}
+
+static ret_t keyboard_focus_first(widget_t* page) {
+  widget_foreach(page, on_visit_widget_to_focus_first, NULL);
+
+  return RET_OK;
+}
+
 static ret_t keyboard_set_active_page(widget_t* button, const char* name) {
-  widget_t* parent = button;
-  while (parent != NULL) {
-    const char* type = widget_get_type(parent);
+  widget_t* iter = button;
+  while (iter != NULL) {
+    const char* type = widget_get_type(iter);
     if (tk_str_eq(type, WIDGET_TYPE_PAGES)) {
       break;
     }
-    parent = parent->parent;
+    iter = iter->parent;
   }
 
-  return_value_if_fail(parent != NULL, RET_FAIL);
+  return_value_if_fail(iter != NULL, RET_FAIL);
+  if (pages_set_active_by_name(iter, name) == RET_OK) {
+    keyboard_focus_first(widget_get_child(iter, PAGES(iter)->active));
+  }
 
-  return pages_set_active_by_name(parent, name);
+  return RET_OK;
 }
 
 #define STR_CLOSE "close"
@@ -93,15 +114,16 @@ static ret_t keyboard_set_active_page(widget_t* button, const char* name) {
 #define STR_KEY_SPACE "space"
 #define STR_KEY_PREFIX "key:"
 #define STR_PAGE_PREFIX "page:"
+#define STR_HARD_KEY_PREFIX "hard_key:"
 #define STR_KEY_TAB "tab"
 #define STR_KEY_BACKSPACE "backspace"
 
 static ret_t keyboard_on_button_click(void* ctx, event_t* e) {
-  uint32_t code = 0;
   input_method_t* im = input_method();
   widget_t* button = WIDGET(e->target);
   const char* name = button->name;
   const char* key = strstr(name, STR_KEY_PREFIX);
+  const char* hard_key = strstr(name, STR_HARD_KEY_PREFIX);
   const char* page_name = strstr(name, STR_PAGE_PREFIX);
 
   if (tk_str_eq(name, STR_CLOSE)) {
@@ -112,19 +134,25 @@ static ret_t keyboard_on_button_click(void* ctx, event_t* e) {
 
   if (page_name != NULL) {
     return keyboard_set_active_page(button, page_name + strlen(STR_PAGE_PREFIX));
-  } else if (key != NULL) {
-    key += strlen(STR_KEY_PREFIX);
-    if (tk_str_eq(key, STR_KEY_BACKSPACE)) {
-      code = TK_KEY_BACKSPACE;
-    } else if (tk_str_eq(key, STR_KEY_SPACE)) {
-      code = TK_KEY_SPACE;
-    } else if (tk_str_eq(key, STR_KEY_TAB)) {
-      code = TK_KEY_TAB;
-    } else {
-      code = *key;
-    }
+  } else if (hard_key != NULL) {
+    const key_type_value_t* kv = NULL;
+    key_event_t key_event;
+    hard_key += strlen(STR_HARD_KEY_PREFIX);
+    kv = keys_type_find(hard_key);
+    return_value_if_fail(kv != NULL, RET_BAD_PARAMS);
 
-    return input_method_dispatch_key(im, code);
+    widget_dispatch(window_manager(), key_event_init(&key_event, EVT_KEY_DOWN, NULL, kv->value));
+    widget_dispatch(window_manager(), key_event_init(&key_event, EVT_KEY_UP, NULL, kv->value));
+
+    return RET_OK;
+  } else if (key != NULL) {
+    const key_type_value_t* kv = NULL;
+
+    key += strlen(STR_KEY_PREFIX);
+    kv = keys_type_find(key);
+    return_value_if_fail(kv != NULL, RET_BAD_PARAMS);
+
+    return input_method_dispatch_key(im, kv->value);
   } else {
     if (tk_str_eq(name, STR_ACTION)) {
       return input_method_dispatch_action(im);
@@ -184,9 +212,15 @@ static ret_t keyboard_hook_buttons(void* ctx, const void* iter) {
 
 static ret_t keyboard_on_load(void* ctx, event_t* e) {
   widget_t* widget = WIDGET(ctx);
+  widget_t* pages = widget_lookup_by_type(widget, WIDGET_TYPE_PAGES, TRUE);
 
   (void)e;
   widget_foreach(widget, keyboard_hook_buttons, widget);
+  if (pages != NULL) {
+    keyboard_focus_first(widget_get_child(pages, PAGES(pages)->active));
+  } else {
+    keyboard_focus_first(widget);
+  }
 
   return RET_OK;
 }

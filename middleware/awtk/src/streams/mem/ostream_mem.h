@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  output stream base on memory
  *
- * Copyright (c) 2019 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,7 +33,7 @@ typedef struct _tk_ostream_mem_t tk_ostream_mem_t;
  * @class tk_ostream_mem_t
  * @parent tk_ostream_t
  *
- * output stream base on memory
+ * 基于内存实现的输出流。
  *
  */
 struct _tk_ostream_mem_t {

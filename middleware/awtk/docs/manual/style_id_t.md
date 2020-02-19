@@ -1,7 +1,6 @@
 ## style\_id\_t
 ### 概述
- style常量定义。
-### 常量
+style常量定义。### 常量
 <p id="style_id_t_consts">
 
 | 名称 | 说明 | 
@@ -38,3 +37,5 @@
 | STYLE\_ID\_SELECTED\_FG\_COLOR | 编辑器中选中区域的前景颜色。 |
 | STYLE\_ID\_SELECTED\_TEXT\_COLOR | 编辑器中选中区域的文本颜色。 |
 | STYLE\_ID\_ROUND\_RADIUS | 圆角半径(仅在WITH\_VGCANVAS定义时生效)。 |
+| STYLE\_ID\_CHILDREN\_LAYOUT | 子控件布局参数。 |
+| STYLE\_ID\_SELF\_LAYOUT | 控件布局参数。 |

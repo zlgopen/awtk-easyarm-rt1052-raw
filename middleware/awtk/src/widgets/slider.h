@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  slider
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,7 +43,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [basic](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/basic.xml)
+ * [basic](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/basic.xml)
  *
  * 在c代码中使用函数slider\_create创建滑块控件。如：
  *
@@ -68,7 +68,7 @@ BEGIN_C_DECLS
  *
  * > 更多用法请参考：
  * [theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/styles/default.xml#L179)
+ * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L179)
  *
  */
 typedef struct _slider_t {
@@ -111,15 +111,34 @@ typedef struct _slider_t {
   /**
    * @property {uint32_t} bar_size
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * bar的宽度或高度。
+   * 轴的宽度或高度（单位：像素），为0表示为控件的宽度或高度的一半，缺省为0。
    */
   uint32_t bar_size;
 
+  /**
+   * @property {uint32_t} dragger_size
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 滑块的宽度或高度（单位：像素），缺省为10。
+   */
+  uint32_t dragger_size;
+
+  /**
+   * @property {bool_t} dragger_adapt_to_icon
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 滑块的宽度或高度是否与icon适应，缺省为true。
+   */
+  bool_t dragger_adapt_to_icon;
+
+  /**
+   * @property {bool_t} slide_with_bar
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否允许在轴上滑动来改变滑块位置，缺省为FALSE。
+   */
+  bool_t slide_with_bar;
+
   /*private*/
   bool_t dragging;
-
   double saved_value;
-  double dragger_size;
   point_t down;
   rect_t dragger_rect;
 
@@ -229,6 +248,10 @@ ret_t slider_set_bar_size(widget_t* widget, uint32_t bar_size);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t slider_set_vertical(widget_t* widget, bool_t vertical);
+
+#define SLIDER_PROP_DRAGGER_SIZE "dragger_size"
+#define SLIDER_PROP_DRAGGER_ADAPT_TO_ICON "dragger_adapt_to_icon"
+#define SLIDER_PROP_SLIDE_WITH_BAR "slide_with_bar"
 
 #define SLIDER(widget) ((slider_t*)(slider_cast(WIDGET(widget))))
 

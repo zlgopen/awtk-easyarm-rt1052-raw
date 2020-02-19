@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  tab_control
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -62,7 +62,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [tab control](https://github.com/zlgopen/awtk/blob/master/demos/assets/raw/ui/)
+ * [tab control](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
  *
  */
 typedef struct _tab_control_t {

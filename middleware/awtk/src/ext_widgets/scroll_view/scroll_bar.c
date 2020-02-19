@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  scroll_bar
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -142,6 +142,22 @@ static ret_t scroll_bar_desktop_on_event(widget_t* widget, event_t* e) {
     case EVT_POINTER_ENTER:
       widget_set_state(widget, WIDGET_STATE_OVER);
       break;
+    case EVT_RESIZE:
+    case EVT_MOVE_RESIZE: {
+      widget_t* up = widget_lookup(widget, CHILD_UP, FALSE);
+      widget_t* down = widget_lookup(widget, CHILD_DOWN, FALSE);
+      bool_t horizon = widget->w > widget->h;
+
+      if (up != NULL) {
+        widget_use_style(up, horizon ? "scroll_left" : "scroll_up");
+      }
+
+      if (down != NULL) {
+        widget_use_style(down, horizon ? "scroll_right" : "scroll_down");
+      }
+
+      break;
+    }
     default:
       break;
   }
@@ -445,7 +461,7 @@ TK_DECL_VTABLE(scroll_bar_desktop) = {.size = sizeof(scroll_bar_t),
                                       .get_prop = scroll_bar_get_prop};
 
 bool_t scroll_bar_is_mobile(widget_t* widget) {
-  return widget && widget->vt == TK_REF_VTABLE(scroll_bar_mobile);
+  return widget && WIDGET_IS_INSTANCE_OF(widget, scroll_bar_mobile);
 }
 
 static ret_t scroll_bar_on_value_animate_end(void* ctx, event_t* e) {

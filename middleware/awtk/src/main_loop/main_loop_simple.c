@@ -1,9 +1,9 @@
-/**
+﻿/**
  * File:   main_loop_simple.c
  * Author: AWTK Develop Team
  * Brief:  a simple main loop
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * this program is distributed in the hope that it will be useful,
  * but without any warranty; without even the implied warranty of
@@ -21,6 +21,10 @@
 
 #include "tkc/time_now.h"
 #include "main_loop/main_loop_simple.h"
+
+#include "tkc/event_source_idle.h"
+#include "tkc/event_source_timer.h"
+#include "tkc/event_source_manager_default.h"
 
 static ret_t main_loop_simple_queue_event(main_loop_t* l, const event_queue_req_t* r) {
   ret_t ret = RET_FAIL;
@@ -139,7 +143,7 @@ static ret_t main_loop_dispatch_events(main_loop_simple_t* loop) {
         timer_add(r.add_timer.func, r.add_timer.e.target, r.add_timer.duration);
         break;
       default: {
-        if(r.event.target != NULL) {
+        if (r.event.target != NULL) {
           widget = WIDGET(r.event.target);
         }
         widget_dispatch(widget, &(r.event));
@@ -164,10 +168,9 @@ static ret_t main_loop_dispatch_input(main_loop_simple_t* loop) {
 static ret_t main_loop_simple_step(main_loop_t* l) {
   main_loop_simple_t* loop = (main_loop_simple_t*)l;
 
-  timer_dispatch();
   main_loop_dispatch_input(loop);
   main_loop_dispatch_events(loop);
-  idle_dispatch();
+  event_source_manager_dispatch(loop->event_source_manager);
 
   window_manager_paint(loop->base.wm);
 
@@ -186,7 +189,15 @@ static ret_t main_loop_simple_run(main_loop_t* l) {
   return RET_OK;
 }
 
+static event_source_manager_t* main_loop_simple_get_event_source_manager(main_loop_t* l) {
+  main_loop_simple_t* loop = (main_loop_simple_t*)l;
+
+  return loop->event_source_manager;
+}
+
 main_loop_simple_t* main_loop_simple_init(int w, int h) {
+  event_source_t* idle_source = NULL;
+  event_source_t* timer_source = NULL;
   static main_loop_simple_t s_main_loop_simple;
   main_loop_simple_t* loop = &s_main_loop_simple;
 
@@ -206,15 +217,27 @@ main_loop_simple_t* main_loop_simple_init(int w, int h) {
   loop->base.run = main_loop_simple_run;
   loop->base.step = main_loop_simple_step;
   loop->base.queue_event = main_loop_simple_queue_event;
+  loop->base.get_event_source_manager = main_loop_simple_get_event_source_manager;
 
   window_manager_post_init(loop->base.wm, w, h);
   main_loop_set((main_loop_t*)loop);
+
+  loop->event_source_manager = event_source_manager_default_create();
+
+  idle_source = event_source_idle_create(idle_manager());
+  timer_source = event_source_timer_create(timer_manager());
+  event_source_manager_add(loop->event_source_manager, idle_source);
+  event_source_manager_add(loop->event_source_manager, timer_source);
+  OBJECT_UNREF(idle_source);
+  OBJECT_UNREF(timer_source);
 
   return loop;
 }
 
 ret_t main_loop_simple_reset(main_loop_simple_t* loop) {
   return_value_if_fail(loop != NULL, RET_BAD_PARAMS);
+
+  event_source_manager_destroy(loop->event_source_manager);
   event_queue_destroy(loop->queue);
   tk_mutex_destroy(loop->mutex);
 

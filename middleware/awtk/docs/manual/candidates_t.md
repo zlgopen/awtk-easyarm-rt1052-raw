@@ -2,8 +2,28 @@
 ### 概述
 ![image](images/candidates_t_0.png)
 
- 输入法候选字词控件。
+输入法候选字词控件。
 
+如果希望启用用数字选择对应的候选字，请设置属性grab_keys="true"。如：
+
+```xml
+<candidates x="0" y="0" w="100%" h="30" grab_keys="true"/>
+```
+
+>相关文件： assets/default/raw/ui/kb_default.xml
+
+如果希望通过左右键切换不同的候选字，除了设置属性grab_keys="true"，还需要设置按钮的focused状态的style。
+
+```xml
+<style name="candidates" text_color="black">
+<normal  />
+<pressed    bg_color="#c0c0c0" border_color="#a0a0a0"/>
+<over       bg_color="#e0e0e0" border_color="#a0a0a0"/>
+<focused    border_color="#a0a0a0"/>
+</style>
+```
+
+>相关文件：assets/default/raw/styles/keyboard.xml
 ----------------------------------
 ### 函数
 <p id="candidates_t_methods">
@@ -17,9 +37,7 @@
 
 * 函数功能：
 
-> <p id="candidates_t_candidates_cast"> 转换为candidates对象(供脚本语言使用)。
-
-
+> <p id="candidates_t_candidates_cast">转换为candidates对象(供脚本语言使用)。
 
 * 函数原型：
 
@@ -38,9 +56,7 @@ widget_t* candidates_cast (widget_t* widget);
 
 * 函数功能：
 
-> <p id="candidates_t_candidates_create"> 创建candidates对象
-
-
+> <p id="candidates_t_candidates_create">创建candidates对象
 
 * 函数原型：
 

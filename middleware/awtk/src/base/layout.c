@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget layout
  *
- * Copyright (c) 2018 - 2019  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -79,18 +79,37 @@ ret_t widget_layout_children(widget_t* widget) {
 
 ret_t widget_set_self_layout(widget_t* widget, const char* params) {
   return_value_if_fail(widget != NULL && params != NULL, RET_BAD_PARAMS);
-  self_layouter_destroy(widget->self_layout);
+
+  if (widget->self_layout != NULL) {
+    if (tk_str_eq(widget->self_layout->params.str, params)) {
+      return RET_OK;
+    }
+    self_layouter_destroy(widget->self_layout);
+  }
 
   widget->self_layout = self_layouter_create(params);
+
+  if (widget->self_layout != NULL) {
+    str_set(&(widget->self_layout->params), params);
+  }
 
   return RET_OK;
 }
 
 ret_t widget_set_children_layout(widget_t* widget, const char* params) {
   return_value_if_fail(widget != NULL && params != NULL, RET_BAD_PARAMS);
-  children_layouter_destroy(widget->children_layout);
+  if (widget->children_layout != NULL) {
+    if (tk_str_eq(widget->children_layout->params.str, params)) {
+      return RET_OK;
+    }
+    children_layouter_destroy(widget->children_layout);
+  }
 
   widget->children_layout = children_layouter_create(params);
+
+  if (widget->children_layout != NULL) {
+    str_set(&(widget->children_layout->params), params);
+  }
 
   return RET_OK;
 }
