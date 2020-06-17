@@ -1,4 +1,4 @@
-﻿
+
 /**
  * File:   awtk_config.h
  * Author: AWTK Develop Team
@@ -103,5 +103,8 @@
  */
 #define WITH_IME_PINYIN 1
 #define WITHOUT_SUGGEST_WORDS 1
+
+#define LCD_W 480
+#define LCD_H 272
 
 #endif/*AWTK_CONFIG_H*/
