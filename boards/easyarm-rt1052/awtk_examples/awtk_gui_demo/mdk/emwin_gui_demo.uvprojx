@@ -10,12 +10,13 @@
       <TargetName>emwin_gui_demo flexspi_nor_sdram_debug</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060020::V5.06 (build 20)::ARMCC</pCCUsed>
+      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>MIMXRT1052DVL6B</Device>
           <Vendor>NXP</Vendor>
-          <PackID>NXP.MIMXRT1052_DFP.10.0.4</PackID>
+          <PackID>NXP.MIMXRT1052_DFP.12.0.0</PackID>
           <PackURL>http://mcuxpresso.nxp.com/cmsis_pack/repo/</PackURL>
           <Cpu>CPUTYPE("Cortex-M7") FPU3(DFPU)</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -125,47 +126,6 @@
             <HexOffset>0</HexOffset>
             <Oh166RecLen>16</Oh166RecLen>
           </OPTHX>
-          <Simulator>
-            <UseSimulator>0</UseSimulator>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
-            <RestoreBreakpoints>1</RestoreBreakpoints>
-            <RestoreWatchpoints>1</RestoreWatchpoints>
-            <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
-            <RestoreFunctions>1</RestoreFunctions>
-            <RestoreToolbox>1</RestoreToolbox>
-            <LimitSpeedToRealTime>0</LimitSpeedToRealTime>
-            <RestoreSysVw>1</RestoreSysVw>
-          </Simulator>
-          <Target>
-            <UseTarget>1</UseTarget>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
-            <RestoreBreakpoints>1</RestoreBreakpoints>
-            <RestoreWatchpoints>1</RestoreWatchpoints>
-            <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
-            <RestoreFunctions>0</RestoreFunctions>
-            <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>1</RestoreTracepoints>
-            <RestoreSysVw>1</RestoreSysVw>
-          </Target>
-          <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>6</TargetSelection>
-          <SimDlls>
-            <CpuDll></CpuDll>
-            <CpuDllArguments></CpuDllArguments>
-            <PeripheralDll></PeripheralDll>
-            <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile></InitializationFile>
-          </SimDlls>
-          <TargetDlls>
-            <CpuDll></CpuDll>
-            <CpuDllArguments></CpuDllArguments>
-            <PeripheralDll></PeripheralDll>
-            <PeripheralDllArguments></PeripheralDllArguments>
-            <InitializationFile>evkbimxrt1050_flexspi_nor_sdram.ini</InitializationFile>
-            <Driver>Segger\JL2CM3.dll</Driver>
-          </TargetDlls>
         </DebugOption>
         <Utilities>
           <Flash1>
@@ -224,6 +184,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>3</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>1</StupSel>
@@ -364,16 +325,20 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
+            <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
             <v6LangP>3</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
+            <v6Lto>0</v6Lto>
+            <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--library_interface=armcc --diag_suppress=66,1296,186 --diag_suppress=1296,186 --gnu</MiscControls>
               <Define>XIP_EXTERNAL_FLASH=1, XIP_BOOT_HEADER_ENABLE=1, XIP_BOOT_HEADER_DCD_ENABLE=1, SKIP_SYSCLK_INIT, DEBUG, CPU_MIMXRT1052DVL6B, HAS_AWTK_CONFIG</Define>
               <Undefine></Undefine>
-              <IncludePath>..;../../..;../../../../../CMSIS/Include;../../../../../devices;../../../../../middleware/emwin/emWin_Config;../../../../../middleware/emwin/emWin_header;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../components/ft5406_rt;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052;../../../../../devices/MIMXRT1052/utilities/str;../../../../../devices/MIMXRT1052/utilities/debug_console;../../../../../components/uart;../../../../../components/serial_manager;../../../../../components/serial_manager;../../../../../devices/MIMXRT1052/drivers;../../../../../components/lists;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/xip;../../../xip;..\..\..\..\..\middleware\awtk\src;..\..\..\..\..\middleware\awtk\src\ext_widgets;..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port</IncludePath>
+              <IncludePath>..;../../..;../../../../../CMSIS/Include;../../../../../devices;../../../../../middleware/emwin/emWin_Config;../../../../../middleware/emwin/emWin_header;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../components/ft5406_rt;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052;../../../../../devices/MIMXRT1052/utilities/str;../../../../../devices/MIMXRT1052/utilities/debug_console;../../../../../components/uart;../../../../../components/serial_manager;../../../../../components/serial_manager;../../../../../devices/MIMXRT1052/drivers;../../../../../components/lists;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/drivers;../../../../../devices/MIMXRT1052/xip;../../../xip;..\..\..\..\..\middleware\awtk\awtk\src;..\..\..\..\..\middleware\awtk\awtk\src\ext_widgets;..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -386,6 +351,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>DEBUG, __STARTUP_INITIALIZE_NONCACHEDATA</Define>
@@ -473,11 +439,15 @@
                     <uThumb>2</uThumb>
                     <uSurpInc>2</uSurpInc>
                     <uC99>2</uC99>
+                    <uGnu>2</uGnu>
                     <useXO>2</useXO>
                     <v6Lang>0</v6Lang>
                     <v6LangP>0</v6LangP>
                     <vShortEn>0</vShortEn>
                     <vShortWch>0</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
                     <VariousControls>
                       <MiscControls></MiscControls>
                       <Define></Define>
@@ -869,24 +839,29 @@
           <GroupName>awtk-port</GroupName>
           <Files>
             <File>
-              <FileName>main_loop_easyarm_rt1052_raw.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\main_loop_easyarm_rt1052_raw.c</FilePath>
-            </File>
-            <File>
-              <FileName>platform.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\platform.c</FilePath>
+              <FileName>awtk_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port\awtk_config.h</FilePath>
             </File>
             <File>
               <FileName>fs_os.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\fs_os.c</FilePath>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port\fs_os.c</FilePath>
+            </File>
+            <File>
+              <FileName>main_loop_easyarm_rt1052_raw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port\main_loop_easyarm_rt1052_raw.c</FilePath>
             </File>
             <File>
               <FileName>mutex_null.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\awtk-port\mutex_null.c</FilePath>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port\mutex_null.c</FilePath>
+            </File>
+            <File>
+              <FileName>platform.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port\platform.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -896,22 +871,12 @@
             <File>
               <FileName>assets.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk\demos\assets.c</FilePath>
-            </File>
-            <File>
-              <FileName>assets.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk\demos\assets.h</FilePath>
-            </File>
-            <File>
-              <FileName>demo_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk\demos\demo_main.c</FilePath>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk\demos\assets.c</FilePath>
             </File>
             <File>
               <FileName>demo_ui_app.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk\demos\demo_ui_app.c</FilePath>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk\demos\demo_ui_app.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -921,12 +886,18 @@
             <File>
               <FileName>awtk_imx1050.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\middleware\awtk-rt1052-raw\lib\awtk_imx1050.lib</FilePath>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\lib\awtk_imx1050.lib</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
   </Targets>
+
+  <RTE>
+    <apis/>
+    <components/>
+    <files/>
+  </RTE>
 
 </Project>
