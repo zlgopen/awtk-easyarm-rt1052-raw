@@ -1,5 +1,289 @@
 # 最新动态
+* 2020/06/28
+  * 完善font cache（感谢智明提供补丁）。
+  * font\_bitmap\_index\_t中的偏移量改为32位(如果使用位图字体，需要重新生成资源)。
+  * 修复位图字体空格字膜宽度的不正确的问题（感谢智明提供补丁）。
 
+* 2020/06/27
+  * 完善font cache（感谢智明提供补丁）。
+  * 窗口切换到前台时，将其为窗口管理的target/key\_arget。
+
+* 2020/06/26
+  * edit 支持 date/time/time\_full 输入类型。
+  * 增加文档 [如何用 edit 控件编辑日期](how_to_edit_date.md)
+  * 增加文档 [如何用 edit 控件编辑时间](how_to_edit_time.md)
+  * 增加文档 [如何用 edit 控件编辑 IP 地址](how_to_edit_ip_addr.md)
+
+* 2020/06/25
+  * edit 支持 ip v4 输入类型。
+
+* 2020/06/24
+  * 增加函数 tk\_thread\_self。
+  * 增加 mutex\_nest 嵌套互斥锁。
+  * object_locker 改用嵌套互斥锁实现。
+  * 增加事件 cmd\_exec\_event\_t，方便拦截 object exec。
+  * 完善 rich text（感谢尧燊提供补丁）
+  * 修改 app conf/file browser 中的内存泄露。
+
+* 2020/06/23
+  * 完善 FAQ，增加《如何去掉不需要的控件，以节省 flash 空间》
+  
+* 2020/06/22
+  * 完善 conf-io 支持 add 命令，新建一个空的子节点。
+  * 修复 Build script 问题（感谢智明/陈谭提供补丁）。
+  * 修改 mutable\_image 文档（感谢智明提供补丁）。
+  * 将部分文件转成 UTF8-BOM 格式（感谢陈谭提供补丁）。
+
+* 2020/06/21
+  * 增加 object\_cmd\_t 定义对象支持的常见命令。
+  * 完善 conf-io 实现常见命令。
+
+* 2020/06/20
+  * 完善 tab\_button\_group 支持缺省的 active button。
+
+* 2020/06/19
+  * 完善 DLL 导出符号。
+  * 完善 conf-io，支持自读模式。
+  * 完善 conf-io，支持缺省配置。
+  * 完善 conf-io，修改 json 文件不存在的问题。
+  * 增加 object\_compositor 将两个对象包装成一个对象。
+  * 修复特殊情况下软键盘无法关闭的问题（感谢陈谭提供补丁）。
+  * 修复控件动画放在窗口上有概率出现显示不正常的问题（感谢智明提供补丁）。
+
+* 2020/06/18
+  * 增加文档《内存分配》
+  * 完善 mem allocator pool
+  * 完善 API 注释（感谢俊杰提供补丁）。
+  * 增加函数 check\_button\_get\_checked\_button
+  * 增加 tk\_mem\_init\_stage2 用于初始化 pool/oom，否则在嵌入式式平台会死锁。
+
+* 2020/06/17
+  * 保留 xml 属性中的空格。
+  * 完善 edit（感谢培煌提供补丁）
+  * 修复空格字体的显示问题（感谢智明提供补丁）。
+  * 修复圆角矩形在宽高很小的时候出现异常的问题（感谢智明提供补丁）。
+  * 重新设计内存管理器架构，新增加锁、调试和防内存碎片功能。
+
+* 2020/06/15
+  * 完善 app conf/object locker
+  * 完善 toast （感谢培煌提供补丁）
+  * 完善资源生成脚本（感谢朝泽提供补丁）。
+  * 完善 window manager simple（感谢智明提供补丁）。
+  * 修复旋转后 online\_fb 的 line\_length 不正确的问题（感谢智明提供补丁）。
+
+* 2020/06/14
+  * 完善 scroll view，增加滚动相关事件。
+  * 增加文档《如何实现弹出菜单》
+  * 完善 conf-io，支持 reload。
+  
+* 2020/06/13
+  * 完善资源生成脚本，兼容 AWTK 和 Designer（感谢朝泽提供补丁）。
+  * 完善 str\_count\_sub\_str（感谢朝泽提供补丁）。 
+  * 完善 《自定义控件规范》（感谢朝泽提供补丁）。 
+  * 增加 data\_reader\_asset。
+  * 完善 conf_io，支持移动配置项的顺序，增加#index 获得序数。
+  
+* 2020/06/12
+  * 增加 app\_conf\_set\_wstr/app\_conf\_get\_wstr
+  * 完善 window\_manager\_back\_to\_home 对软键盘窗口的处理。
+  * 增加 object\_locker 对 object 进行装饰，提供互斥的功能。
+  * 用 object\_locker 重新实现 app\_conf。
+
+* 2020/06/11
+  * 完善 conf\_io，支持#name/#size
+  * 增加 dll 导出函数（感谢俊杰提供补丁）。 
+  * 修改 canvas\_draw\_char\_impl baseline 的 BUG。
+  * 完善文档。
+  
+* 2020/06/10
+  * 增加宏 NATIVE\_WINDOW\_BORDERLESS 控制是否去掉 native window 的标题栏。
+  * 增加 FAQ《应用程序在 Windows 的手持设备中运行，如何去掉窗口的标题栏》
+  * image value 支持 16 进制格式。
+  * 增加一些导出函数（感谢尧燊提供补丁）
+  * 增加 AWTK 应用程序的图标。
+
+* 2020/06/09
+  * 增加 dll 导出函数（感谢俊杰提供补丁）。 
+  * 完善 app_conf 的注释（感谢瑞安提供补丁）。 
+
+* 2020/06/08
+  * 优化圆角矩形的抗锯齿效果（感谢智明提供补丁）。
+
+* 2020/06/07
+  * 增加 conf-io 用于存取应用程序的配置信息。
+  * 增加文档《如何存取应用程序的配置信息》
+
+* 2020/06/05
+  * 增加文档《如何绘制旋转文字》
+  
+* 2020/06/05
+  * 增加 lcd 相关文档。
+  * 完善 API 注释，导出一些函数。
+  * 完善 switch（感谢俊杰提供补丁）。 
+
+* 2020/06/04
+  * 完善 file_chooser 支持初始目录和过滤规则。
+  * 完善 widget_dispatch，保证事件处理函数中，e->target 指向当前的 widget。
+  * 增加文档《为 512K Flash 优化空间》
+  
+* 2020/06/03
+  * 完善 path_normalize 函数。
+
+* 2020/06/02
+  * 完善文档
+  * 完善 label
+  * 增加 [awtk-inter-win-communication](https://github.com/zlgopen/awtk-inter-win-communication) 用于演示窗口之间的通讯方式。
+  * 完善 image（感谢智明提供补丁）。 
+  * 完善 file browser（感谢瑞安提供补丁）。 
+
+* 2020/06/01
+  * 增加 [awtk-widget-generator](https://github.com/zlgopen/awtk-widget-generator) 用于生成自定义控件。
+
+  * 增加 [awtk-widget-qr](https://github.com/zlgopen/awtk-widget-qr) 二维码控件。
+
+  * 完善 list item
+
+* 2020/05/31
+  * 修改 event id 潜在的问题。
+
+* 2020/05/30
+  * 增加文档《如何使用软键盘上的 action 按钮》 
+
+* 2020/05/29
+  * 完善 assets\_manager\_ref（感谢俊杰提供补丁）。 
+  * 增加文档《如何使用对话框》
+  * 修改无文件系统时输入法无法使用的问题。
+  
+
+* 2020/05/27
+  * 去掉 assets_manager 中的 log。
+  * 增加文档《如何访问控件的属性》。
+  * 修改了 tk\_dl\_open 支持中文路径（感谢大恒提供补丁）。
+
+* 2020/05/27
+  * 增加文档《如何定制 combo_box 控件中按钮的风格和大小》
+  * 增加文档《如何用 valgrind 查找内存相关问题》
+  * 修改 agge 中内存未初始化的 BUG（感谢智明提供补丁）
+  * 修改 file browser 在 Linux 下无法回到根目录的 BUG（感谢瑞安提供补丁）
+
+* 2020/05/26
+  * 完善 widget_dispatch。
+  * 完善 scroll view 事件处理。
+  * 完善 switch 事件处理（感谢俊杰提供补丁）。
+  * 完善 draggable 事件处理（感谢俊杰提供补丁）。
+  * 完善 list item 事件处理（感谢俊杰提供补丁）。 
+  * 增加 1.4.1 分支
+  * 增加工具 image\_dither（感谢智明提供）
+
+* 2020/05/25
+  * 修改切换语言奔溃的问题。
+  * 修改 valgrind 发现的内存泄露。
+  * 增加一些 DLL 导出函数（感谢尧燊提供补丁）。
+
+* 2020/05/23
+  * 支持控件设置独立的鼠标指针。
+  * 更新文档《如何启用鼠标指针》
+  
+* 2020/05/22
+  * 修改 list item 快速点击无效的问题（感谢 yeslee 提供补丁）
+  * 完善缺省字体处理（感谢俊杰提供补丁）
+  * 修改快速圆角矩形支持 mono 模式（感谢智明提供补丁）
+
+* 2020/05/21
+  * 增加文档《自定义控件规范》
+  * 修正了 WITH\_BITMAP\_FONT 模式下 font\_manager\_unload\_all（比如语言切换）后由于字体名称设置错误导致字体加载失败的问题（感谢朝泽提供补丁）。
+  * edit 控件增加 action text 属性，用于控制软键盘上 action 按钮的文本。
+  * 用 key\_code\_is\_enter 判断是否是回车（感谢大恒提供补丁）。
+  * 修复 gtest 的 Pixel 测试问题和优化了 dark 的混合效率（感谢智明提供补丁）。
+  * 修复 mingw 编译报错的问题，同时让 mingw 和 32 位 linux 的 float_t 指定为 float 类型（感谢智明提供补丁）。
+  * 修改 layout 的执行时机（感谢智明提供补丁）。
+
+* 2020/05/20
+  * 增加 canvas\_get\_font\_height
+  * 增加导出一些函数方便自定义控件使用。
+  * 完善编译脚本解决 DLL 一些问题。
+
+* 2020/05/19
+  * 增加《事件录制与重放》文档。
+  * image 的 draw type 为 ceneter 时支持旋转和缩放。
+  
+* 2020/05/18
+  * 增加事件录制与重放功能，辅助手动测试和压力测试。
+  * 完善 text edit（感谢大恒提供补丁）。
+  * 完善 system settings 和 release 脚本（感谢俊杰提供补丁）。
+  * 支持硬件多层合并 (GUI + Camera)（感谢智明提供补丁）。
+
+* 2020/05/14
+  * 修复 clip view 中 type 的问题（感谢尧燊提供补丁）。
+  * 修复 file browser up 中的问题（感谢瑞安提供补丁）。
+
+* 2020/05/13
+  * 完善文档。
+  * 完善 tr_text 处理（感谢尧燊提供补丁）。
+  * 增加状态 WIDGET\_STATE\_DISABLE\_OF\_CHECKED/WIDGET\_STAT\_DISABLE\_OF\_ACTIVE（感谢尧燊提供补丁）。
+  * 完善文件选择器（感谢瑞安提供补丁）
+
+* 2020/05/11
+  * 将 google 拼音数据纳入资源管理，根据有无文件系统决定放到文件系统还是和代码一起编译。
+  * 将联想字数据纳入资源管理，根据有无文件系统决定放到文件系统还是和代码一起编译。
+
+* 2020/05/10
+  * 更新文档。
+  * 增加 semaphore_null.c
+
+* 2020/05/09
+  * 更新文档（感谢俊杰提供补丁）
+  * 更新文档。
+  * 增加 semaphore_null.c
+
+* 2020/05/09
+  * 更新文档（感谢俊杰提供补丁）
+
+* 2020/05/08
+  * 增加函数 tk\_wstr\_dup\_utf8
+  * 增加函数 fs\_os\_file\_tell
+  * 增加函数 fs\_os\_file\_size
+  * 增加函数 fs\_os\_file\_stat
+  * 增加函数 fs\_os\_file\_sync
+  * 增加函数 tk_mutex_try_lock 以及各个平台的实现。
+  * 重构 src/platforms/pc/fs_os.c 中的函数。
+  * 完善 draggable 控件，enable=false 时，禁止拖动。
+  * 修复如果 slide_view 控件其他控件遮挡时候，刷新 slide_view 控件会出现显示异常的问题和修复了 switch 控件对 片段式显存的支持（感谢智明提供补丁）。
+  * 修改了片段式显存下 canvas 设置裁减区收到当前脏矩形控制，防止裁减区越界的问题（感谢智明提供补丁）。
+  * 修复了 awtk 的警告问题（感谢智明提供补丁）。
+
+* 2020/05/07
+  * 完善 input\_method\_dispatch\_candidates。
+  * 完善 widget_set_theme（感谢大恒提供补丁）
+  
+* 2020/05/06
+  * 支持从 SD 卡加载资源，做了一些小的改动。
+  
+* 2020/05/04
+  * 完善文件系统，函数指针放到 vtable 中，增加测试。
+
+* 2020/05/03
+  * 增加函数 str\_append\_more。
+  * 在 EVT_BLUR 的事件回调中 widget_destroy_children（当前控件的父控件等）, 会导致 widget_dispatch_blur_event() 访问野指针（感谢朝泽提供补丁）。
+  * 控件事件的回调被调用时，如果当前控件的 ref_count == 2，且回调中同时执行了 widget_destroy_children（当前控件的父控件等）、widget_destroy（自身），会导致 widget_unref_in_idle() 访问野指针（感谢朝泽提供补丁）。
+  * 如果在窗口某控件的 EVT_BLUR 事件回调中调用 widget_set_need_relayout_children()，当焦点在该控件时关闭程序，会导致当前窗口的 destroy 在 widget_destroy_sync(window_manager()) 之后执行，引起 wm_on_destroy_child() 访问野指针（感谢朝泽提供补丁）。
+
+* 2020/05/02
+  * 完善控件动画（感谢朝泽提供补丁）。
+
+* 2020/05/01
+  * 完善 draw_image_repeat（感谢智明提供补丁）。
+  * edit/mledit 支持用按键关闭、打开和 toggle [输入法](https://github.com/zlgopen/awtk/blob/master/docs/input_method.md)。
+
+* 2020/04/30
+  * 完善 update res 脚本（感谢朝泽提供补丁）。 
+  * 完善 draw_image_repeat（感谢智明提供补丁）。
+
+* 2020/04/29
+  * 完善 rich text view 滚动条的处理。
+  * lcd 增加 draw_image_repeat 函数，方便特定平台优化（感谢智明提供补丁）。
+  * 完善 str gen 名称支持引号。
+  
 * 2020/04/28
   * 完善 color picker（感谢尧燊提供补丁）。 
   * 修复 guage_pointer 函数设置锚点不正确的问题（感谢智明提供补丁） 

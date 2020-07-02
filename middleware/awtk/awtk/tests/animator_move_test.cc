@@ -224,5 +224,6 @@ TEST(AnimatorMove, repeat_forever) {
   widget_animator_time_elapse(wa, 1000);
   ASSERT_EQ(wa->repeat_times, TK_UINT32_MAX);
 
+  widget_animator_destroy(wa);
   widget_destroy(button);
 }

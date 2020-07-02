@@ -19,7 +19,7 @@
  *
  */
 
-#include "tos.h"
+#include "tos_k.h"
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "tkc/thread.h"
@@ -136,4 +136,8 @@ ret_t tk_thread_destroy(tk_thread_t* thread) {
   TKMEM_FREE(thread);
 
   return RET_OK;
+}
+
+uint64_t tk_thread_self(void) {
+  return (uint64_t)tos_task_curr_task_get();
 }

@@ -59,6 +59,13 @@
  */
 
 /**
+ * 如果代码在flash中，而资源在文件系统，请定义本宏指明资源所在的路径。
+ * 
+ * #define APP_RES_ROOT "0://awtk/"
+ * 
+ */
+
+/**
  * 如果定义本宏，使用标准的UNICODE换行算法，除非资源极为有限，请定义本宏。
  *
  * #define WITH_UNICODE_BREAK 1
@@ -199,7 +206,14 @@
 /**
  * 如果需要从zip文件中加载资源，请定义本宏。
  *
- * #define WITH_ASSET_LOADER_ZIP
+ * #define WITH_ASSET_LOADER_ZIP 1
+ */
+
+/**
+ * 对于只有512K flash的平台，而且LCD格式是BGR565。如果希望进一步优化空间，去掉多余的bitmap格式支持代码。请定义本宏。
+ * 其它LCD格式，可以自行修改：src/blend/soft_g2d.c 保留需要的格式即可。
+ *
+ * #define LCD_BGR565_LITE 1
  */
 
 #endif /*AWTK_CONFIG_H*/

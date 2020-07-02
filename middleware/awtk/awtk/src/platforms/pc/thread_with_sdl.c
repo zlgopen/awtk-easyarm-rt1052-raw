@@ -27,7 +27,6 @@
 #include "tkc/platform.h"
 #include "tkc/time_now.h"
 #include "tkc/thread.h"
-#include "tkc/mutex.h"
 #include "tkc/cond.h"
 #include "tkc/semaphore.h"
 
@@ -53,6 +52,17 @@ ret_t tk_mutex_lock(tk_mutex_t* mutex) {
   return_value_if_fail(mutex != NULL, RET_BAD_PARAMS);
 
   if (SDL_LockMutex(mutex->mutex) != 0) {
+    log_debug("SDL_LockMutex fail\n");
+    return RET_FAIL;
+  }
+
+  return RET_OK;
+}
+
+ret_t tk_mutex_try_lock(tk_mutex_t* mutex) {
+  return_value_if_fail(mutex != NULL, RET_BAD_PARAMS);
+
+  if (SDL_TryLockMutex(mutex->mutex) != 0) {
     log_debug("SDL_LockMutex fail\n");
     return RET_FAIL;
   }
@@ -270,5 +280,9 @@ ret_t tk_thread_destroy(tk_thread_t* thread) {
   TKMEM_FREE(thread);
 
   return RET_OK;
+}
+
+uint64_t tk_thread_self(void) {
+  return (uint64_t)SDL_ThreadID();
 }
 #endif /*HAS_PTHREAD*/

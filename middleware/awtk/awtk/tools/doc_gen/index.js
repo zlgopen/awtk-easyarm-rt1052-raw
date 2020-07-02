@@ -102,6 +102,7 @@ class ApiGenerator {
   genFuncPrototype(p) {
     let result = '* 函数原型：\n\n';
     result += '```\n';
+    console.log(p.name)
     result += `${p.return.type} ${p.name} (`;
     p.params.forEach((iter, index) => {
       if(index) {
@@ -333,7 +334,7 @@ class ApiGenerator {
     let result = '';
 
     if (cls.consts && cls.consts.length) {
-      result += `### 常量\n`
+      result += `\n### 常量\n`
       result += genAnchor(cls.name, {
         name: 'consts'
       }) + '\n\n';

@@ -34,6 +34,15 @@
 * [资源打包](assets_zip.md)
 * [LCD 密度与图片的对应关系](../demos/assets/default/raw/images/README.md)
 * [slide_view/pages 各个页面缺省的焦点控件](pages_slide_view_default_focused_child_for_each_page.md)
+* [输入事件记录与重放](event_recorder_player.md)
+* [API 注释格式](api_doc.md)
+* [自定义控件规范](custom_widget_rules.md)
+* [动态库与静态库](shared_static.md)
+* [窗口之间如何通信](https://github.com/zlgopen/awtk-inter-win-communication)
+* [为 512K Flash 优化空间](how_to_optimize_for_512K_flash.md)
+* [如何绘制旋转文字](how_to_draw_rotate_text.md)
+* [如何修改 Windows 下应用程序的图标](https://github.com/zlgopen/awtk/blob/master/win32_res/README.md)
+
 ### 2.HowTos
 * [AWTK 调试技巧](debug_tips.md)
 * [AWTK 优化技巧](optimation.md)
@@ -52,19 +61,31 @@
 * [如何在主题文件中写控件布局参数](how_to_write_layout_params_in_style.md)
 * [如何开启按键音](how_to_enable_key_touch_sound.md)
 * [如何更新拼音输入法数据](how_to_update_gpinyin_data.md)
+* [如何用 valgrind 查找内存相关问题](how_to_use_valgrind_detect_memory_bugs.md)
+* [如何定制 combo_box 控件中按钮的风格和大小](how_to_customize_combo_boxox_button.md)
+[如何访问控件的属性](how_to_access_widget_props.md)
 * [如何集成第三方库](https://github.com/zlgopen/awtk-hello/blob/master/docs/how_to_integrate_3rd_libs.md)
-* [动态库与静态库](shared_static.md)
+* [如何使用对话框](how_toto_use_dialog.md)
+* [如何使用软键盘上的 action 按钮](how_to_use_action_text.md)
+* [如何存取应用程序的配置信息](how_to_use_app_conf.md)
+* [如何实现弹出菜单](how_to_impl_popup_menu.md)
+* [如何用 edit 控件编辑日期](how_to_edit_date.md)
+* [如何用 edit 控件编辑时间](how_to_edit_time.md)
+* [如何用 edit 控件编辑IP地址](how_to_edit_ip_addr.md)
 
 ### 3. 内部原理
 * [AWTK 脚本绑定原理](script_binding.md)
+* [AWTK 内存分配器](mem_alloactor.md)
 
 ### 4. 移植文档
 * [嵌入式平台移植注意事项](porting_common.md)
 * [将 AWTK 移植到 STM32f103ze 裸系统](porting_to_stm32f103ze.md)
 * [将 AWTK 移植到 STM32f429igtx 裸系统](porting_to_stm32f429igtx.md)
 * [将 AWTK 移植到 AWorksOS 平台](porting_to_awtk_aworks_rt1052.md)
-* [将 AWTK 移植到 TinyOS 平台](https://github.com/zlgopen/awtk-stm32f103ze-tencentos/blob/master/docs/tos-port.md)
+* [将 AWTK 移植到 TencentOS 平台](https://github.com/zlgopen/awtk-stm32f103ze-tencentos/blob/master/docs/tos-port.md)
 * [将 AWTK 移植到 RT-Thread 平台](https://github.com/zlgopen/awtk-stm32f103ze-rtthread/blob/master/docs/rtt-port.md)
+* [将 AWTK 移植到 LPC1867 裸系统（推荐）](https://github.com/zlgopen/awtk-lpc1768-raw/blob/master/docs/lpc1768_port.md)
+* [将 AWTK 移植到 STM32H743(TencentOS) 平台（推荐）](https://github.com/zlgopen/awtk-stm32h743iitx-tencentos/blob/master/docs/stm32h743iitx_port.md)
 
 ### 5. 技术笔记
 * [LCD 接口的三种实现方式](lcd.md)

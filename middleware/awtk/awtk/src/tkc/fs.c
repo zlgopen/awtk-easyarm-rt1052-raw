@@ -23,69 +23,98 @@
 #include "tkc/mem.h"
 
 int32_t fs_file_read(fs_file_t* file, void* buffer, uint32_t size) {
-  return_value_if_fail(file != NULL && buffer != NULL && file->read != NULL, -1);
+  return_value_if_fail(file != NULL && file->vt != NULL && buffer != NULL && file->vt->read != NULL,
+                       -1);
 
-  return file->read(file, buffer, size);
+  return file->vt->read(file, buffer, size);
 }
 
 int32_t fs_file_write(fs_file_t* file, const void* buffer, uint32_t size) {
-  return_value_if_fail(file != NULL && buffer != NULL && file->write != NULL, -1);
+  return_value_if_fail(
+      file != NULL && file->vt != NULL && buffer != NULL && file->vt->write != NULL, -1);
 
-  return file->write(file, buffer, size);
+  return file->vt->write(file, buffer, size);
 }
 
 int32_t fs_file_printf(fs_file_t* file, const char* const format_str, ...) {
   va_list v_l;
   int32_t ret = 0;
-  return_value_if_fail(file != NULL && file->f_printf != NULL, -1);
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->printf != NULL, -1);
 
   va_start(v_l, format_str);
-  ret = file->f_printf(file, format_str, v_l);
+  ret = file->vt->printf(file, format_str, v_l);
   va_end(v_l);
 
   return ret;
 }
 
 ret_t fs_file_seek(fs_file_t* file, int32_t offset) {
-  return_value_if_fail(file != NULL && file->seek != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->seek != NULL, RET_BAD_PARAMS);
 
-  return file->seek(file, offset);
+  return file->vt->seek(file, offset);
 }
 
 ret_t fs_file_truncate(fs_file_t* file, int32_t offset) {
-  return_value_if_fail(file != NULL && file->truncate != NULL, RET_BAD_PARAMS);
-
-  return file->truncate(file, offset);
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->truncate != NULL,
+                       RET_BAD_PARAMS);
+  fs_file_seek(file, 0);
+  return file->vt->truncate(file, offset);
 }
 
 bool_t fs_file_eof(fs_file_t* file) {
-  return_value_if_fail(file != NULL && file->eof != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->eof != NULL, TRUE);
 
-  return file->eof(file);
+  return file->vt->eof(file);
+}
+
+int64_t fs_file_tell(fs_file_t* file) {
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->tell != NULL, -1);
+
+  return file->vt->tell(file);
+}
+
+int64_t fs_file_size(fs_file_t* file) {
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->size != NULL, -1);
+
+  return file->vt->size(file);
 }
 
 ret_t fs_file_close(fs_file_t* file) {
-  return_value_if_fail(file != NULL && file->close != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->close != NULL, RET_BAD_PARAMS);
 
-  return file->close(file);
+  return file->vt->close(file);
+}
+
+ret_t fs_file_sync(fs_file_t* file) {
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->sync != NULL, RET_BAD_PARAMS);
+
+  return file->vt->sync(file);
+}
+
+ret_t fs_file_stat(fs_file_t* file, fs_stat_info_t* fst) {
+  return_value_if_fail(file != NULL && file->vt != NULL && file->vt->stat != NULL && fst != NULL,
+                       RET_BAD_PARAMS);
+
+  return file->vt->stat(file, fst);
 }
 
 ret_t fs_dir_rewind(fs_dir_t* dir) {
-  return_value_if_fail(dir != NULL && dir->rewind != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(dir != NULL && dir->vt != NULL && dir->vt->rewind != NULL, RET_BAD_PARAMS);
 
-  return dir->rewind(dir);
+  return dir->vt->rewind(dir);
 }
 
 ret_t fs_dir_read(fs_dir_t* dir, fs_item_t* item) {
-  return_value_if_fail(dir != NULL && dir->read != NULL && item != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(dir != NULL && dir->vt != NULL && dir->vt->read != NULL && item != NULL,
+                       RET_BAD_PARAMS);
 
-  return dir->read(dir, item);
+  return dir->vt->read(dir, item);
 }
 
 ret_t fs_dir_close(fs_dir_t* dir) {
-  return_value_if_fail(dir != NULL && dir->close != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(dir != NULL && dir->vt != NULL && dir->vt->close != NULL, RET_BAD_PARAMS);
 
-  return dir->close(dir);
+  return dir->vt->close(dir);
 }
 
 fs_file_t* fs_open_file(fs_t* fs, const char* name, const char* mode) {
@@ -106,9 +135,9 @@ bool_t fs_file_exist(fs_t* fs, const char* name) {
   return fs->file_exist(fs, name);
 }
 
-bool_t fs_file_rename(fs_t* fs, const char* name, const char* new_name) {
+ret_t fs_file_rename(fs_t* fs, const char* name, const char* new_name) {
   return_value_if_fail(fs != NULL && fs->file_rename != NULL && name != NULL && new_name != NULL,
-                       FALSE);
+                       RET_BAD_PARAMS);
 
   return fs->file_rename(fs, name, new_name);
 }
@@ -137,8 +166,9 @@ bool_t fs_dir_exist(fs_t* fs, const char* name) {
   return fs->dir_exist(fs, name);
 }
 
-bool_t fs_dir_rename(fs_t* fs, const char* name, const char* new_name) {
-  return_value_if_fail(fs != NULL && fs->dir_rename != NULL && name != NULL && new_name, FALSE);
+ret_t fs_dir_rename(fs_t* fs, const char* name, const char* new_name) {
+  return_value_if_fail(fs != NULL && fs->dir_rename != NULL && name != NULL && new_name,
+                       RET_BAD_PARAMS);
 
   return fs->dir_rename(fs, name, new_name);
 }
@@ -252,4 +282,105 @@ bool_t file_exist(const char* name) {
   return_value_if_fail(name != NULL, FALSE);
 
   return fs_file_exist(os_fs(), name);
+}
+
+ret_t fs_test_file(fs_t* fs) {
+  char buff[32];
+  fs_file_t* fp = NULL;
+  const char* filename = "./test.txt";
+
+  memset(buff, 0x00, sizeof(buff));
+  fp = fs_open_file(fs, filename, "w+");
+  assert(fs_file_write(fp, "hello", 5) == 5);
+  assert(fs_file_tell(fp) == 5);
+  assert(fs_file_sync(fp) == RET_OK);
+  assert(fs_file_size(fp) == 5);
+  assert(fs_file_truncate(fp, 0) == RET_OK);
+  assert(fs_file_write(fp, "world", 5) == 5);
+  assert(fs_file_seek(fp, 0) == RET_OK);
+  assert(fs_file_write(fp, "WORLD", 5) == 5);
+  assert(fs_file_close(fp) == RET_OK);
+  assert(fs_file_exist(fs, filename) == TRUE);
+
+  fp = fs_open_file(fs, filename, "a");
+  assert(fs_file_write(fp, "world", 5) == 5);
+  assert(fs_file_close(fp) == RET_OK);
+  assert(fs_get_file_size(fs, filename) == 10);
+
+  fp = fs_open_file(fs, filename, "r");
+  assert(fs_file_read(fp, buff, 10) == 10);
+  assert(strcmp(buff, "WORLDworld") == 0);
+  assert(fs_file_close(fp) == RET_OK);
+  assert(fs_get_file_size(fs, filename) == 10);
+
+  fp = fs_open_file(fs, filename, "w+");
+  assert(fs_file_printf(fp, "%s:%d", "hello", 10) == 8);
+  assert(fs_file_close(fp) == RET_OK);
+
+  assert(fs_file_rename(fs, filename, "./test.bin") == RET_OK);
+  assert(!fs_file_exist(fs, filename));
+  assert(fs_file_exist(fs, "./test.bin"));
+  assert(fs_remove_file(fs, "./test.bin") == RET_OK);
+  assert(!fs_file_exist(fs, "./test.bin"));
+
+  return RET_OK;
+}
+
+ret_t fs_test_dir(fs_t* fs) {
+  fs_item_t item;
+  fs_dir_t* dir = NULL;
+
+  assert(!fs_dir_exist(fs, "./a"));
+  assert(fs_create_dir(fs, "./a") == RET_OK);
+  assert(fs_dir_exist(fs, "./a"));
+
+  assert(fs_create_dir(fs, "./a/b") == RET_OK);
+  assert(fs_dir_exist(fs, "./a/b"));
+
+  assert(fs_create_dir(fs, "./a/b/c1") == RET_OK);
+  assert(fs_dir_exist(fs, "./a/b/c1"));
+
+  assert(fs_create_dir(fs, "./a/b/c2") == RET_OK);
+  assert(fs_dir_exist(fs, "./a/b/c2"));
+
+  dir = fs_open_dir(fs, "./a/b");
+  assert(dir != NULL);
+
+  do {
+    assert(fs_dir_read(dir, &item) == RET_OK);
+    if (item.name[0] != '.') {
+      break;
+    } else {
+      assert(!item.is_reg_file);
+      assert(item.is_dir);
+    }
+  } while (TRUE);
+
+  assert(strcmp(item.name, "c1") == 0 || strcmp(item.name, "c2") == 0);
+  assert(!item.is_reg_file);
+  assert(item.is_dir);
+
+  assert(fs_dir_read(dir, &item) == RET_OK);
+  assert(strcmp(item.name, "c1") == 0 || strcmp(item.name, "c2") == 0);
+  assert(!item.is_reg_file);
+  assert(item.is_dir);
+
+  assert(fs_dir_close(dir) == RET_OK);
+
+  if (fs_dir_rename(fs, "./a/b/c2", "./a/b/c3") == RET_OK) {
+    assert(!fs_dir_exist(fs, "./a/b/c2"));
+    assert(fs_dir_exist(fs, "./a/b/c3"));
+    assert(fs_dir_rename(fs, "./a/b/c3", "./a/b/c2") == RET_OK);
+  }
+  assert(fs_remove_dir(fs, "./a/b/c1") == RET_OK);
+  assert(fs_remove_dir(fs, "./a/b/c2") == RET_OK);
+  assert(fs_remove_dir(fs, "./a/b") == RET_OK);
+  assert(fs_remove_dir(fs, "./a") == RET_OK);
+
+  return RET_OK;
+}
+
+ret_t fs_test(fs_t* fs) {
+  fs_test_file(fs);
+  return fs_test_dir(fs);
 }

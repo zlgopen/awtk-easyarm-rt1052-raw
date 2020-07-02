@@ -102,6 +102,28 @@ ret_t str_append(str_t* str, const char* text) {
   return str_append_with_len(str, text, strlen(text));
 }
 
+ret_t str_append_more(str_t* str, const char* text, ...) {
+  va_list va;
+  const char* p = NULL;
+  return_value_if_fail(str != NULL && text != NULL, RET_BAD_PARAMS);
+
+  return_value_if_fail(str_append(str, text) == RET_OK, RET_OOM);
+
+  va_start(va, text);
+  do {
+    p = va_arg(va, char*);
+    if (p != NULL) {
+      return_value_if_fail(str_append(str, p) == RET_OK, RET_OOM);
+    } else {
+      break;
+    }
+  } while (p != NULL);
+
+  va_end(va);
+
+  return RET_OK;
+}
+
 ret_t str_append_int(str_t* str, int32_t value) {
   char num[32];
   tk_snprintf(num, sizeof(num), "%d", value);
@@ -140,9 +162,9 @@ ret_t str_decode_xml_entity_with_len(str_t* str, const char* text, uint32_t len)
       } else if (strncmp(s, "amp;", 4) == 0) {
         c = '&';
         s += 4;
-      } else if (strncmp(s, "quota;", 6) == 0) {
+      } else if (strncmp(s, "quot;", 5) == 0) {
         c = '\"';
-        s += 6;
+        s += 5;
       } else if (strncmp(s, "nbsp;", 5) == 0) {
         c = ' ';
         s += 5;
@@ -403,6 +425,10 @@ static uint32_t str_count_sub_str(str_t* s, const char* str) {
   char* p = s->str;
   uint32_t count = 0;
   uint32_t size = strlen(str);
+
+  if (size == 0) {
+    return 0;
+  }
 
   do {
     p = strstr(p, str);

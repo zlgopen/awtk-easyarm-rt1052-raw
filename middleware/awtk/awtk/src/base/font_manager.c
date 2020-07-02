@@ -78,12 +78,14 @@ ret_t font_manager_add_font(font_manager_t* fm, font_t* font) {
   return darray_push(&(fm->fonts), font);
 }
 
+#if WITH_BITMAP_FONT
 static const char* font_manager_fix_bitmap_font_name(char str[MAX_PATH], const char* name,
                                                      font_size_t size) {
   memset(str, 0, MAX_PATH);
   tk_snprintf(str, MAX_PATH, "%s_%d", name, size);
   return str;
 }
+#endif
 
 font_t* font_manager_lookup(font_manager_t* fm, const char* name, font_size_t size) {
 #if WITH_BITMAP_FONT
@@ -200,6 +202,19 @@ ret_t font_manager_destroy(font_manager_t* fm) {
   return_value_if_fail(fm != NULL, RET_BAD_PARAMS);
   font_manager_deinit(fm);
   TKMEM_FREE(fm);
+
+  return RET_OK;
+}
+
+ret_t font_manager_shrink_cache(font_manager_t* fm, uint32_t cache_size) {
+  uint32_t i = 0;
+  font_t* font = NULL;
+  return_value_if_fail(fm != NULL, RET_FAIL);
+
+  for (i = 0; i < fm->fonts.size; i++) {
+    font = (font_t*)darray_get(&(fm->fonts), i);
+    font_shrink_cache(font, cache_size);
+  }
 
   return RET_OK;
 }

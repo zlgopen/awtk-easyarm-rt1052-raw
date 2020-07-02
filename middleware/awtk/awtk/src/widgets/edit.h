@@ -29,6 +29,11 @@
 
 BEGIN_C_DECLS
 
+typedef ret_t (*edit_fix_value_t)(widget_t* widget);
+typedef ret_t (*edit_inc_value_t)(widget_t* widget);
+typedef ret_t (*edit_dec_value_t)(widget_t* widget);
+typedef bool_t (*edit_is_valid_value_t)(widget_t* widget);
+typedef ret_t (*edit_pre_input_t)(widget_t* widget, uint32_t key);
 typedef bool_t (*edit_is_valid_char_t)(widget_t* widget, wchar_t c);
 
 /**
@@ -168,6 +173,19 @@ typedef struct _edit_t {
   char* tr_tips;
 
   /**
+   * @property {char*} action_text
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 软键盘上action按钮的文本。内置取值有：
+   * 
+   * * next 将焦点切换到下一个控件。
+   * * done 完成，关闭软键盘。
+   * 
+   * 也可以使用其它文本，比如send表示发送。这个需要自己实现相应的功能，处理EVT\_IM\_ACTION事件即可。
+   * 
+   */
+  char* action_text;
+
+  /**
    * @property {char*} keyboard
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * 自定义软键盘名称。
@@ -207,7 +225,13 @@ typedef struct _edit_t {
   uint32_t idle_id;
   uint32_t timer_id;
   text_edit_t* model;
+
+  edit_inc_value_t inc_value;
+  edit_dec_value_t dec_value;
+  edit_fix_value_t fix_value;
+  edit_pre_input_t pre_input;
   edit_is_valid_char_t is_valid_char;
+  edit_is_valid_value_t is_valid_value;
 } edit_t;
 
 /**
@@ -380,6 +404,17 @@ ret_t edit_set_open_im_when_focused(widget_t* widget, bool_t open_im_when_focuse
 ret_t edit_set_input_type(widget_t* widget, input_type_t type);
 
 /**
+ * @method edit_set_action_text
+ * 设置软键盘上action按钮的文本。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {char*} action_text 软键盘上action按钮的文本。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_action_text(widget_t* widget, const char* action_text);
+
+/**
  * @method edit_set_tips
  * 设置编辑器的输入提示。
  * @annotation ["scriptable"]
@@ -449,7 +484,7 @@ ret_t edit_set_cursor(widget_t* widget, uint32_t cursor);
 /**
  * @method edit_set_is_valid_char
  * 设置输入字符检查函数。
- *> 如果内置检查函数不能满足需求时，可以设置自定义的检查函数。
+ *> 如果内置函数不能满足需求时，可以设置自定义的检查函数。
  *
  * @param {widget_t*} widget widget对象。
  * @param {edit_is_valid_char_t} is_valid_char 检查输入字符是否有效的回调函数。
@@ -457,6 +492,66 @@ ret_t edit_set_cursor(widget_t* widget, uint32_t cursor);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t edit_set_is_valid_char(widget_t* widget, edit_is_valid_char_t is_valid_char);
+
+/**
+ * @method edit_set_is_valid_value
+ * 设置输入内容检查函数。
+ *> 如果内置函数不能满足需求时，可以设置自定义的检查函数。
+ *
+ * @param {widget_t*} widget widget对象。
+ * @param {edit_is_valid_value_t} is_valid_value 检查输入内容是否有效的回调函数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_is_valid_value(widget_t* widget, edit_is_valid_value_t is_valid_value);
+
+/**
+ * @method edit_set_fix_value
+ * 设置修正输入内容的回调函数。
+ *> 如果内置函数不能满足需求时，可以设置自定义的检查函数。
+ *
+ * @param {widget_t*} widget widget对象。
+ * @param {edit_fix_value_t} fix_value 修正输入内容的回调函数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_fix_value(widget_t* widget, edit_fix_value_t fix_value);
+
+/**
+ * @method edit_set_inc_value
+ * 设置增加值的回调函数。
+ *> 如果内置函数不能满足需求时，可以设置自定义的检查函数。
+ *
+ * @param {widget_t*} widget widget对象。
+ * @param {edit_inc_value_t} inc_value 增加值的回调函数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_inc_value(widget_t* widget, edit_inc_value_t inc_value);
+
+/**
+ * @method edit_set_dec_value
+ * 设置减少值的回调函数。
+ *> 如果内置函数不能满足需求时，可以设置自定义的检查函数。
+ *
+ * @param {widget_t*} widget widget对象。
+ * @param {edit_dec_value_t} dec_value 减少值的回调函数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_dec_value(widget_t* widget, edit_dec_value_t dec_value);
+
+/**
+ * @method edit_set_pre_input
+ * 设置预输入处的回调函数。
+ *> 如果内置函数不能满足需求时，可以设置自定义的检查函数。
+ *
+ * @param {widget_t*} widget widget对象。
+ * @param {edit_pre_input_t} pre_input 预输入处理的回调函数(处理一些特殊的键)。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_pre_input(widget_t* widget, edit_pre_input_t pre_input);
 
 #define EDIT(widget) ((edit_t*)(edit_cast(WIDGET(widget))))
 
@@ -480,6 +575,10 @@ ret_t edit_clear(edit_t* edit);
 bool_t edit_is_valid_value(widget_t* widget);
 ret_t edit_input_char(widget_t* widget, wchar_t c);
 bool_t edit_is_valid_char(widget_t* widget, wchar_t c);
+
+/*common functions for edit_xxx*/
+ret_t edit_add_value_with_sep(widget_t* widget, int delta, char sep);
+ret_t edit_pre_input_with_sep(widget_t* widget, uint32_t key, char sep);
 
 /*for compatability*/
 #define edit_set_input_tips(w, t) edit_set_tips(w, t)

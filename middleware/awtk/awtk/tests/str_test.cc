@@ -87,10 +87,10 @@ TEST(Str, decode_xml_entity) {
   ASSERT_EQ(str_decode_xml_entity(s, "a&lt;b&gt;c"), RET_OK);
   ASSERT_EQ(str_eq(s, "a<b>c"), TRUE);
 
-  ASSERT_EQ(str_decode_xml_entity(s, "&quota;a&lt;b&gt;c&quota;"), RET_OK);
+  ASSERT_EQ(str_decode_xml_entity(s, "&quot;a&lt;b&gt;c&quot;"), RET_OK);
   ASSERT_EQ(str_eq(s, "\"a<b>c\""), TRUE);
 
-  ASSERT_EQ(str_decode_xml_entity(s, "&quota;a&lt;b&gt;c&quota;&amp;&amp;"), RET_OK);
+  ASSERT_EQ(str_decode_xml_entity(s, "&quot;a&lt;b&gt;c&quot;&amp;&amp;"), RET_OK);
   ASSERT_EQ(str_eq(s, "\"a<b>c\"&&"), TRUE);
 
   str_reset(s);
@@ -295,6 +295,26 @@ TEST(Str, json) {
   ASSERT_EQ(str_append_char(&str, '}'), RET_OK);
 
   ASSERT_STREQ(str.str, "{\"name\":\"zhangshan\",\"age\":100,\"weight\":60.5000,\"gender\":true}");
+
+  str_reset(s);
+}
+
+TEST(Str, append_more1) {
+  str_t str;
+  str_t* s = NULL;
+  s = str_init(&str, 100);
+  ASSERT_EQ(str_append_more(s, "123", NULL), RET_OK);
+  ASSERT_STREQ(s->str, "123");
+
+  str_reset(s);
+}
+
+TEST(Str, append_more2) {
+  str_t str;
+  str_t* s = NULL;
+  s = str_init(&str, 100);
+  ASSERT_EQ(str_append_more(s, "123", "abc", NULL), RET_OK);
+  ASSERT_STREQ(s->str, "123abc");
 
   str_reset(s);
 }

@@ -133,6 +133,9 @@ static ret_t main_loop_dispatch_events(main_loop_simple_t* loop) {
       case EVT_POINTER_UP:
         window_manager_dispatch_input_event(widget, (event_t*)&(r.pointer_event));
         break;
+      case EVT_WHEEL:
+        window_manager_dispatch_input_event(widget, (event_t*)&(r.wheel_event));
+        break;
       case EVT_KEY_DOWN:
       case EVT_KEY_UP:
         window_manager_dispatch_input_event(widget, (event_t*)&(r.key_event));
@@ -173,6 +176,7 @@ static ret_t main_loop_simple_step(main_loop_t* l) {
   main_loop_dispatch_events(loop);
   event_source_manager_dispatch(loop->event_source_manager);
 
+  window_manager_check_and_layout(loop->base.wm);
   window_manager_paint(loop->base.wm);
 
   return RET_OK;

@@ -68,12 +68,12 @@ typedef enum _event_type_t {
   EVT_POINTER_UP_BEFORE_CHILDREN,
   /**
    * @const EVT_WHEEL
-   * 滚轮事件名(pointer_event_t)。
+   * 滚轮事件名(wheel_event_t)。
    */
   EVT_WHEEL,
   /**
    * @const EVT_WHEEL_BEFORE_CHILDREN
-   * 鼠标滚轮事件名，在子控件处理之前触发(key_event_t)。
+   * 鼠标滚轮事件名，在子控件处理之前触发(wheel_event_t)。
    */
   EVT_WHEEL_BEFORE_CHILDREN,
   /**
@@ -400,6 +400,21 @@ typedef enum _event_type_t {
    * 控件移除子控件(event_t)。
    */
   EVT_WIDGET_REMOVE_CHILD,
+  /**
+   * @const EVT_SCROLL_START
+   * scroll view开始滚动(event_t)。
+   */
+  EVT_SCROLL_START,
+  /**
+   * @const EVT_SCROLL
+   * scroll view滚动(event_t)。
+   */
+  EVT_SCROLL,
+  /**
+   * @const EVT_SCROLL_END
+   * scroll view结束滚动(event_t)。
+   */
+  EVT_SCROLL_END,
   /**
    * @const EVT_REQ_START
    * event queue其它请求编号起始值。

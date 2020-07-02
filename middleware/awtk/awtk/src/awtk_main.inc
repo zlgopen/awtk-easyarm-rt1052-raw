@@ -71,7 +71,7 @@ int SDL_main(int argc, char* argv[]) {
 
   tk_init(lcd_w, lcd_h, APP_MOBILE, APP_NAME, APP_RES_ROOT);
 
-#elif defined(WIN32)
+#elif defined(WIN32) && !defined(MINGW)
 #include <windows.h>
 #define MAX_ARGV 7
 
@@ -81,7 +81,7 @@ static void command_line_to_argv(char* lpcmdline, char* argv[MAX_ARGV], int32_t*
 
   argv[0] = "awtk.exe";
 
-  if (!*p) {
+  if (p == NULL || *p == '\0') {
     argv[1] = NULL;
     return;
   }
@@ -116,11 +116,15 @@ int WINAPI wWinMain(HINSTANCE hinstance, HINSTANCE hprevinstance, LPWSTR lpcmdli
   char* argv[MAX_ARGV];
   int32_t lcd_w = LCD_WIDTH;
   int32_t lcd_h = LCD_HEIGHT;
-
-  str_init(&str, 1024);
+  char buff[1024];
+  str_init(&str, 0);
+  str.str = buff;
+  str.size = 0;
+  str.capacity = sizeof(buff);
   str_from_wstr(&str, lpcmdline);
   command_line_to_argv(str.str, argv, &argc);
-
+  str.str = NULL;
+  
   TK_ENABLE_CONSOLE();
 
 #ifdef ON_CMD_LINE
@@ -193,7 +197,7 @@ int main(int argc, char* argv[]) {
   application_exit();
   GLOBAL_EXIT();
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(MINGW)
   str_reset(&str);
 #endif /*WIN32*/
 

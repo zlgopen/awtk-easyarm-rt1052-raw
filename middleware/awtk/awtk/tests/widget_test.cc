@@ -95,6 +95,10 @@ TEST(Widget, basic2) {
   ASSERT_EQ(strcmp(w->name, "name"), 0);
   ASSERT_EQ(strcmp(widget_get_prop_str(w, WIDGET_PROP_NAME, ""), "name"), 0);
 
+  ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_POINTER_CURSOR, "cursor"), RET_OK);
+  ASSERT_EQ(strcmp(w->pointer_cursor, "cursor"), 0);
+  ASSERT_EQ(strcmp(widget_get_prop_str(w, WIDGET_PROP_POINTER_CURSOR, ""), "cursor"), 0);
+
   widget_destroy(w);
 }
 
@@ -1230,7 +1234,7 @@ TEST(Widget, tr_text) {
   widget_set_tr_text(w, "hello");
   widget_set_text(w, L"ok");
 
-  ASSERT_EQ(w->tr_text, (const char*)NULL);
+  ASSERT_STREQ(w->tr_text, "hello");
 
   widget_destroy(w);
 }

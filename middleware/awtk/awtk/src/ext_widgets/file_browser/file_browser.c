@@ -193,7 +193,6 @@ ret_t file_browser_remove(file_browser_t* fb, const char* name) {
 ret_t file_browser_refresh(file_browser_t* fb) {
   fs_item_t info;
   fs_stat_info_t st;
-  uint32_t len = 0;
   fs_dir_t* dir = NULL;
   char fullpath[MAX_PATH + 1];
   return_value_if_fail(fb != NULL && fb->cwd[0] != '\0', RET_BAD_PARAMS);
@@ -202,7 +201,6 @@ ret_t file_browser_refresh(file_browser_t* fb) {
   dir = fs_open_dir(fb->fs, fb->cwd);
   return_value_if_fail(dir != NULL, RET_BAD_PARAMS);
 
-  len = strlen(fb->cwd);
   memset(fullpath, 0x00, sizeof(fullpath));
   while (fs_dir_read(dir, &info) == RET_OK) {
     fb_item_t* iter = NULL;
@@ -257,12 +255,18 @@ ret_t file_browser_up(file_browser_t* fb) {
   return_value_if_fail(fb != NULL, RET_BAD_PARAMS);
 
   p = strrchr(fb->cwd, TK_PATH_SEP);
+  while (p != NULL && (p[1] == '\0' || (p[1] == '.' && p[2] == '\0'))) {
+    *p = '\0';
+    p = strrchr(fb->cwd, TK_PATH_SEP);
+  }
+
   if (p != NULL) {
     *p = '\0';
   }
 
   if (fb->cwd[0] == '\0') {
     fb->cwd[0] = '/';
+    fb->cwd[1] = '\0';
   }
 
   return file_browser_refresh(fb);
@@ -509,6 +513,10 @@ bool_t fb_filter_by_ext_names(void* ctx, const void* data) {
   fs_item_t* item = (fs_item_t*)data;
   const char* ext_names = (const char*)ctx;
   const char* p = strrchr(item->name, '.');
+
+  if (item->is_dir) {
+    return TRUE;
+  }
 
   if (ext_names == NULL) {
     return TRUE;

@@ -25,10 +25,13 @@
 #include "base/enums.h"
 #include "base/window.h"
 #include "keyboard/keyboard.h"
-#include "suggest_words.inc"
+
 #include "base/input_method.h"
 #include "base/window_manager.h"
 #include "ui_loader/ui_builder_default.h"
+
+static ret_t input_method_default_on_edit_destroy(void* ctx, event_t* e);
+static ret_t input_method_default_on_keyboard_destroy(void* ctx, event_t* e);
 
 static const char* input_type_to_keyboard_name(int32_t input_type) {
   const char* keyboard = NULL;
@@ -47,6 +50,13 @@ static const char* input_type_to_keyboard_name(int32_t input_type) {
       break;
     }
     case INPUT_UINT: {
+      keyboard = "kb_uint";
+      break;
+    }
+    case INPUT_IPV4: 
+    case INPUT_TIME: 
+    case INPUT_DATE: 
+    case INPUT_TIME_FULL: {
       keyboard = "kb_uint";
       break;
     }
@@ -132,7 +142,6 @@ static ret_t input_method_on_win_close(void* ctx, event_t* e) {
   input_method_default_restore_win_position(im);
 
   if (im->keyboard != NULL) {
-    /* 用来区分 keyboard 切换类型时候调用的 window_close */
     widget_get_prop(im->keyboard, WIDGET_PROP_CLOSE_ANIM_HINT, &v);
     if (tk_str_cmp(value_str(&v), "") != 0) {
       im->keyboard = NULL;
@@ -140,8 +149,6 @@ static ret_t input_method_on_win_close(void* ctx, event_t* e) {
       im->win = NULL;
     }
   }
-
-  (void)e;
 
   return RET_REMOVE;
 }
@@ -176,6 +183,7 @@ static ret_t input_type_open_keyboard(input_method_t* im, const char* keyboard_n
 
   im->busy = TRUE;
   widget_on(im->keyboard, EVT_WINDOW_OPEN, input_method_default_on_keyboard_open, im);
+  widget_on(im->keyboard, EVT_DESTROY, input_method_default_on_keyboard_destroy, im);
 
   if ((p.y + widget->h) > im->keyboard->y) {
     close_anim_hint = "vtranslate";
@@ -254,10 +262,59 @@ static ret_t on_idle_close_keyboard(const idle_info_t* idle) {
     window_close(im->keyboard);
     im->keyboard = NULL;
     im->widget = NULL;
+  } else if(im->widget == NULL) {
+    window_close_force(info->keyboard);
+    im->keyboard = NULL;
+    im->widget = NULL;
   }
+
   TKMEM_FREE(info);
 
   return RET_OK;
+}
+
+static ret_t input_method_default_ensure_suggest_words(input_method_t* im) {
+  if (im->data != NULL) {
+    return RET_OK;
+  }
+
+#if !defined(WITHOUT_SUGGEST_WORDS) && !defined(WITH_IME_NULL)
+  if (im->data == NULL) {
+    const asset_info_t* suggest_words =
+        assets_manager_ref(assets_manager(), ASSET_TYPE_DATA, "suggest_words_zh_cn.dat");
+    if (suggest_words != NULL) {
+      im->suggest_words = suggest_words_create((const asset_info_t*)(suggest_words));
+      im->data = (void*)suggest_words;
+    }
+  }
+#endif /*WITHOUT_SUGGEST_WORDS*/
+
+  return RET_OK;
+}
+
+static ret_t input_method_default_on_keyboard_destroy(void* ctx, event_t* e) {
+  widget_t* widget = WIDGET(e->target);
+  input_method_t* im = (input_method_t*)ctx;
+
+  if (im->keyboard == widget) {
+    input_method_default_restore_win_position(im);
+    im->win = NULL;
+    im->widget = NULL;
+    im->keyboard = NULL;
+  }
+
+  return RET_REMOVE;
+}
+
+static ret_t input_method_default_on_edit_destroy(void* ctx, event_t* e) {
+  widget_t* widget = WIDGET(e->target);
+  input_method_t* im = (input_method_t*)ctx;
+
+  if(im->widget == widget) {
+    input_method_request(im, NULL);
+  }
+
+  return RET_REMOVE;
 }
 
 static ret_t input_method_default_request(input_method_t* im, widget_t* widget) {
@@ -266,11 +323,13 @@ static ret_t input_method_default_request(input_method_t* im, widget_t* widget) 
   }
 
   input_engine_reset_input(im->engine);
-  input_method_dispatch_candidates(im, "", 0);
+  input_method_dispatch_candidates(im, "", 0, 0);
+  input_method_default_ensure_suggest_words(im);
 
   if (widget != NULL) {
     im->widget = widget;
     input_method_default_show_keyboard(im);
+    widget_on(widget, EVT_DESTROY, input_method_default_on_edit_destroy, im);
   } else {
     if (im->keyboard != NULL) {
       idle_close_info_t* info = TKMEM_ZALLOC(idle_close_info_t);
@@ -298,6 +357,7 @@ ret_t input_method_default_destroy(input_method_t* im) {
   emitter_deinit(&(im->emitter));
   input_engine_destroy(im->engine);
   suggest_words_destroy(im->suggest_words);
+  assets_manager_unref(assets_manager(), (const asset_info_t*)(im->data));
 
   TKMEM_FREE(im);
 
@@ -314,10 +374,6 @@ input_method_t* input_method_default_create(void) {
 
   emitter_init(&(im->emitter));
   im->engine = input_engine_create(im);
-
-#ifndef WITHOUT_SUGGEST_WORDS
-  im->suggest_words = suggest_words_create((const asset_info_t*)(data_words_bin));
-#endif /*WITHOUT_SUGGEST_WORDS*/
 
   return im;
 }

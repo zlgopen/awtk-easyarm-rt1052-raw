@@ -52,7 +52,7 @@ static ret_t on_file_save(void* ctx, event_t* e) {
   file_chooser_t* chooser = file_chooser_create();
   emitter_on(EMITTER(chooser), EVT_DONE, tk_on_choose_file_result, ctx);
 
-  file_chooser_set_init_dir(chooser, "./");
+  file_chooser_set_init_dir(chooser, "../");
 
   return file_chooser_choose_file_for_save(chooser);
 }
@@ -61,7 +61,8 @@ static ret_t on_file_open(void* ctx, event_t* e) {
   file_chooser_t* chooser = file_chooser_create();
   emitter_on(EMITTER(chooser), EVT_DONE, tk_on_choose_file_result, ctx);
 
-  file_chooser_set_init_dir(chooser, "./");
+  file_chooser_set_init_dir(chooser, "src");
+  file_chooser_set_filter(chooser, ".c.h.cpp.inc");
 
   return file_chooser_choose_file_for_open(chooser);
 }
@@ -105,5 +106,9 @@ ret_t application_exit() {
   log_debug("application_exit\n");
   return RET_OK;
 }
+
+#ifdef WITH_FS_RES
+#define APP_DEFAULT_FONT "default_full"
+#endif /*WITH_FS_RES*/
 
 #include "awtk_main.inc"

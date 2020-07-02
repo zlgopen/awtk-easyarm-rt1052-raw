@@ -13,8 +13,10 @@
 | <a href="#window_manager_t_window_manager_back">window\_manager\_back</a> | 请求关闭顶层窗口。 |
 | <a href="#window_manager_t_window_manager_back_to">window\_manager\_back\_to</a> | 回到指定的窗口，关闭之上的全部窗口。 |
 | <a href="#window_manager_t_window_manager_back_to_home">window\_manager\_back\_to\_home</a> | 回到主窗口，关闭之上的全部窗口。 |
+| <a href="#window_manager_t_window_manager_begin_wait_pointer_cursor">window\_manager\_begin\_wait\_pointer\_cursor</a> | 开始等待鼠标指针。 |
 | <a href="#window_manager_t_window_manager_cast">window\_manager\_cast</a> | 转换为window_manager对象(供脚本语言使用)。 |
 | <a href="#window_manager_t_window_manager_dispatch_native_window_event">window\_manager\_dispatch\_native\_window\_event</a> | 处理native window事件。 |
+| <a href="#window_manager_t_window_manager_end_wait_pointer_cursor">window\_manager\_end\_wait\_pointer\_cursor</a> | 结束等待鼠标指针。 |
 | <a href="#window_manager_t_window_manager_get_pointer_pressed">window\_manager\_get\_pointer\_pressed</a> | 获取指针当前是否按下。 |
 | <a href="#window_manager_t_window_manager_get_pointer_x">window\_manager\_get\_pointer\_x</a> | 获取指针当前的X坐标。 |
 | <a href="#window_manager_t_window_manager_get_pointer_y">window\_manager\_get\_pointer\_y</a> | 获取指针当前的Y坐标。 |
@@ -22,6 +24,7 @@
 | <a href="#window_manager_t_window_manager_get_top_main_window">window\_manager\_get\_top\_main\_window</a> | 获取最上面的主窗口。 |
 | <a href="#window_manager_t_window_manager_get_top_window">window\_manager\_get\_top\_window</a> | 获取最上面的窗口。 |
 | <a href="#window_manager_t_window_manager_is_animating">window\_manager\_is\_animating</a> | 获取当前窗口动画是否正在播放。 |
+| <a href="#window_manager_t_window_manager_paint">window\_manager\_paint</a> | 绘制。 |
 | <a href="#window_manager_t_window_manager_resize">window\_manager\_resize</a> | 调整原生窗口的大小。 |
 | <a href="#window_manager_t_window_manager_set">window\_manager\_set</a> | 设置缺省的窗口管理器。 |
 | <a href="#window_manager_t_window_manager_set_cursor">window\_manager\_set\_cursor</a> | 设置鼠标指针。 |
@@ -109,6 +112,26 @@ ret_t window_manager_back_to_home (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 窗口管理器对象。 |
+#### window\_manager\_begin\_wait\_pointer\_cursor 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="window_manager_t_window_manager_begin_wait_pointer_cursor">开始等待鼠标指针。
+
+* 函数原型：
+
+```
+ret_t window_manager_begin_wait_pointer_cursor (widget_t* widget, bool_t ignore_user_input);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。。 |
+| widget | widget\_t* | 窗口管理器对象。 |
+| ignore\_user\_input | bool\_t | 是否忽略用户输入。 |
 #### window\_manager\_cast 函数
 -----------------------
 
@@ -149,6 +172,25 @@ ret_t window_manager_dispatch_native_window_event (widget_t* widget, event_t* e,
 | widget | widget\_t* | 窗口管理器对象。 |
 | e | event\_t* | 事件。 |
 | handle | void* | native window句柄。 |
+#### window\_manager\_end\_wait\_pointer\_cursor 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="window_manager_t_window_manager_end_wait_pointer_cursor">结束等待鼠标指针。
+
+* 函数原型：
+
+```
+ret_t window_manager_end_wait_pointer_cursor (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。。 |
+| widget | widget\_t* | 窗口管理器对象。 |
 #### window\_manager\_get\_pointer\_pressed 函数
 -----------------------
 
@@ -282,6 +324,27 @@ bool_t window_manager_is_animating (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | bool\_t | 返回TRUE表示正在播放，FALSE表示没有播放。 |
 | widget | widget\_t* | 窗口管理器对象。 |
+#### window\_manager\_paint 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="window_manager_t_window_manager_paint">绘制。
+
+> 仅由主循环调用。
+
+* 函数原型：
+
+```
+ret_t window_manager_paint (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 窗口管理器对象。 |
 #### window\_manager\_resize 函数
 -----------------------
 
@@ -361,7 +424,7 @@ ret_t window_manager_set_screen_saver_time (widget_t* widget, uint32_t screen_sa
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 窗口管理器对象。 |
-| screen\_saver\_time | uint32\_t | 屏保时间(单位毫秒)。 |
+| screen\_saver\_time | uint32\_t | 屏保时间(单位毫秒), 为0关闭屏保。 |
 #### window\_manager\_set\_show\_fps 函数
 -----------------------
 

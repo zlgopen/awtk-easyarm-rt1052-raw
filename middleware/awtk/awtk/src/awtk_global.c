@@ -33,6 +33,15 @@
 #include "base/window_manager.h"
 #include "base/widget_factory.h"
 #include "base/assets_manager.h"
+
+#ifdef WITH_DATA_READER_WRITER
+#include "tkc/data_reader_factory.h"
+#include "tkc/data_writer_factory.h"
+#include "tkc/data_writer_file.h"
+#include "tkc/data_reader_file.h"
+#include "base/data_reader_asset.h"
+#endif /*WITH_DATA_READER_WRITER*/
+
 #include "base/widget_animator_manager.h"
 #include "font_loader/font_loader_bitmap.h"
 #include "base/window_animator_factory.h"
@@ -117,10 +126,13 @@ ret_t tk_init_assets(void) {
 static ret_t awtk_mem_on_out_of_memory(void* ctx, uint32_t tried_times, uint32_t need_size) {
   if (tried_times == 1) {
     image_manager_unload_unused(image_manager(), 10);
+    font_manager_shrink_cache(font_manager(), 10);
   } else if (tried_times == 2) {
     image_manager_unload_unused(image_manager(), 0);
+    font_manager_shrink_cache(font_manager(), 0);
   } else if (tried_times == 3) {
     event_t e = event_init(EVT_LOW_MEMORY, NULL);
+    font_manager_unload_all(font_manager());
     widget_dispatch(window_manager(), &e);
   } else {
     event_t e = event_init(EVT_OUT_OF_MEMORY, NULL);
@@ -132,6 +144,15 @@ static ret_t awtk_mem_on_out_of_memory(void* ctx, uint32_t tried_times, uint32_t
 
 ret_t tk_init_internal(void) {
   font_loader_t* font_loader = NULL;
+
+#ifdef WITH_DATA_READER_WRITER
+  data_writer_factory_set(data_writer_factory_create());
+  data_reader_factory_set(data_reader_factory_create());
+  data_writer_factory_register(data_writer_factory(), "file", data_writer_file_create);
+  data_reader_factory_register(data_reader_factory(), "file", data_reader_file_create);
+  data_reader_factory_register(data_reader_factory(), "asset", data_reader_asset_create);
+#endif /*WITH_DATA_READER_WRITER*/
+
 #ifdef WITH_STB_IMAGE
   image_loader_register(image_loader_stb());
 #endif /*WITH_STB_IMAGE*/
@@ -148,13 +169,12 @@ ret_t tk_init_internal(void) {
 
   return_value_if_fail(timer_prepare(time_now_ms) == RET_OK, RET_FAIL);
   return_value_if_fail(idle_manager_set(idle_manager_create()) == RET_OK, RET_FAIL);
+  return_value_if_fail(widget_factory_set(widget_factory_create()) == RET_OK, RET_FAIL);
+  return_value_if_fail(theme_set(theme_create(NULL)) == RET_OK, RET_FAIL);
+  return_value_if_fail(assets_manager_set(assets_manager_create(30)) == RET_OK, RET_FAIL);
 #ifndef WITHOUT_INPUT_METHOD
   return_value_if_fail(input_method_set(input_method_create()) == RET_OK, RET_FAIL);
 #endif /*WITHOUT_INPUT_METHOD*/
-  return_value_if_fail(widget_factory_set(widget_factory_create()) == RET_OK, RET_FAIL);
-
-  return_value_if_fail(theme_set(theme_create(NULL)) == RET_OK, RET_FAIL);
-  return_value_if_fail(assets_manager_set(assets_manager_create(30)) == RET_OK, RET_FAIL);
   return_value_if_fail(locale_info_set(locale_info_create(NULL, NULL)) == RET_OK, RET_FAIL);
   return_value_if_fail(font_manager_set(font_manager_create(font_loader)) == RET_OK, RET_FAIL);
   return_value_if_fail(image_manager_set(image_manager_create()) == RET_OK, RET_FAIL);
@@ -203,6 +223,7 @@ ret_t tk_init_internal(void) {
 ret_t tk_init(wh_t w, wh_t h, app_type_t app_type, const char* app_name, const char* app_root) {
   main_loop_t* loop = NULL;
   return_value_if_fail(platform_prepare() == RET_OK, RET_FAIL);
+  return_value_if_fail(tk_mem_init_stage2() == RET_OK, RET_FAIL);
   ENSURE(system_info_init(app_type, app_name, app_root) == RET_OK);
   return_value_if_fail(tk_init_internal() == RET_OK, RET_FAIL);
 
@@ -273,6 +294,13 @@ ret_t tk_deinit_internal(void) {
 
   assets_manager_destroy(assets_manager());
   assets_manager_set(NULL);
+
+#ifdef WITH_DATA_READER_WRITER
+  data_writer_factory_destroy(data_writer_factory());
+  data_reader_factory_destroy(data_reader_factory());
+  data_writer_factory_set(NULL);
+  data_reader_factory_set(NULL);
+#endif /*WITH_DATA_READER_WRITER*/
 
   system_info_deinit();
 

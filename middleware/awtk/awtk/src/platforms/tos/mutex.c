@@ -19,7 +19,7 @@
  *
  */
 
-#include "tos.h"
+#include "tos_k.h"
 #include "tkc/mem.h"
 #include "tkc/mutex.h"
 
@@ -42,6 +42,14 @@ ret_t tk_mutex_lock(tk_mutex_t* mutex) {
   return_value_if_fail(mutex != NULL, RET_BAD_PARAMS);
 
   return_value_if_fail(tos_mutex_pend(&(mutex->mutex)) == K_ERR_NONE, RET_FAIL);
+
+  return RET_OK;
+}
+
+ret_t tk_mutex_try_lock(tk_mutex_t* mutex) {
+  return_value_if_fail(mutex != NULL, RET_BAD_PARAMS);
+
+  return_value_if_fail(tos_mutex_pend_timed(&(mutex->mutex), 0) == K_ERR_NONE, RET_FAIL);
 
   return RET_OK;
 }

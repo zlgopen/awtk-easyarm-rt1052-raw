@@ -157,6 +157,7 @@
 
 ![input\_method\_overview](images/input_method_overview.png)
 
+* [input\_type](manual/input_type_t.md) 输入类型(用于控制软键盘和输入格式)
 * [input\_method](manual/input_method_t.md) 输入法接口。
 * [input\_method\_default](manual/input_method_default_t.md) 输入法缺省实现。
 * [input\_method\_sdl](manual/input_method_sdl_t.md) 输入法SDL实现。
@@ -201,6 +202,38 @@
 * [children\_layouter\_default](manual/children_layouter_default_t.md) 缺省的子控件布局算法实现。
 
 * [children\_layouter\_list\_view](manual/children_layouter_list_view_t.md) 列表视图的子控件布局算法实现。
+
+### lcd
+
+![lcd](images/lcd.png)
+ 
+* [lcd](manual/lcd_t.md) LCD接口
+
+* [lcd\_type](manual/lcd_type_t.md) LCD类型定义
+
+* [lcd\_draw\_mode](manual/lcd_draw_mode_t.md) LCD绘制模式
+
+* [lcd\_mem\_fragment](manual/lcd_mem_fragment_t.md) 片段LCD
+
+* [lcd\_orientation](manual/lcd_orientation_t.md) LCD旋转常量
+
+* [lcd\_mem\_bgr565](manual/lcd_mem_bgr565_t.md) bgr565 格式的LCD
+
+* [lcd\_mem\_bgr888](manual/lcd_mem_bgr888_t.md) bgr888 格式的LCD
+
+* [lcd\_mem\_bgra8888](manual/lcd_mem_bgra8888_t.md) bgra8888 格式的LCD
+
+* [lcd\_mem\_rgb565](manual/lcd_mem_rgb565_t.md) rgb565 格式的LCD
+
+* [lcd\_mem\_rgb888](manual/lcd_mem_rgb888_t.md) rgb888 格式的LCD
+
+* [lcd\_mem\_rgba8888](manual/lcd_mem_rgba8888_t.md) bgra8888 格式的LCD
+
+* [lcd\_mem\_special](manual/lcd_mem_special_t.md) 特殊格式的LCD
+
+* [lcd\_mono](manual/lcd_mono_t.md) 单色LCD
+
+* [lcd\_profile](manual/lcd_profile_t.md) 用于profile性能的LCD
 
 ### 杂项
 

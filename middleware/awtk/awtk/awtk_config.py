@@ -24,6 +24,8 @@ def joinPath(root, subdir):
 
 TK_ROOT=os.path.dirname(os.path.normpath(os.path.abspath(__file__)))
 
+WIN32_AWTK_RES=os.path.join(TK_ROOT, 'win32_res/awtk.res');
+
 print('TK_ROOT: ' + TK_ROOT);
 
 TK_SRC        = joinPath(TK_ROOT, 'src')
@@ -33,7 +35,7 @@ TK_3RD_ROOT   = joinPath(TK_ROOT, '3rd')
 TK_TOOLS_ROOT = joinPath(TK_ROOT, 'tools')
 TK_DEMO_ROOT  = joinPath(TK_ROOT, 'demos')
 GTEST_ROOT    = joinPath(TK_ROOT, '3rd/gtest/googletest')
-AWTK_STATIC_LIBS=['awtk_global', 'extwidgets', 'widgets', 'base', 'gpinyin', 'streams', 'ubjson', 'compressors', 'miniz', 'tkc', 'linebreak']
+AWTK_STATIC_LIBS=['awtk_global', 'extwidgets', 'widgets', 'base', 'gpinyin', 'streams', 'conf_io', 'ubjson', 'compressors', 'miniz', 'tkc', 'linebreak']
 
 #INPUT_ENGINE='null'
 #INPUT_ENGINE='spinyin'
@@ -78,6 +80,12 @@ TOOLS_NAME = ''
 
 COMMON_CCFLAGS=' -DTK_ROOT=\\\"'+TK_ROOT+'\\\" ' 
 #COMMON_CCFLAGS=COMMON_CCFLAGS+' -DENABLE_PERFORMANCE_PROFILE=1 '
+#COMMON_CCFLAGS=COMMON_CCFLAGS+' -DNATIVE_WINDOW_BORDERLESS=1 '
+#COMMON_CCFLAGS=COMMON_CCFLAGS+' -DENABLE_MEM_LEAK_CHECK=1 '
+
+COMMON_CCFLAGS=COMMON_CCFLAGS+' -DENABLE_CURSOR=1 '
+COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_DATA_READER_WRITER=1 '
+COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_EVENT_RECORDER_PLAYER=1 '
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_ASSET_LOADER -DWITH_FS_RES -DWITH_ASSET_LOADER_ZIP ' 
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DSTBTT_STATIC -DSTB_IMAGE_STATIC -DWITH_STB_IMAGE '
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_VGCANVAS -DWITH_UNICODE_BREAK -DWITH_DESKTOP_STYLE '
@@ -156,7 +164,7 @@ if OS_NAME == 'Darwin':
   OS_LIBS = ['stdc++', 'pthread', 'm', 'dl']
   OS_LINKFLAGS='-framework IOKit -framework Cocoa -framework QuartzCore -framework OpenGL -weak_framework Metal -weak_framework MetalKit'
   COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DHAS_SEM_OPEN '
-  COMMON_CCFLAGS = COMMON_CCFLAGS + ' -D__APPLE__ -DHAS_PTHREAD -DMACOS -DENABLE_MEM_LEAK_CHECK1 '
+  COMMON_CCFLAGS = COMMON_CCFLAGS + ' -D__APPLE__ -DHAS_PTHREAD -DMACOS '
   COMMON_CCFLAGS = COMMON_CCFLAGS + ' -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS  -DBGFX_CONFIG_RENDERER_METAL=1 '
   AWTK_DLL_DEPS_LIBS = AWTK_STATIC_LIBS + NANOVG_BACKEND_LIBS + ['SDL2', 'glad'] + OS_LIBS
   OS_WHOLE_ARCHIVE=' -all_load '
@@ -173,13 +181,13 @@ elif OS_NAME == 'Linux':
   COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DSDL_REAL_API -DSDL_HAPTIC_DISABLED -DSDL_SENSOR_DISABLED -DSDL_JOYSTICK_DISABLED '
   OS_PROJECTS=['3rd/SDL/SConscript']
   if TARGET_ARCH == 'x86':
-    OS_FLAGS = OS_FLAGS + ' -DWITH_DOUBLE_FLOAT '
+    OS_FLAGS = OS_FLAGS + ' -U__FLT_EVAL_METHOD__ -D__FLT_EVAL_METHOD__=0 '
   else:
     OS_FLAGS = OS_FLAGS + ' -DWITH_64BIT_CPU '
 
   OS_LINKFLAGS=' -Wl,-rpath=' + os.path.abspath(TK_LIB_DIR) + ' '
   AWTK_DLL_DEPS_LIBS = NANOVG_BACKEND_LIBS + ['SDL2', 'glad'] + OS_LIBS
-  OS_WHOLE_ARCHIVE =' -Wl,--whole-archive -lawtk_global -lextwidgets -lwidgets -lbase -lgpinyin -lstreams -lubjson -lcompressors -lminiz -ltkc -llinebreak -Wl,--no-whole-archive'
+  OS_WHOLE_ARCHIVE =' -Wl,--whole-archive -lawtk_global -lextwidgets -lwidgets -lbase -lgpinyin -lstreams -lconf_io -lubjson -lcompressors -lminiz -ltkc -llinebreak -Wl,--no-whole-archive'
 
 elif OS_NAME == 'Windows':
   if not os.path.exists(os.path.abspath(TK_BIN_DIR)) :
@@ -191,25 +199,26 @@ elif OS_NAME == 'Windows':
     OS_FLAGS='-DWIN32 -D_WIN32 -DWINDOWS /EHsc -D_CONSOLE  /DEBUG /Od  /FS /Z7 /utf-8'
     if TARGET_ARCH == 'x86':
       OS_FLAGS += OS_FLAGS
-      OS_LINKFLAGS='/MACHINE:X86 /DEBUG'
+      OS_LINKFLAGS='/MACHINE:X86 /DEBUG ' + WIN32_AWTK_RES + ' '
       OS_SUBSYSTEM_CONSOLE='/SUBSYSTEM:CONSOLE,5.01  '
       OS_SUBSYSTEM_WINDOWS='/SUBSYSTEM:WINDOWS,5.01  '
       COMMON_CCFLAGS = COMMON_CCFLAGS + ' -D_WIN32 '
     else:
       OS_FLAGS = OS_FLAGS + ' -DWITH_64BIT_CPU '
-      OS_LINKFLAGS='/MACHINE:X64 /DEBUG'
+      OS_LINKFLAGS='/MACHINE:X64 /DEBUG ' + WIN32_AWTK_RES + ' '
       OS_SUBSYSTEM_CONSOLE='/SUBSYSTEM:CONSOLE  '
       OS_SUBSYSTEM_WINDOWS='/SUBSYSTEM:WINDOWS  '
       COMMON_CCFLAGS = COMMON_CCFLAGS + ' -D_WIN64 '
-    OS_WHOLE_ARCHIVE=' /DEF:"dllexports/awtk.def"'
+    OS_WHOLE_ARCHIVE=' /DEF:"dllexports/awtk.def" '
     AWTK_DLL_DEPS_LIBS = AWTK_STATIC_LIBS + NANOVG_BACKEND_LIBS + ['SDL2', 'glad'] + OS_LIBS
 
   elif TOOLS_NAME == 'mingw' :
-    OS_LIBS=['kernel32', 'gdi32', 'user32', 'winmm','imm32','version','shell32','ole32','Oleaut32','Advapi32','oleaut32','uuid','stdc++']
-    OS_FLAGS='-DWINDOWS -D_CONSOLE -g -Wall'
+    OS_LIBS=['kernel32', 'gdi32', 'user32', 'winmm','imm32','version','shell32','ole32','Oleaut32','Advapi32','oleaut32','uuid','stdc++',"ws2_32"]
+    OS_FLAGS='-DMINGW -DWINDOWS -D_CONSOLE -g -Wall'
+    OS_LINKFLAGS=' -Wl,-rpath=' + os.path.abspath(TK_LIB_DIR) + ' '
     COMMON_CFLAGS=COMMON_CFLAGS+' -std=gnu99 '
-    COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_DOUBLE_FLOAT -DUNICODE ' 
-    OS_WHOLE_ARCHIVE=' -Wl,--whole-archive '
+    COMMON_CCFLAGS=COMMON_CCFLAGS+' -U__FLT_EVAL_METHOD__ -D__FLT_EVAL_METHOD__=0 -DUNICODE -DDECLSPEC=  ' 
+    OS_WHOLE_ARCHIVE =' -Wl,--whole-archive -lawtk_global -lextwidgets -lwidgets -lbase -lgpinyin -lstreams -lconf_io -lubjson -lcompressors -lminiz -ltkc -llinebreak -Wl,--no-whole-archive'
     AWTK_DLL_DEPS_LIBS = AWTK_STATIC_LIBS + NANOVG_BACKEND_LIBS + ['SDL2', 'glad'] + OS_LIBS
     
   #OS_FLAGS='-DWIN32 -D_WIN32 -DWINDOWS /EHsc -D_CONSOLE  /DEBUG /Od  /FS /Z7 -D_DEBUG /MDd '
@@ -223,6 +232,7 @@ CFLAGS=COMMON_CFLAGS
 LINKFLAGS=OS_LINKFLAGS;
 LIBPATH=[TK_LIB_DIR, TK_BIN_DIR] + OS_LIBPATH
 CCFLAGS=OS_FLAGS + COMMON_CCFLAGS 
+AWTK_CCFLAGS=OS_FLAGS + COMMON_CCFLAGS + ' -DWITH_WIDGET_TYPE_CHECK=1 '
 
 STATIC_LIBS = AWTK_STATIC_LIBS + NANOVG_BACKEND_LIBS + ['SDL2', 'glad'] + OS_LIBS
 SHARED_LIBS=['awtk'] + OS_LIBS;
@@ -270,6 +280,9 @@ os.environ['FRAME_BUFFER_FORMAT'] = FRAME_BUFFER_FORMAT;
 os.environ['OS_WHOLE_ARCHIVE'] = OS_WHOLE_ARCHIVE;
 os.environ['AWTK_DLL_DEPS_LIBS'] = ';'.join(AWTK_DLL_DEPS_LIBS)
 os.environ['STATIC_LIBS'] = ';'.join(STATIC_LIBS)
+
+os.environ['WITH_AWTK_SO'] = 'true'
+os.environ['AWTK_CCFLAGS'] = AWTK_CCFLAGS;
 
 def has_custom_cc():
     return False

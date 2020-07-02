@@ -735,6 +735,7 @@ static ret_t vgcanvas_cairo_reinit(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h,
   vgcanvas->w = w;
   vgcanvas->h = h;
   vgcanvas->ratio = 1;
+  vgcanvas->stride = stride;
   vgcanvas->format = format;
   vgcanvas->buff = (uint32_t*)data;
 
@@ -881,6 +882,7 @@ vgcanvas_t* vgcanvas_create(uint32_t w, uint32_t h, uint32_t stride, bitmap_form
   cairo->base.h = h;
   cairo->base.vt = &vt;
   cairo->base.ratio = 1;
+  cairo->base.stride = stride;
   cairo->base.format = format;
   cairo->base.buff = (uint32_t*)data;
 

@@ -80,6 +80,8 @@ static ret_t scroll_view_on_pointer_down(scroll_view_t* scroll_view, pointer_eve
   scroll_view->down.y = e->y;
   scroll_view->xoffset_save = scroll_view->xoffset;
   scroll_view->yoffset_save = scroll_view->yoffset;
+  scroll_view->xoffset_end = scroll_view->xoffset;
+  scroll_view->yoffset_end = scroll_view->yoffset;
 
   velocity_update(v, e->e.time, e->x, e->y);
 
@@ -93,6 +95,7 @@ static ret_t scroll_view_on_scroll_done(void* ctx, event_t* e) {
 
   scroll_view->wa = NULL;
   widget_invalidate_force(widget, NULL);
+  widget_dispatch_simple_event(widget, EVT_SCROLL_END);
 
   return RET_REMOVE;
 }
@@ -184,6 +187,7 @@ ret_t scroll_view_scroll_to(widget_t* widget, int32_t xoffset_end, int32_t yoffs
     widget_animator_scroll_set_params(scroll_view->wa, xoffset, yoffset, xoffset_end, yoffset_end);
     widget_animator_on(scroll_view->wa, EVT_ANIM_END, scroll_view_on_scroll_done, scroll_view);
     widget_animator_start(scroll_view->wa);
+    widget_dispatch_simple_event(widget, EVT_SCROLL_START);
   }
 
   return RET_OK;
@@ -262,6 +266,7 @@ static ret_t scroll_view_notify_scrolled(scroll_view_t* scroll_view) {
   if (scroll_view->on_scroll) {
     scroll_view->on_scroll(widget, scroll_view->xoffset, scroll_view->yoffset);
   }
+  widget_dispatch_simple_event(widget, EVT_SCROLL);
 
   return RET_OK;
 }

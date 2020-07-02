@@ -19,12 +19,11 @@
  *
  */
 
-#include "tos.h"
+#include "tos_k.h"
 #include "platforms/common/rtos.h"
 
 ret_t rtos_init(void) {
   tos_knl_init();
-  tos_robin_config(TOS_ROBIN_STATE_ENABLED, (k_timeslice_t)500u);
 
   return RET_OK;
 }
@@ -45,4 +44,8 @@ void rtos_tick(void) {
 
 void rtos_delay(uint32_t ms) {
   tos_task_delay(ms);
+}
+
+bool_t rtos_is_running(void) {
+  return tos_knl_is_running();
 }

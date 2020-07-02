@@ -1,6 +1,7 @@
 ## event\_type\_t
 ### 概述
-类型常量定义。### 常量
+类型常量定义。
+### 常量
 <p id="event_type_t_consts">
 
 | 名称 | 说明 | 
@@ -11,8 +12,8 @@
 | EVT\_POINTER\_MOVE\_BEFORE\_CHILDREN | 指针移动事件名，在子控件处理之前触发(pointer\_event\_t)。 |
 | EVT\_POINTER\_UP | 指针抬起事件名(pointer\_event\_t)。 |
 | EVT\_POINTER\_UP\_BEFORE\_CHILDREN | 指针抬起事件名，在子控件处理之前触发(pointer\_event\_t)。 |
-| EVT\_WHEEL | 滚轮事件名(pointer\_event\_t)。 |
-| EVT\_WHEEL\_BEFORE\_CHILDREN | 鼠标滚轮事件名，在子控件处理之前触发(key\_event\_t)。 |
+| EVT\_WHEEL | 滚轮事件名(wheel\_event\_t)。 |
+| EVT\_WHEEL\_BEFORE\_CHILDREN | 鼠标滚轮事件名，在子控件处理之前触发(wheel\_event\_t)。 |
 | EVT\_POINTER\_DOWN\_ABORT | 取消前一个指针按下事件名(pointer\_event\_t)。 |
 | EVT\_CONTEXT\_MENU | 右键/长按弹出上下文菜单的事件名(pointer\_event\_t)。 |
 | EVT\_POINTER\_ENTER | 指针进入事件名(pointer\_event\_t)。 |
@@ -76,11 +77,17 @@
 | EVT\_THEME\_CHANGED | 主题变化(event\_t)。 |
 | EVT\_WIDGET\_ADD\_CHILD | 控件加载新的子控件(event\_t)。 |
 | EVT\_WIDGET\_REMOVE\_CHILD | 控件移除子控件(event\_t)。 |
+| EVT\_SCROLL\_START | scroll view开始滚动(event\_t)。 |
+| EVT\_SCROLL | scroll view滚动(event\_t)。 |
+| EVT\_SCROLL\_END | scroll view结束滚动(event\_t)。 |
 | EVT\_REQ\_START | event queue其它请求编号起始值。 |
 | EVT\_USER\_START | 用户定义事件起始值。 |
 | EVT\_NONE | 无效事件名称。 |
 | EVT\_PROP\_WILL\_CHANGE | 对象的属性即将改变的事件名(prop\_change\_event\_t)。 |
 | EVT\_PROP\_CHANGED | 对象的属性改变的事件名(prop\_change\_event\_t)。 |
+| EVT\_CMD\_WILL\_EXEC | 对象即将执行命令(cmd\_exec\_event\_t)。 |
+| EVT\_CMD\_EXECED | 对象完成执行命令(cmd\_exec\_event\_t)。 |
+| EVT\_CMD\_CAN\_EXEC | 对象命令是否能执行指定的命令(cmd\_exec\_event\_t)。 |
 | EVT\_ITEMS\_WILL\_CHANGE | 即将增加和删除集合中的项目(event\_t)。 |
 | EVT\_ITEMS\_CHANGED | 完成增加和删除集合中的项目(event\_t)。 |
 | EVT\_PROPS\_CHANGED | 对象的属性改变的事件名(props\_event\_t)。 |

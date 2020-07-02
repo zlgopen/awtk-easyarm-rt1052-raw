@@ -149,6 +149,10 @@ struct _widget_vtable_t {
    * parent class vtable
    */
   const struct _widget_vtable_t* parent;
+  /**
+   * cursor image name
+   */
+  const char* pointer_cursor;
 
   widget_create_t create;
   widget_get_prop_t get_prop;
@@ -276,6 +280,12 @@ struct _widget_t {
    * 控件名字。
    */
   char* name;
+  /**
+   * @property {char*} pointer_cursor
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 鼠标光标图片名称。
+   */
+  char* pointer_cursor;
   /**
    * @property {char*} tr_text
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
@@ -1273,9 +1283,9 @@ ret_t widget_set_sensitive(widget_t* widget, bool_t sensitive);
  *
  * ```
  *
- * @return {int32_t} 返回id，用于widget_off。
+ * @return {uint32_t} 返回id，用于widget_off。
  */
-int32_t widget_on(widget_t* widget, uint32_t type, event_func_t on_event, void* ctx);
+uint32_t widget_on(widget_t* widget, uint32_t type, event_func_t on_event, void* ctx);
 
 /**
  * @method widget_on_with_tag
@@ -1289,21 +1299,21 @@ int32_t widget_on(widget_t* widget, uint32_t type, event_func_t on_event, void* 
  * @param {void*} ctx 事件处理函数上下文。
  * @param {uint32_t} tag tag。
  *
- * @return {int32_t} 返回id，用于widget_off。
+ * @return {uint32_t} 返回id，用于widget_off。
  */
-int32_t widget_on_with_tag(widget_t* widget, uint32_t type, event_func_t on_event, void* ctx,
-                           uint32_t tag);
+uint32_t widget_on_with_tag(widget_t* widget, uint32_t type, event_func_t on_event, void* ctx,
+                            uint32_t tag);
 
 /**
  * @method widget_off
  * 注销指定事件的处理函数。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget 控件对象。
- * @param {int32_t} id widget_on返回的ID。
+ * @param {uint32_t} id widget_on返回的ID。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t widget_off(widget_t* widget, int32_t id);
+ret_t widget_off(widget_t* widget, uint32_t id);
 
 /**
  * @method widget_child_on
@@ -1315,10 +1325,10 @@ ret_t widget_off(widget_t* widget, int32_t id);
  * @param {event_func_t} on_event 事件处理函数。
  * @param {void*} ctx 事件处理函数上下文。
  *
- * @return {int32_t} 返回id，用于widget_off。
+ * @return {uint32_t} 返回id，用于widget_off。
  */
-int32_t widget_child_on(widget_t* widget, const char* name, uint32_t type, event_func_t on_event,
-                        void* ctx);
+uint32_t widget_child_on(widget_t* widget, const char* name, uint32_t type, event_func_t on_event,
+                         void* ctx);
 
 /**
  * @method widget_off_by_func
@@ -1376,7 +1386,6 @@ ret_t widget_invalidate_force(widget_t* widget, rect_t* r);
 /**
  * @method widget_paint
  * 绘制控件到一个canvas上。
- * @annotation ["private"]
  * @param {widget_t*} widget 控件对象。
  * @param {canvas_t*} c 画布对象。
  *
@@ -1862,7 +1871,6 @@ bool_t widget_is_keyboard(widget_t* widget);
 /**
  * @method widget_paint_helper
  * 帮助子控件实现自己的绘制函数。
- * @annotation ["private"]
  * @param {widget_t*} widget 控件对象。
  * @param {canvas_t*} c 画布对象。
  * @param {const char*} icon 图标的名称。
@@ -1871,6 +1879,16 @@ bool_t widget_is_keyboard(widget_t* widget);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t widget_paint_helper(widget_t* widget, canvas_t* c, const char* icon, wstr_t* text);
+
+/**
+ * @method widget_draw_background
+ * 根据控件的style绘制背景矩形。
+ * @param {widget_t*} widget 控件对象。
+ * @param {canvas_t*} c 画布对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t widget_draw_background(widget_t* widget, canvas_t* c);
 
 /**
  * @method widget_stroke_border_rect
@@ -1948,7 +1966,6 @@ ret_t widget_dispatch_event_to_target_recursive(widget_t* widget, event_t* e);
 /**
  * @method widget_is_point_in
  * 判断一个点是否在控件内。
- * @annotation ["private"]
  * @param {widget_t*} widget 控件对象。
  * @param {xy_t} x x坐标
  * @param {xy_t} y y坐标
@@ -1983,7 +2000,6 @@ ret_t widget_dispatch_to_key_target(widget_t* widget, event_t* e);
 /**
  * @method widget_find_target
  * 查找x/y坐标对应的子控件。
- * @annotation ["private"]
  * @param {widget_t*} widget 控件对象。
  * @param {xy_t} x x坐标。
  * @param {xy_t} y y坐标。
@@ -1995,7 +2011,6 @@ widget_t* widget_find_target(widget_t* widget, xy_t x, xy_t y);
 /**
  * @method widget_re_translate_text
  * 语言改变后，重新翻译控件上的文本(包括子控件)。
- * @annotation ["private"]
  * @param {widget_t*} widget 控件对象。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
@@ -2009,7 +2024,6 @@ ret_t widget_re_translate_text(widget_t* widget);
  * > 请用widget\_create代替本函数。
  *
  * @depreated
- * @annotation ["private"]
  * @param {widget_t*} widget widget对象。
  * @param {widget_t*} parent widget的父控件。
  * @param {widget_vtable_t*} vt 虚表。
@@ -2026,7 +2040,6 @@ widget_t* widget_init(widget_t* widget, widget_t* parent, const widget_vtable_t*
 /**
  * @method widget_create
  * 创建控件。仅在子类控件构造函数中使用。
- * @annotation ["private"]
  * @param {widget_t*} parent widget的父控件。
  * @param {widget_vtable_t*} vt 虚表。
  * @param {xy_t}   x x坐标
@@ -2293,8 +2306,13 @@ bitmap_t* widget_take_snapshot_rect(widget_t* widget, rect_t* r);
  */
 canvas_t* widget_get_canvas(widget_t* widget);
 
-/*for designer only*/
-/*调用者需要unload全部图片*/
+/**
+ * @method widget_reset_canvas
+ * 重置canvas对象。for designer only,调用者需要unload全部图片
+ * @param {widget_t*} widget 控件对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t widget_reset_canvas(widget_t* widget);
 
 /*虚函数的包装*/
@@ -2306,9 +2324,41 @@ ret_t widget_on_pointer_down(widget_t* widget, pointer_event_t* e);
 ret_t widget_on_pointer_move(widget_t* widget, pointer_event_t* e);
 ret_t widget_on_pointer_up(widget_t* widget, pointer_event_t* e);
 ret_t widget_on_context_menu(widget_t* widget, pointer_event_t* e);
+/**
+ * @method widget_on_paint_background
+ * 绘制背景。
+ * @param {widget_t*} widget 控件对象。
+ * @param {canvas_t*} c canvas对象。
+ *
+ * @return {ret_t} 返回。
+ */
 ret_t widget_on_paint_background(widget_t* widget, canvas_t* c);
+/**
+ * @method widget_on_paint_self
+ * 绘制自身。
+ * @param {widget_t*} widget 控件对象。
+ * @param {canvas_t*} c canvas对象。
+ *
+ * @return {ret_t} 返回。
+ */
 ret_t widget_on_paint_self(widget_t* widget, canvas_t* c);
+/**
+ * @method widget_on_paint_children
+ * 绘制子控件。
+ * @param {widget_t*} widget 控件对象。
+ * @param {canvas_t*} c canvas对象。
+ *
+ * @return {ret_t} 返回。
+ */
 ret_t widget_on_paint_children(widget_t* widget, canvas_t* c);
+/**
+ * @method widget_on_paint_border
+ * 绘制边框。
+ * @param {widget_t*} widget 控件对象。
+ * @param {canvas_t*} c canvas对象。
+ *
+ * @return {ret_t} 返回。
+ */
 ret_t widget_on_paint_border(widget_t* widget, canvas_t* c);
 ret_t widget_on_paint_begin(widget_t* widget, canvas_t* c);
 ret_t widget_on_paint_end(widget_t* widget, canvas_t* c);
@@ -2317,13 +2367,36 @@ ret_t widget_on_paint_end(widget_t* widget, canvas_t* c);
 
 const char* const* widget_get_persistent_props(void);
 
+/**
+ * @method widget_is_instance_of
+ * 检查控件是否是指定的类型。
+ * @param {widget_t*} widget 控件对象。
+ * @param {widget_vtable_t*} vt 虚表。
+ *
+ *  @return {bool_t} 返回TRUE表示是，FALSE表示否。
+ */
 bool_t widget_is_instance_of(widget_t* widget, const widget_vtable_t* vt);
+
 #define WIDGET_IS_INSTANCE_OF(widget, name) widget_is_instance_of(widget, TK_REF_VTABLE(name))
 
 /*public for subclass*/
 TK_EXTERN_VTABLE(widget);
 
+/**
+ * @method widget_set_need_relayout_children
+ * 设置控件需要relayout标识。
+ * @param {widget_t*} widget 控件对象。
+ *
+ *  @return {ret_t} 返回。
+ */
 ret_t widget_set_need_relayout_children(widget_t* widget);
+/**
+ * @method widget_ensure_visible_in_viewport
+ * 使控件滚动到可见区域。
+ * @param {widget_t*} widget 控件对象。
+ *
+ *  @return {ret_t} 返回。
+ */
 ret_t widget_ensure_visible_in_viewport(widget_t* widget);
 ret_t widget_set_need_update_style(widget_t* widget);
 bool_t widget_is_activate_key(widget_t* widget, key_event_t* e);
@@ -2376,8 +2449,51 @@ assets_manager_t* widget_get_assets_manager(widget_t* widget);
  */
 font_manager_t* widget_get_font_manager(widget_t* widget);
 
+/**
+ * @method widget_update_pointer_cursor
+ * 更新鼠标指针。
+ * @param {widget_t*} widget 控件对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。。
+ */
+ret_t widget_update_pointer_cursor(widget_t* widget);
+
+/**
+ * @method widget_begin_wait_pointer_cursor
+ * 开始等待鼠标指针。
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t} ignore_user_input 是否忽略用户输入。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。。
+ */
+ret_t widget_begin_wait_pointer_cursor(widget_t* widget, bool_t ignore_user_input);
+
+/**
+ * @method widget_end_wait_pointer_cursor
+ * 结束等待鼠标指针。
+ * @param {widget_t*} widget 控件对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。。
+ */
+ret_t widget_end_wait_pointer_cursor(widget_t* widget);
+
 bool_t widget_has_focused_widget_in_window(widget_t* widget);
+/**
+ * @method widget_set_style
+ * 设置widget私有样式。
+ * @param {widget_t*} widget 控件对象。
+ * @param {const char*} state_and_name 样式对应类型与名字。
+ * @param {const value_t*} value 值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。。
+ */
 ret_t widget_set_style(widget_t* widget, const char* state_and_name, const value_t* value);
+/**
+ * @method widget_calc_icon_text_rect
+ * 计算icon text的位置。
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。。
+ */
 ret_t widget_calc_icon_text_rect(const rect_t* ir, int32_t font_size, float_t text_size,
                                  int32_t icon_at, uint32_t img_w, uint32_t img_h, int32_t spacer,
                                  rect_t* r_text, rect_t* r_icon);

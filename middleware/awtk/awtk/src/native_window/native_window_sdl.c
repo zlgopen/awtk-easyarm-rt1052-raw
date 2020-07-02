@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   native_window_sdl.h
  * Author: AWTK Develop Team
  * Brief:  native window sdl
@@ -20,6 +20,7 @@
  */
 
 #include <SDL.h>
+#include "base/system_info.h"
 #include "base/window_manager.h"
 
 #ifdef WITH_NANOVG_GL
@@ -53,6 +54,8 @@ typedef struct _native_window_sdl_t {
   SDL_Renderer* render;
   SDL_Window* window;
   canvas_t canvas;
+  SDL_Cursor* cursor;
+  SDL_Surface* cursor_surface;
 } native_window_sdl_t;
 
 static native_window_t* s_shared_win = NULL;
@@ -271,6 +274,104 @@ static ret_t native_window_sdl_get_info(native_window_t* win, native_window_info
   return RET_OK;
 }
 
+static ret_t native_window_sdl_cursor_from_bitmap(native_window_t* win, bitmap_t* img) {
+  Uint32 depth = 32;
+  uint8_t* data = NULL;
+  uint32_t w = img->w;
+  uint32_t h = img->h;
+  uint32_t rmask = 0;
+  uint32_t gmask = 0;
+  uint32_t bmask = 0;
+  uint32_t amask = 0;
+  uint32_t pitch = 4 * w;
+  native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(win);
+
+  if (img->format == BITMAP_FMT_BGRA8888) {
+    bmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    rmask = 0x00ff0000;
+    amask = 0xff000000;
+  } else if (img->format == BITMAP_FMT_RGBA8888) {
+    rmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    bmask = 0x00ff0000;
+    amask = 0xff000000;
+  } else {
+    /*
+     *assert(!"not supported format!");
+     */
+    return RET_FAIL;
+  }
+
+  if (sdl->cursor_surface != NULL) {
+    SDL_FreeSurface(sdl->cursor_surface);
+    sdl->cursor_surface = NULL;
+  }
+
+  data = bitmap_lock_buffer_for_read(img);
+  return_value_if_fail(data != NULL, RET_BAD_PARAMS);
+  sdl->cursor_surface =
+      SDL_CreateRGBSurfaceFrom(data, w, h, depth, pitch, rmask, gmask, bmask, amask);
+  bitmap_unlock_buffer(img);
+  return_value_if_fail(sdl->cursor_surface != NULL, RET_OOM);
+
+  sdl->cursor = SDL_CreateColorCursor(sdl->cursor_surface, 0, 0);
+  SDL_SetCursor(sdl->cursor);
+
+  return RET_OK;
+}
+
+static int map_to_sdl_cursor(const char* name) {
+  if (tk_str_eq(WIDGET_CURSOR_DEFAULT, name)) {
+    return SDL_SYSTEM_CURSOR_ARROW;
+  } else if (tk_str_eq(WIDGET_CURSOR_EDIT, name)) {
+    return SDL_SYSTEM_CURSOR_IBEAM;
+  } else if (tk_str_eq(WIDGET_CURSOR_HAND, name)) {
+    return SDL_SYSTEM_CURSOR_HAND;
+  } else if (tk_str_eq(WIDGET_CURSOR_WAIT, name)) {
+    return SDL_SYSTEM_CURSOR_WAIT;
+  } else if (tk_str_eq(WIDGET_CURSOR_CROSS, name)) {
+    return SDL_SYSTEM_CURSOR_CROSSHAIR;
+  } else if (tk_str_eq(WIDGET_CURSOR_NO, name)) {
+    return SDL_SYSTEM_CURSOR_NO;
+  } else if (tk_str_eq(WIDGET_CURSOR_SIZENWSE, name)) {
+    return SDL_SYSTEM_CURSOR_SIZENWSE;
+  } else if (tk_str_eq(WIDGET_CURSOR_SIZENESW, name)) {
+    return SDL_SYSTEM_CURSOR_SIZENESW;
+  } else if (tk_str_eq(WIDGET_CURSOR_SIZEWE, name)) {
+    return SDL_SYSTEM_CURSOR_SIZEWE;
+  } else if (tk_str_eq(WIDGET_CURSOR_SIZENS, name)) {
+    return SDL_SYSTEM_CURSOR_SIZENS;
+  } else if (tk_str_eq(WIDGET_CURSOR_SIZEALL, name)) {
+    return SDL_SYSTEM_CURSOR_SIZEALL;
+  }
+
+  return -1;
+}
+
+static ret_t native_window_sdl_set_cursor(native_window_t* win, const char* name, bitmap_t* img) {
+  native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(win);
+
+  if (sdl->cursor != NULL) {
+    SDL_FreeCursor(sdl->cursor);
+    sdl->cursor = NULL;
+  }
+
+  if (system_info()->app_type == APP_DESKTOP) {
+    int system_cursor = map_to_sdl_cursor(name);
+    if (system_cursor >= 0) {
+      sdl->cursor = SDL_CreateSystemCursor((SDL_SystemCursor)system_cursor);
+      SDL_SetCursor(sdl->cursor);
+
+      return RET_OK;
+    }
+  } else if (img != NULL) {
+    return native_window_sdl_cursor_from_bitmap(win, img);
+  }
+
+  return RET_FAIL;
+}
+
 static const native_window_vtable_t s_native_window_vtable = {
     .type = "native_window_sdl",
     .move = native_window_sdl_move,
@@ -285,6 +386,7 @@ static const native_window_vtable_t s_native_window_vtable = {
     .preprocess_event = native_window_sdl_preprocess_event,
     .swap_buffer = native_window_sdl_swap_buffer,
     .gl_make_current = native_window_sdl_gl_make_current,
+    .set_cursor = native_window_sdl_set_cursor,
     .get_canvas = native_window_sdl_get_canvas};
 
 static ret_t native_window_sdl_set_prop(object_t* obj, const char* name, const value_t* v) {
@@ -374,6 +476,10 @@ static native_window_t* native_window_create_internal(const char* title, uint32_
 #ifndef WITH_NANOVG_SOFT
   flags |= SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 #endif /*WITH_NANOVG_SOFT*/
+
+#ifdef NATIVE_WINDOW_BORDERLESS
+  flags |= SDL_WINDOW_BORDERLESS;
+#endif /*NATIVE_WINDOW_BORDERLESS*/
 
   sdl->window = SDL_CreateWindow(title, x, y, w, h, flags);
 

@@ -19,7 +19,7 @@
  *
  */
 
-#include "tos.h"
+#include "tos_k.h"
 
 #include "tkc/mem.h"
 #include "tkc/time_now.h"

@@ -459,6 +459,16 @@ ret_t canvas_set_text_align(canvas_t* c, align_h_t align_h, align_v_t align_v);
 float_t canvas_measure_text(canvas_t* c, const wchar_t* str, uint32_t nr);
 
 /**
+ * @method canvas_get_font_height
+ * 获取字体的高度。
+ *
+ * @param {canvas_t*} c canvas对象。
+ *
+ * @return {float_t} 返回字体的高度。
+ */
+float_t canvas_get_font_height(canvas_t* c);
+
+/**
  * @method canvas_measure_utf8
  * 计算文本所占的宽度。
  *
@@ -608,8 +618,20 @@ canvas_t* canvas_cast(canvas_t* c);
  */
 ret_t canvas_reset(canvas_t* c);
 
-/*public for internal use*/
+/**
+ * @method canvas_draw_image_at
+ * 在指定位置画图。
+ *
+ * @param {canvas_t*} c canvas对象。
+ * @param {bitmap_t*} img 图片对象。
+ * @param {xy_t} x x坐标。
+ * @param {xy_t} y w坐标。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t canvas_draw_image_at(canvas_t* c, bitmap_t* img, xy_t x, xy_t y);
+
+/*public for internal use*/
 ret_t canvas_draw_icon_in_rect(canvas_t* c, bitmap_t* img, rect_t* r);
 
 ret_t canvas_draw_image_center(canvas_t* c, bitmap_t* img, rect_t* dst);
@@ -624,20 +646,72 @@ ret_t canvas_draw_image_repeat(canvas_t* c, bitmap_t* img, rect_t* dst);
 ret_t canvas_draw_image_repeat_x(canvas_t* c, bitmap_t* img, rect_t* dst);
 ret_t canvas_draw_image_repeat_y(canvas_t* c, bitmap_t* img, rect_t* dst);
 ret_t canvas_draw_image_repeat_y_inverse(canvas_t* c, bitmap_t* img, rect_t* dst_in);
+ret_t canvas_draw_image_repeat9(canvas_t* c, bitmap_t* img, rect_t* dst_in);
+ret_t canvas_draw_image_repeat3_x(canvas_t* c, bitmap_t* img, rect_t* dst_in);
+ret_t canvas_draw_image_repeat3_y(canvas_t* c, bitmap_t* img, rect_t* dst_in);
 ret_t canvas_draw_image_scale(canvas_t* c, bitmap_t* img, rect_t* dst);
 ret_t canvas_draw_image_scale_w(canvas_t* c, bitmap_t* img, rect_t* dst);
 ret_t canvas_draw_image_scale_h(canvas_t* c, bitmap_t* img, rect_t* dst);
 ret_t canvas_draw_image_scale_down(canvas_t* c, bitmap_t* img, rect_t* src, rect_t* dst);
 
+/**
+ * @method canvas_draw_line
+ * 画直线。
+ * @param {canvas_t*} c canvas对象。
+ * @param {xy_t} x1 起始点的x坐标。
+ * @param {xy_t} y1 起始点的y坐标。
+ * @param {xy_t} x2 结束点的x坐标。
+ * @param {xy_t} y2 结束点的y坐标。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t canvas_draw_line(canvas_t* c, xy_t x1, xy_t y1, xy_t x2, xy_t y2);
 ret_t canvas_draw_char(canvas_t* c, wchar_t chr, xy_t x, xy_t y);
 ret_t canvas_draw_image_matrix(canvas_t* c, bitmap_t* img, matrix_t* matrix);
 ret_t canvas_set_fps(canvas_t* c, bool_t show_fps, uint32_t fps);
+/**
+ * @method canvas_set_font_manager
+ * 设置canvas的font_manager对象。
+ *
+ * @param {canvas_t*} c canvas对象。
+ * @param {font_manager_t*} font_manager font_manager对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t canvas_set_font_manager(canvas_t* c, font_manager_t* font_manager);
+/**
+ * @method canvas_set_assets_manager
+ * 设置canvas的assets_manager对象。
+ *
+ * @param {canvas_t*} c canvas对象。
+ * @param {assets_manager_t*} assets_manager assets_manager对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t canvas_set_assets_manager(canvas_t* c, assets_manager_t* assets_manager);
 
+/**
+ * @method canvas_begin_frame
+ * 绘制开始。
+ *
+ * @param {canvas_t*} c canvas对象。
+ * @param {rect_t*} dirty_rect 脏矩形。
+ * @param {lcd_draw_mode_t} draw_mode 绘制模式。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t canvas_begin_frame(canvas_t* c, rect_t* dirty_rect, lcd_draw_mode_t draw_mode);
+
+/**
+ * @method canvas_end_frame
+ * 绘制结束。
+ *
+ * @param {canvas_t*} c canvas对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t canvas_end_frame(canvas_t* c);
+
 ret_t canvas_test_paint(canvas_t* c, bool_t pressed, xy_t x, xy_t y);
 
 /*save/restore works for awtk web only*/

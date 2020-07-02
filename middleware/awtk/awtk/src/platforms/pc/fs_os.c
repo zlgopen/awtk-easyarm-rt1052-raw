@@ -35,43 +35,118 @@
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 
+#if defined(WIN32) && !defined(MINGW)
+static ret_t fs_stat_info_from_stat(fs_stat_info_t* fst, struct _stat64i32* st) {
+#else
+static ret_t fs_stat_info_from_stat(fs_stat_info_t* fst, struct stat* st) {
+#endif /*WIN32*/
+  return_value_if_fail(fst != NULL && &st != NULL, RET_BAD_PARAMS);
+
+  memset(fst, 0x00, sizeof(fs_stat_info_t));
+  fst->dev = st->st_dev;
+  fst->ino = st->st_ino;
+  fst->mode = st->st_mode;
+  fst->nlink = st->st_nlink;
+  fst->uid = st->st_uid;
+  fst->gid = st->st_gid;
+  fst->rdev = st->st_rdev;
+  fst->size = st->st_size;
+  fst->atime = st->st_atime;
+  fst->mtime = st->st_mtime;
+  fst->ctime = st->st_ctime;
+  fst->is_dir = (st->st_mode & S_IFDIR) != 0;
+#ifdef S_IFLNK
+  fst->is_link = (st->st_mode & S_IFLNK) != 0;
+#else
+  fst->is_link = FALSE;
+#endif /*S_IFLNK*/
+  fst->is_reg_file = (st->st_mode & S_IFREG) != 0;
+
+  return RET_OK;
+}
+
 static int32_t fs_os_file_read(fs_file_t* file, void* buffer, uint32_t size) {
   FILE* fp = (FILE*)(file->data);
 
   return (int32_t)fread(buffer, 1, size, fp);
 }
 
-int32_t fs_os_file_write(fs_file_t* file, const void* buffer, uint32_t size) {
+static int32_t fs_os_file_write(fs_file_t* file, const void* buffer, uint32_t size) {
   FILE* fp = (FILE*)(file->data);
 
   return fwrite(buffer, 1, size, fp);
 }
 
-int32_t fs_os_file_printf(fs_file_t* file, const char* const format_str, va_list vl) {
+static int32_t fs_os_file_printf(fs_file_t* file, const char* const format_str, va_list vl) {
   FILE* fp = (FILE*)(file->data);
 
   return vfprintf(fp, format_str, vl);
 }
 
-ret_t fs_os_file_seek(fs_file_t* file, int32_t offset) {
+static ret_t fs_os_file_seek(fs_file_t* file, int32_t offset) {
   FILE* fp = (FILE*)(file->data);
 
   return fseek(fp, offset, SEEK_SET) == 0 ? RET_OK : RET_FAIL;
 }
 
-ret_t fs_os_file_truncate(fs_file_t* file, int32_t size) {
+static int64_t fs_os_file_tell(fs_file_t* file) {
+  FILE* fp = (FILE*)(file->data);
+
+  return ftell(fp);
+}
+
+static int64_t fs_os_file_size(fs_file_t* file) {
+  fs_stat_info_t st;
+
+  if (fs_file_stat(file, &st) == RET_OK && st.is_reg_file) {
+    return st.size;
+  } else {
+    return -1;
+  }
+}
+
+static ret_t fs_os_file_stat(fs_file_t* file, fs_stat_info_t* fst) {
+  int rc = 0;
+  FILE* fp = (FILE*)(file->data);
+#if defined(WIN32) && !defined(MINGW)
+  struct _stat64i32 st;
+  rc = _fstat64i32(fileno(fp), &st);
+#else
+  struct stat st;
+  rc = fstat(fileno(fp), &st);
+#endif
+  if (rc == 0) {
+    return fs_stat_info_from_stat(fst, &st);
+  } else {
+    memset(fst, 0x00, sizeof(fs_stat_info_t));
+
+    return RET_FAIL;
+  }
+}
+
+static ret_t fs_os_file_sync(fs_file_t* file) {
+  FILE* fp = (FILE*)(file->data);
+#ifdef WIN32
+  return fflush(fp) == 0 ? RET_OK : RET_FAIL;
+#else
+  fflush(fp);
+  return fsync(fileno(fp)) == 0 ? RET_OK : RET_FAIL;
+#endif /*WIN32*/
+}
+
+static ret_t fs_os_file_truncate(fs_file_t* file, int32_t size) {
   FILE* fp = (FILE*)(file->data);
 
   return ftruncate(fileno(fp), size) == 0 ? RET_OK : RET_FAIL;
 }
 
-bool_t fs_os_file_eof(fs_file_t* file) {
+static bool_t fs_os_file_eof(fs_file_t* file) {
   FILE* fp = (FILE*)(file->data);
 
   return feof(fp) != 0;
 }
 
-ret_t fs_os_file_close(fs_file_t* file) {
+static ret_t fs_os_file_close(fs_file_t* file) {
   FILE* fp = (FILE*)(file->data);
   fclose(fp);
   TKMEM_FREE(file);
@@ -79,7 +154,7 @@ ret_t fs_os_file_close(fs_file_t* file) {
   return RET_OK;
 }
 
-ret_t fs_os_dir_rewind(fs_dir_t* dir) {
+static ret_t fs_os_dir_rewind(fs_dir_t* dir) {
   DIR* d = (DIR*)(dir->data);
 
   rewinddir(d);
@@ -87,7 +162,7 @@ ret_t fs_os_dir_rewind(fs_dir_t* dir) {
   return RET_OK;
 }
 
-ret_t fs_os_dir_read(fs_dir_t* dir, fs_item_t* item) {
+static ret_t fs_os_dir_read(fs_dir_t* dir, fs_item_t* item) {
   DIR* d = (DIR*)(dir->data);
   struct dirent* ent = readdir(d);
 
@@ -112,7 +187,7 @@ ret_t fs_os_dir_read(fs_dir_t* dir, fs_item_t* item) {
   }
 }
 
-ret_t fs_os_dir_close(fs_dir_t* dir) {
+static ret_t fs_os_dir_close(fs_dir_t* dir) {
   DIR* d = (DIR*)dir->data;
   closedir(d);
   TKMEM_FREE(dir);
@@ -120,19 +195,25 @@ ret_t fs_os_dir_close(fs_dir_t* dir) {
   return RET_OK;
 }
 
+static const fs_file_vtable_t s_file_vtable = {.read = fs_os_file_read,
+                                               .write = fs_os_file_write,
+                                               .printf = fs_os_file_printf,
+                                               .seek = fs_os_file_seek,
+                                               .tell = fs_os_file_tell,
+                                               .size = fs_os_file_size,
+                                               .stat = fs_os_file_stat,
+                                               .sync = fs_os_file_sync,
+                                               .truncate = fs_os_file_truncate,
+                                               .eof = fs_os_file_eof,
+                                               .close = fs_os_file_close};
+
 static fs_file_t* fs_file_create(FILE* fp) {
   fs_file_t* f = NULL;
   return_value_if_fail(fp != NULL, NULL);
 
   f = TKMEM_ZALLOC(fs_file_t);
   if (f != NULL) {
-    f->read = fs_os_file_read;
-    f->write = fs_os_file_write;
-    f->f_printf = fs_os_file_printf;
-    f->seek = fs_os_file_seek;
-    f->truncate = fs_os_file_truncate;
-    f->eof = fs_os_file_eof;
-    f->close = fs_os_file_close;
+    f->vt = &s_file_vtable;
     f->data = fp;
   } else {
     fclose(fp);
@@ -141,23 +222,13 @@ static fs_file_t* fs_file_create(FILE* fp) {
   return f;
 }
 
-fs_file_t* fs_os_open_file(fs_t* fs, const char* name, const char* mode) {
+static fs_file_t* fs_os_open_file(fs_t* fs, const char* name, const char* mode) {
   (void)fs;
   return_value_if_fail(name != NULL && mode != NULL, NULL);
 #ifdef WIN32
-  int16_t len = 0;
   fs_file_t* file = NULL;
-  wchar_t* w_name = NULL;
-  wchar_t* w_mode = NULL;
-
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
-  len = strlen(mode) + 1;
-  w_mode = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(mode, w_mode, len);
-
+  wchar_t* w_name = tk_wstr_dup_utf8(name);
+  wchar_t* w_mode = tk_wstr_dup_utf8(mode);
   file = fs_file_create(_wfopen(w_name, w_mode));
   TKMEM_FREE(w_name);
   TKMEM_FREE(w_mode);
@@ -167,18 +238,12 @@ fs_file_t* fs_os_open_file(fs_t* fs, const char* name, const char* mode) {
 #endif
 }
 
-ret_t fs_os_remove_file(fs_t* fs, const char* name) {
+static ret_t fs_os_remove_file(fs_t* fs, const char* name) {
   (void)fs;
   return_value_if_fail(name != NULL, RET_FAIL);
 
 #ifdef WIN32
-  int16_t len = 0;
-  wchar_t* w_name = NULL;
-
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
+  wchar_t* w_name = tk_wstr_dup_utf8(name);
   _wunlink(w_name);
   TKMEM_FREE(w_name);
 #else
@@ -187,65 +252,43 @@ ret_t fs_os_remove_file(fs_t* fs, const char* name) {
   return RET_OK;
 }
 
-bool_t fs_os_file_exist(fs_t* fs, const char* name) {
-  (void)fs;
+static bool_t fs_os_file_exist(fs_t* fs, const char* name) {
+  fs_stat_info_t st;
   return_value_if_fail(name != NULL, FALSE);
 
-#ifdef WIN32
-  bool_t rtn = FALSE;
-  int16_t len = 0;
-  wchar_t* w_name = NULL;
-  struct _stat64i32 st;
-
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
-  rtn = (_wstat(w_name, &st) == 0 && st.st_mode & S_IFREG);
-  TKMEM_FREE(w_name);
-  return rtn;
-#else
-  struct stat st;
-  return (stat(name, &st) == 0 && st.st_mode & S_IFREG);
-#endif
+  if (fs_stat(fs, name, &st) == RET_OK) {
+    return st.is_reg_file;
+  } else {
+    return FALSE;
+  }
 }
 
-bool_t fs_os_file_rename(fs_t* fs, const char* name, const char* new_name) {
+static ret_t fs_os_file_rename(fs_t* fs, const char* name, const char* new_name) {
   (void)fs;
-  return_value_if_fail(name != NULL && new_name != NULL, FALSE);
+  return_value_if_fail(name != NULL && new_name != NULL, RET_BAD_PARAMS);
 
 #ifdef WIN32
-  bool_t rtn = FALSE;
-  int16_t len = 0;
-  wchar_t* w_name = NULL;
-  wchar_t* w_new_name = NULL;
-
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
-  len = strlen(new_name) + 1;
-  w_new_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(new_name, w_new_name, len);
-
-  rtn = _wrename(w_name, w_new_name) == 0;
+  wchar_t* w_name = tk_wstr_dup_utf8(name);
+  wchar_t* w_new_name = tk_wstr_dup_utf8(new_name);
+  bool_t rtn = _wrename(w_name, w_new_name) == 0;
   TKMEM_FREE(w_name);
   TKMEM_FREE(w_new_name);
-  return rtn;
+  return rtn ? RET_OK : RET_FAIL;
 #else
-  return rename(name, new_name) == 0;
+  return rename(name, new_name) == 0 ? RET_OK : RET_FAIL;
 #endif
 }
 
-fs_dir_t* fs_dir_create(DIR* dir) {
+static const fs_dir_vtable_t s_dir_vtable = {
+    .read = fs_os_dir_read, .rewind = fs_os_dir_rewind, .close = fs_os_dir_close};
+
+static fs_dir_t* fs_dir_create(DIR* dir) {
   fs_dir_t* d = NULL;
   return_value_if_fail(dir != NULL, NULL);
 
   d = TKMEM_ZALLOC(fs_dir_t);
   if (d != NULL) {
-    d->read = fs_os_dir_read;
-    d->rewind = fs_os_dir_rewind;
-    d->close = fs_os_dir_close;
+    d->vt = &s_dir_vtable;
     d->data = dir;
   } else {
     closedir(dir);
@@ -254,34 +297,24 @@ fs_dir_t* fs_dir_create(DIR* dir) {
   return d;
 }
 
-fs_dir_t* fs_os_open_dir(fs_t* fs, const char* name) {
+static fs_dir_t* fs_os_open_dir(fs_t* fs, const char* name) {
   (void)fs;
   return_value_if_fail(name != NULL, NULL);
 #ifdef WIN32
-  int16_t len = 0;
-  wchar_t* w_name = NULL;
-  fs_dir_t* pDir = NULL;
-
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
-  pDir = fs_dir_create(opendir(w_name));
+  wchar_t* w_name = tk_wstr_dup_utf8(name);
+  fs_dir_t* dir = fs_dir_create(opendir(w_name));
   TKMEM_FREE(w_name);
-  return pDir;
+  return dir;
 #else
   return fs_dir_create(opendir(name));
 #endif
 }
 
-ret_t fs_os_remove_dir(fs_t* fs, const char* name) {
+static ret_t fs_os_remove_dir(fs_t* fs, const char* name) {
   (void)fs;
   return_value_if_fail(name != NULL, RET_FAIL);
 #if defined(WIN32)
-  wchar_t* w_name = NULL;
-  int16_t len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
+  wchar_t* w_name = tk_wstr_dup_utf8(name);
   int8_t ret = _wrmdir(w_name);
   TKMEM_FREE(w_name);
   if (ret == 0) {
@@ -295,14 +328,11 @@ ret_t fs_os_remove_dir(fs_t* fs, const char* name) {
   }
 }
 
-ret_t fs_os_create_dir(fs_t* fs, const char* name) {
+static ret_t fs_os_create_dir(fs_t* fs, const char* name) {
   (void)fs;
   return_value_if_fail(name != NULL, RET_FAIL);
 #if defined(WIN32)
-  wchar_t* w_name = NULL;
-  int16_t len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
+  wchar_t* w_name = tk_wstr_dup_utf8(name);
   int8_t ret = _wmkdir(w_name);
   TKMEM_FREE(w_name);
   if (ret == 0) {
@@ -316,65 +346,34 @@ ret_t fs_os_create_dir(fs_t* fs, const char* name) {
   }
 }
 
-bool_t fs_os_dir_exist(fs_t* fs, const char* name) {
-  (void)fs;
+static bool_t fs_os_dir_exist(fs_t* fs, const char* name) {
+  fs_stat_info_t st;
   return_value_if_fail(name != NULL, FALSE);
-#ifdef WIN32
-  struct _stat64i32 st;
-  bool_t rtn = FALSE;
-  int16_t len = 0;
-  wchar_t* w_name = NULL;
 
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
-  rtn = (_wstat(w_name, &st) == 0 && st.st_mode & S_IFDIR);
-  TKMEM_FREE(w_name);
-  return rtn;
-#else
-  struct stat st;
-  return (stat(name, &st) == 0 && st.st_mode & S_IFDIR);
-#endif
+  if (fs_stat(fs, name, &st) == RET_OK) {
+    return st.is_dir;
+  } else {
+    return FALSE;
+  }
 }
 
-bool_t fs_os_dir_rename(fs_t* fs, const char* name, const char* new_name) {
-  (void)fs;
-  (void)name;
-  (void)new_name;
-  assert(!"fs_os_dir_rename not supported yet");
-
-  return FALSE;
+static ret_t fs_os_dir_rename(fs_t* fs, const char* name, const char* new_name) {
+  return fs_os_file_rename(fs, name, new_name);
 }
 
-int32_t fs_os_get_file_size(fs_t* fs, const char* name) {
-  (void)fs;
-  return_value_if_fail(name != NULL, -1);
-#ifdef WIN32
-  struct _stat64i32 st;
-  bool_t rtn = FALSE;
-  int16_t len = 0;
-  wchar_t* w_name = NULL;
+static int32_t fs_os_get_file_size(fs_t* fs, const char* name) {
+  fs_stat_info_t st;
+  return_value_if_fail(name != NULL, FALSE);
 
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
-  int n = _wstat(w_name, &st);
-  rtn = n == 0;
-  TKMEM_FREE(w_name);
-  if (!rtn) {
+  if (fs_stat(fs, name, &st) == RET_OK && st.is_reg_file) {
+    return st.size;
+  } else {
     return -1;
   }
-  return st.st_size;
-#else
-  struct stat st;
-  return_value_if_fail(stat(name, &st) == 0, -1);
-  return st.st_size;
-#endif
 }
 
-ret_t fs_os_get_disk_info(fs_t* fs, const char* volume, int32_t* free_kb, int32_t* total_kb) {
+static ret_t fs_os_get_disk_info(fs_t* fs, const char* volume, int32_t* free_kb,
+                                 int32_t* total_kb) {
   /*TODO*/
   *free_kb = 0;
   *total_kb = 0;
@@ -384,7 +383,7 @@ ret_t fs_os_get_disk_info(fs_t* fs, const char* volume, int32_t* free_kb, int32_
   return RET_FAIL;
 }
 
-ret_t fs_os_get_exe(fs_t* fs, char path[MAX_PATH + 1]) {
+static ret_t fs_os_get_exe(fs_t* fs, char path[MAX_PATH + 1]) {
   uint32_t size = MAX_PATH;
   (void)fs;
 
@@ -409,7 +408,7 @@ ret_t fs_os_get_exe(fs_t* fs, char path[MAX_PATH + 1]) {
   return RET_OK;
 }
 
-ret_t fs_os_get_user_storage_path(fs_t* fs, char path[MAX_PATH + 1]) {
+static ret_t fs_os_get_user_storage_path(fs_t* fs, char path[MAX_PATH + 1]) {
 #if defined(ANDROID)
   const char* homedir = SDL_AndroidGetInternalStoragePath();
   memset(path, 0x00, MAX_PATH + 1);
@@ -433,7 +432,7 @@ ret_t fs_os_get_user_storage_path(fs_t* fs, char path[MAX_PATH + 1]) {
 #elif defined(WIN32)
   WCHAR homedir[MAX_PATH];
 
-  if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, homedir))) {
+  if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_LOCAL_APPDATA, NULL, 0, homedir))) {
     str_t str;
     str_init(&str, MAX_PATH);
     str_from_wstr(&str, homedir);
@@ -452,7 +451,10 @@ static ret_t fs_os_get_cwd(fs_t* fs, char path[MAX_PATH + 1]) {
 
   memset(path, 0x00, MAX_PATH + 1);
 #if defined(WIN32)
-  GetCurrentDirectory(MAX_PATH, path);
+  wchar_t wpath[MAX_PATH + 1];
+  memset(wpath, 0x00, sizeof(wpath));
+  _wgetcwd(wpath, MAX_PATH);
+  tk_utf8_from_utf16_ex(wpath, MAX_PATH, path, MAX_PATH);
 #else
   getcwd(path, MAX_PATH);
 #endif /*WIN32*/
@@ -460,21 +462,15 @@ static ret_t fs_os_get_cwd(fs_t* fs, char path[MAX_PATH + 1]) {
   return RET_OK;
 }
 
-ret_t fs_os_stat(fs_t* fs, const char* name, fs_stat_info_t* fst) {
+static ret_t fs_os_stat(fs_t* fs, const char* name, fs_stat_info_t* fst) {
   (void)fs;
   return_value_if_fail(name != NULL && fst != NULL, RET_BAD_PARAMS);
 
   int stat_ret = 0;
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(MINGW)
   struct _stat64i32 st;
-  int16_t len = 0;
-  wchar_t* w_name = NULL;
-
-  len = strlen(name) + 1;
-  w_name = (wchar_t*)TKMEM_ALLOC(len * 2);
-  tk_utf8_to_utf16(name, w_name, len);
-
+  wchar_t* w_name = tk_wstr_dup_utf8(name);
   stat_ret = _wstat(w_name, &st);
   TKMEM_FREE(w_name);
 #else
@@ -485,27 +481,8 @@ ret_t fs_os_stat(fs_t* fs, const char* name, fs_stat_info_t* fst) {
   if (stat_ret == -1) {
     return RET_FAIL;
   } else {
-    fst->dev = st.st_dev;
-    fst->ino = st.st_ino;
-    fst->mode = st.st_mode;
-    fst->nlink = st.st_nlink;
-    fst->uid = st.st_uid;
-    fst->gid = st.st_gid;
-    fst->rdev = st.st_rdev;
-    fst->size = st.st_size;
-    fst->atime = st.st_atime;
-    fst->mtime = st.st_mtime;
-    fst->ctime = st.st_ctime;
-    fst->is_dir = (st.st_mode & S_IFDIR) != 0;
-#ifdef S_IFLNK
-    fst->is_link = (st.st_mode & S_IFLNK) != 0;
-#else
-    fst->is_link = FALSE;
-#endif /*S_IFLNK*/
-    fst->is_reg_file = (st.st_mode & S_IFREG) != 0;
+    return fs_stat_info_from_stat(fst, &st);
   }
-
-  return RET_OK;
 }
 
 static const fs_t s_os_fs = {.open_file = fs_os_open_file,

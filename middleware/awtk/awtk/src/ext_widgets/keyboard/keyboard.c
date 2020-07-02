@@ -41,6 +41,7 @@ static const char* s_keyboard_properties[] = {WIDGET_PROP_ANIM_HINT, WIDGET_PROP
 static ret_t keyboard_on_destroy(widget_t* widget) {
   keyboard_t* keyboard = KEYBOARD(widget);
   return_value_if_fail(keyboard != NULL, RET_BAD_PARAMS);
+  input_method_off(input_method(), keyboard->action_info_id);
   darray_deinit(&(keyboard->action_buttons));
   str_reset(&(keyboard->temp));
 
@@ -48,11 +49,17 @@ static ret_t keyboard_on_destroy(widget_t* widget) {
 }
 
 static ret_t keyboard_on_event(widget_t* widget, event_t* e) {
+  keyboard_t* keyboard = KEYBOARD(widget);
   if (e->type == EVT_KEY_DOWN || e->type == EVT_KEY_UP) {
     key_event_t* evt = (key_event_t*)e;
     /*goto here only when grab_keys=true*/
-    if (e->type == EVT_KEY_UP) {
-      input_method_dispatch_key(input_method(), evt->key);
+    if (e->type == EVT_KEY_DOWN) {
+      keyboard->key_down = evt->key;
+    } else {
+      if (keyboard->key_down == evt->key) {
+        input_method_dispatch_key(input_method(), evt->key);
+        keyboard->key_down = 0;
+      }
     }
     return RET_STOP;
   }

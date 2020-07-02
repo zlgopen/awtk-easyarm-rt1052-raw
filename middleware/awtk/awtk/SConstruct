@@ -6,7 +6,7 @@ if awtk.TOOLS_NAME != '' :
   APP_TOOLS = [awtk.TOOLS_NAME]
 
 DefaultEnvironment(TOOLS = APP_TOOLS,
-  CCFLAGS = awtk.CCFLAGS,
+  CCFLAGS = awtk.AWTK_CCFLAGS,
   LIBS = awtk.LIBS,
   LIBPATH = awtk.LIBPATH,
   CPPPATH = awtk.CPPPATH,
@@ -25,6 +25,7 @@ SConscriptFiles=awtk.NANOVG_BACKEND_PROJS + [
   '3rd/lz4/SConscript',
   '3rd/miniz/SConscript',
   'src/SConscript',
+  'src/conf_io/SConscript',
   'src/streams/SConscript',
   'src/file_transfer/SConscript',
   'src/compressors/SConscript',
@@ -34,6 +35,7 @@ SConscriptFiles=awtk.NANOVG_BACKEND_PROJS + [
   'tools/font_gen/SConscript', 
   'tools/image_gen/SConscript', 
   'tools/image_resize/SConscript', 
+  'tools/image_dither/SConscript',
   'tools/res_gen/SConscript', 
   'tools/str_gen/SConscript', 
   'tools/ui_gen/qt_to_xml/SConscript',

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * File:   pthread_impl.c
  * Author: AWTK Develop Team
  * Brief:  pthread implemented thread related functions.
@@ -58,6 +58,12 @@ ret_t tk_mutex_lock(tk_mutex_t* mutex) {
   return_value_if_fail(mutex != NULL, RET_BAD_PARAMS);
 
   return pthread_mutex_lock(&(mutex->mutex)) == 0 ? RET_OK : RET_FAIL;
+}
+
+ret_t tk_mutex_try_lock(tk_mutex_t* mutex) {
+  return_value_if_fail(mutex != NULL, RET_BAD_PARAMS);
+
+  return pthread_mutex_trylock(&(mutex->mutex)) == 0 ? RET_OK : RET_FAIL;
 }
 
 ret_t tk_mutex_unlock(tk_mutex_t* mutex) {
@@ -358,5 +364,9 @@ ret_t tk_thread_destroy(tk_thread_t* thread) {
   TKMEM_FREE(thread);
 
   return RET_OK;
+}
+
+uint64_t tk_thread_self(void) {
+  return (uint64_t)pthread_self();
 }
 #endif /*HAS_PTHREAD*/

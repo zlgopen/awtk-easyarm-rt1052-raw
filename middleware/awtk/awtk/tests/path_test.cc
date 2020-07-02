@@ -66,6 +66,12 @@ TEST(Path, normalize) {
   ASSERT_EQ(path_normalize("/a/b", result, sizeof(result)), RET_OK);
   ASSERT_EQ(string(result), normalPath("/a/b"));
 
+  ASSERT_EQ(path_normalize("/a//b", result, sizeof(result)), RET_OK);
+  ASSERT_EQ(string(result), normalPath("/a/b"));
+
+  ASSERT_EQ(path_normalize("/a//./////././/b", result, sizeof(result)), RET_OK);
+  ASSERT_EQ(string(result), normalPath("/a/b"));
+
   ASSERT_EQ(path_normalize("/a/b.exe", result, sizeof(result)), RET_OK);
   ASSERT_EQ(string(result), normalPath("/a/b.exe"));
 
@@ -92,6 +98,21 @@ TEST(Path, normalize) {
 
   ASSERT_EQ(path_normalize("/a/b/../../c", result, sizeof(result)), RET_OK);
   ASSERT_EQ(string(result), normalPath("/c"));
+
+  ASSERT_EQ(path_normalize("/a/b/../", result, sizeof(result)), RET_OK);
+  ASSERT_EQ(string(result), normalPath("/a/"));
+
+  ASSERT_EQ(path_normalize("/a/b/..", result, sizeof(result)), RET_OK);
+  ASSERT_EQ(string(result), normalPath("/a/"));
+
+  ASSERT_EQ(path_normalize("/a/b/..\\", result, sizeof(result)), RET_OK);
+  ASSERT_EQ(string(result), normalPath("/a/"));
+
+  ASSERT_EQ(path_normalize("/a/b\\..", result, sizeof(result)), RET_OK);
+  ASSERT_EQ(string(result), normalPath("/a/"));
+
+  ASSERT_EQ(path_normalize("\\a\\b/../../c", result, sizeof(result)), RET_OK);
+  ASSERT_EQ(string(result), normalPath("/c"));
 }
 
 TEST(Path, build) {
@@ -115,16 +136,28 @@ TEST(Path, approot) {
   ASSERT_EQ(path_exist(result), TRUE);
 }
 
+static const char* normalize_path_str(char* str) {
+  char* p = str;
+  while (*p) {
+    if (*p == '\\') {
+      *p = '/';
+    }
+    p++;
+  }
+
+  return str;
+}
+
 TEST(Path, replace_basename) {
   const char* filename = "a/b/test.txt";
   char result[MAX_PATH + 1];
   ASSERT_EQ(path_replace_basename(result, sizeof(result), filename, "abc.txt"), RET_OK);
-  ASSERT_STREQ(result, "a/b/abc.txt");
+  ASSERT_STREQ(normalize_path_str(result), "a/b/abc.txt");
 }
 
 TEST(Path, replace_extname) {
   const char* filename = "a/b/test.txt";
   char result[MAX_PATH + 1];
   ASSERT_EQ(path_replace_extname(result, sizeof(result), filename, "abc"), RET_OK);
-  ASSERT_STREQ(result, "a/b/test.abc");
+  ASSERT_STREQ(normalize_path_str(result), "a/b/test.abc");
 }

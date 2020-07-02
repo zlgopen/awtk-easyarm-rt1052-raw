@@ -561,7 +561,7 @@ bitmap_t* bitmap_clone(bitmap_t* bitmap) {
   return b;
 }
 
-#if defined(WITH_STB_IMAGE) && defined(WITH_FS_RES)
+#if defined(WITH_STB_IMAGE) && defined(HAS_STDIO)
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_FREE TKMEM_FREE
@@ -576,14 +576,13 @@ bitmap_t* bitmap_rgba8888_from_bitmap(bitmap_t* bitmap) {
   uint32_t y = 0;
   bitmap_t* t = NULL;
   uint32_t* p = NULL;
-  uint32_t* tdata = NULL;
+  uint8_t* tdata = NULL;
   t = bitmap_create_ex(bitmap->w, bitmap->h, 0, BITMAP_FMT_RGBA8888);
   return_value_if_fail(t != NULL, FALSE);
 
-  tdata = (uint32_t*)bitmap_lock_buffer_for_write(t);
-  p = (uint32_t*)(tdata);
+  tdata = (uint8_t*)bitmap_lock_buffer_for_write(t);
   for (y = 0; y < bitmap->h; y++) {
-    p = (uint32_t*)((tdata) + y * t->line_length);
+    p = (uint32_t*)(tdata + (y * t->line_length));
     for (x = 0; x < bitmap->w; x++) {
       bitmap_get_pixel(bitmap, x, y, &(c.rgba));
       *p++ = c.color;
@@ -624,7 +623,7 @@ bool_t bitmap_save_png(bitmap_t* bitmap, const char* filename) {
   return FALSE;
 }
 
-#endif /*defined(WITH_STB_IMAGE) || defined(WITH_FS_RES)*/
+#endif /*defined(WITH_STB_IMAGE) || defined(HAS_STDIO)*/
 
 /*helper*/
 #define BIT_OFFSET(xx) (7 - ((xx) % 8))

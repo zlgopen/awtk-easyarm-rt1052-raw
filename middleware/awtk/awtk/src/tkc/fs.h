@@ -26,6 +26,57 @@
 
 BEGIN_C_DECLS
 
+/**
+ * @class fs_stat_info_t
+ *
+ * 文件状态信息。
+ *
+ */
+typedef struct _fs_stat_info_t {
+  uint32_t dev;
+  uint16_t ino;
+  uint16_t mode;
+  int16_t nlink;
+  int16_t uid;
+  int16_t gid;
+  uint32_t rdev;
+  /**
+   * @property {uint64_t} size
+   * 文件大小。
+   */
+  uint64_t size;
+  /**
+   * @property {uint64_t} atime
+   * 最后访问时间。
+   */
+  uint64_t atime;
+  /**
+   * @property {uint64_t} mtime
+   * 最后修改时间。
+   */
+  uint64_t mtime;
+  /**
+   * @property {uint64_t} ctime
+   * 创建时间。
+   */
+  uint64_t ctime;
+  /**
+   * @property {bool_t} is_dir
+   * 是否为目录。
+   */
+  bool_t is_dir;
+  /**
+   * @property {bool_t} is_link
+   * 是否为链接。
+   */
+  bool_t is_link;
+  /**
+   * @property {bool_t} is_reg_file
+   * 是否普通文件。
+   */
+  bool_t is_reg_file;
+} fs_stat_info_t;
+
 struct _fs_file_t;
 typedef struct _fs_file_t fs_file_t;
 
@@ -35,6 +86,10 @@ typedef int32_t (*fs_printf_t)(fs_file_t* file, const char* const format_str, va
 typedef ret_t (*fs_file_seek_t)(fs_file_t* file, int32_t offset);
 typedef ret_t (*fs_file_truncate_t)(fs_file_t* file, int32_t offset);
 typedef bool_t (*fs_file_eof_t)(fs_file_t* file);
+typedef int64_t (*fs_file_tell_t)(fs_file_t* file);
+typedef int64_t (*fs_file_size_t)(fs_file_t* file);
+typedef ret_t (*fs_file_stat_t)(fs_file_t* file, fs_stat_info_t* fst);
+typedef ret_t (*fs_file_sync_t)(fs_file_t* file);
 typedef ret_t (*fs_file_close_t)(fs_file_t* file);
 
 /**
@@ -59,39 +114,24 @@ typedef ret_t (*fs_file_close_t)(fs_file_t* file);
  * ```
  *
  */
-struct _fs_file_t {
+typedef struct _fs_file_vtable_t {
   fs_file_read_t read;
   fs_file_write_t write;
-  fs_printf_t f_printf;
+  fs_printf_t printf;
   fs_file_seek_t seek;
   fs_file_truncate_t truncate;
   fs_file_eof_t eof;
+  fs_file_tell_t tell;
+  fs_file_size_t size;
+  fs_file_sync_t sync;
+  fs_file_stat_t stat;
   fs_file_close_t close;
+} fs_file_vtable_t;
+
+struct _fs_file_t {
+  const fs_file_vtable_t* vt;
   void* data;
 };
-
-/**
- * @class fs_t
- *
- * 文件状态信息。
- *
- */
-typedef struct _fs_stat_info_t {
-  uint32_t dev;
-  uint16_t ino;
-  uint16_t mode;
-  int16_t nlink;
-  int16_t uid;
-  int16_t gid;
-  uint32_t rdev;
-  uint64_t size;
-  uint64_t atime;
-  uint64_t mtime;
-  uint64_t ctime;
-  bool_t is_dir;
-  bool_t is_link;
-  bool_t is_reg_file;
-} fs_stat_info_t;
 
 /**
  * @method fs_file_read
@@ -166,6 +206,29 @@ ret_t fs_file_truncate(fs_file_t* file, int32_t offset);
 ret_t fs_file_close(fs_file_t* file);
 
 /**
+ * @method fs_file_sync
+ *
+ * 同步文件到磁盘。
+ *
+ * @param {fs_file_t*} file 文件对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_file_sync(fs_file_t* file);
+
+/**
+ * @method fs_file_stat
+ *
+ * 获取文件信息。
+ *
+ * @param {fs_file_t*} file 文件对象。
+ * @param {fs_stat_info_t*} fst 文件状态信息。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_file_stat(fs_file_t* file, fs_stat_info_t* fst);
+
+/**
  * @method fs_file_eof
  *
  * 判断文件是否结束。
@@ -175,6 +238,28 @@ ret_t fs_file_close(fs_file_t* file);
  * @return {bool_t} 返回TRUE表示结束，否则表示没结束。
  */
 bool_t fs_file_eof(fs_file_t* file);
+
+/**
+ * @method fs_file_tell
+ *
+ * 获取文件当前读写位置。
+ *
+ * @param {fs_file_t*} file 文件对象。
+ *
+ * @return {int64_t} 返回文件当前读写位置。
+ */
+int64_t fs_file_tell(fs_file_t* file);
+
+/**
+ * @method fs_file_size
+ *
+ * 获取文件大小。
+ *
+ * @param {fs_file_t*} file 文件对象。
+ *
+ * @return {int64_t} 返回文件大小。
+ */
+int64_t fs_file_size(fs_file_t* file);
 
 /**
  * @class fs_item_t
@@ -220,10 +305,15 @@ typedef ret_t (*fs_dir_close_t)(fs_dir_t* dir);
  * 文件夹接口。
  *
  */
-struct _fs_dir_t {
+typedef struct _fs_dir_vtable_t {
   fs_dir_rewind_t rewind;
   fs_dir_read_t read;
   fs_dir_close_t close;
+  void* data;
+} fs_dir_vtable_t;
+
+struct _fs_dir_t {
+  const fs_dir_vtable_t* vt;
   void* data;
 };
 
@@ -267,13 +357,13 @@ typedef struct _fs_t fs_t;
 typedef fs_file_t* (*fs_open_file_t)(fs_t* fs, const char* name, const char* mode);
 typedef ret_t (*fs_remove_file_t)(fs_t* fs, const char* name);
 typedef bool_t (*fs_file_exist_t)(fs_t* fs, const char* name);
-typedef bool_t (*fs_file_rename_t)(fs_t* fs, const char* name, const char* new_name);
+typedef ret_t (*fs_file_rename_t)(fs_t* fs, const char* name, const char* new_name);
 
 typedef fs_dir_t* (*fs_open_dir_t)(fs_t* fs, const char* name);
 typedef ret_t (*fs_remove_dir_t)(fs_t* fs, const char* name);
 typedef ret_t (*fs_create_dir_t)(fs_t* fs, const char* name);
 typedef bool_t (*fs_dir_exist_t)(fs_t* fs, const char* name);
-typedef bool_t (*fs_dir_rename_t)(fs_t* fs, const char* name, const char* new_name);
+typedef ret_t (*fs_dir_rename_t)(fs_t* fs, const char* name, const char* new_name);
 
 typedef int32_t (*fs_get_file_size_t)(fs_t* fs, const char* name);
 typedef ret_t (*fs_get_disk_info_t)(fs_t* fs, const char* volume, int32_t* free_kb,
@@ -355,9 +445,9 @@ bool_t fs_file_exist(fs_t* fs, const char* name);
  * @param {const char*} name 旧文件名。
  * @param {const char*} new_name 新文件名。
  *
- * @return {ret_t} 返回TRUE表示成功，否则表示失败。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-bool_t fs_file_rename(fs_t* fs, const char* name, const char* new_name);
+ret_t fs_file_rename(fs_t* fs, const char* name, const char* new_name);
 
 /**
  * @method fs_open_dir
@@ -416,9 +506,9 @@ bool_t fs_dir_exist(fs_t* fs, const char* name);
  * @param {const char*} name 旧目录名称。
  * @param {const char*} new_name 新目录名称。
  *
- * @return {ret_t} 返回TRUE表示成功，否则表示失败。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-bool_t fs_dir_rename(fs_t* fs, const char* name, const char* new_name);
+ret_t fs_dir_rename(fs_t* fs, const char* name, const char* new_name);
 
 /**
  * @method fs_get_file_size
@@ -576,6 +666,11 @@ int32_t file_read_part(const char* name, void* buff, uint32_t size, uint32_t off
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t file_write(const char* name, const void* buff, uint32_t size);
+
+/*basic function test*/
+ret_t fs_test(fs_t* fs);
+ret_t fs_test_file(fs_t* fs);
+ret_t fs_test_dir(fs_t* fs);
 
 END_C_DECLS
 

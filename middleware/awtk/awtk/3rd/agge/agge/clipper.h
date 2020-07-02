@@ -62,7 +62,16 @@ namespace agge
 	template <typename T>
 	inline clipper<T>::clipper()
 		: _enabled(false)
-	{	}
+	{	
+	  this->_x1 = 0;
+	  this->_y1 = 0;
+	  this->_f1 = 0;
+
+	  this->_window.x1 = 0;
+	  this->_window.x2 = 0;
+	  this->_window.y1 = 0;
+	  this->_window.y2 = 0;
+	}
 
 	template <typename T>
 	inline void clipper<T>::reset()

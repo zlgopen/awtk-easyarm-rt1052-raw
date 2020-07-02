@@ -30,6 +30,7 @@ ret_t rtos_init(void);
 ret_t rtos_start(void);
 void rtos_tick(void);
 void rtos_delay(uint32_t ms);
+bool_t rtos_is_running(void);
 
 END_C_DECLS
 

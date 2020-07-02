@@ -562,6 +562,67 @@ float_t object_get_prop_float_by_path(object_t* obj, const char* path, float_t d
     (obj) = NULL;                   \
   }
 
+/**
+ * @enum object_cmd_t
+ * @annotation ["scriptable", "string"]
+ * @prefix OBJECT_CMD_
+ * 对象常见命令定义
+ */
+
+/**
+ * @const OBJECT_CMD_SAVE
+ * 保存命令
+ */
+#define OBJECT_CMD_SAVE "save"
+
+/**
+ * @const OBJECT_CMD_RELOAD
+ * 重新加载命令
+ */
+#define OBJECT_CMD_RELOAD "reload"
+
+/**
+ * @const OBJECT_CMD_MOVE_UP
+ * 和前一个属性交换位置
+ *>参数为属性的名称或路径。
+ */
+#define OBJECT_CMD_MOVE_UP "move_up"
+
+/**
+ * @const OBJECT_CMD_MOVE_DOWN
+ * 和后一个属性交换位置
+ *>参数为属性的名称或路径。
+ */
+#define OBJECT_CMD_MOVE_DOWN "move_down"
+
+/**
+ * @const OBJECT_CMD_REMOVE
+ * 删除属性。
+ *>参数为属性的名称或路径。
+ */
+#define OBJECT_CMD_REMOVE "remove"
+
+/**
+ * @const OBJECT_CMD_CLEAR
+ * 清除全部属性。
+ *>参数为属性的名称或路径。
+ */
+#define OBJECT_CMD_CLEAR "clear"
+
+/**
+ * @const OBJECT_CMD_ADD
+ * 增加子项。
+ *>参数为属性的名称或路径。
+ */
+#define OBJECT_CMD_ADD "add"
+
+/**
+ * @const OBJECT_CMD_EDIT
+ * 编辑子项。
+ *>参数为属性的名称或路径。
+ */
+#define OBJECT_CMD_EDIT "edit"
+
 END_C_DECLS
 
 #endif /*TK_OBJECT_H*/

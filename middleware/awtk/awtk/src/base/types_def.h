@@ -267,10 +267,6 @@ typedef struct _widget_animator_t widget_animator_t;
 
 #define TK_LONG_PRESS_TIME 1000
 
-#if defined(WITH_SDL) || defined(LINUX) || defined(AWTK_WEB)
-#define WITH_WIDGET_TYPE_CHECK 1
-#endif /*WITH_SDL || defined(LINUX)*/
-
 #ifdef WITH_WIDGET_TYPE_CHECK
 #define TK_REF_VTABLE(vt) &(g_##vt##_vtable)
 #define TK_PARENT_VTABLE(vt) TK_REF_VTABLE(vt)
@@ -320,6 +316,10 @@ typedef struct _system_info_t system_info_t;
 #endif /*WITH_SDL*/
 
 #endif /*TK_GLYPH_CACHE_NR*/
+
+#if TK_GLYPH_CACHE_NR <= 0
+#error " TK_GLYPH_CACHE_NR must > 0 "
+#endif
 
 #if defined(WITH_STB_FONT) || defined(WITH_FT_FONT)
 #define WITH_TRUETYPE_FONT 1
@@ -448,6 +448,12 @@ typedef enum _bitmap_flag_t {
 #ifndef BITMAP_ALIGN_SIZE
 #define BITMAP_ALIGN_SIZE 32
 #endif /*BITMAP_ALIGN_SIZE*/
+
+#ifndef WITH_ASSET_LOADER
+#ifdef WITH_FS_RES
+#define WITH_ASSET_LOADER 1
+#endif /*WITH_FS_RES*/
+#endif /*WITH_ASSET_LOADER*/
 
 struct _bitmap_t;
 typedef struct _bitmap_t bitmap_t;

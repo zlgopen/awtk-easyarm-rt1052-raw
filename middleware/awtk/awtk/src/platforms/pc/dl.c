@@ -63,15 +63,16 @@ ret_t tk_dl_close(tk_dl_t* dl) {
 
 #elif defined(WIN32)
 struct _tk_dl_t {
-  HANDLE* h;
+  HMODULE h;
 };
 
 tk_dl_t* tk_dl_open(const char* filename) {
-  void* h = NULL;
+  HMODULE h = NULL;
   tk_dl_t* dl = NULL;
   return_value_if_fail(filename != NULL, NULL);
-
-  h = LoadLibraryA(filename);
+  wchar_t* w_file_name = tk_wstr_dup_utf8(filename);
+  h = LoadLibraryW(w_file_name);
+  TKMEM_FREE(w_file_name);
   return_value_if_fail(h != NULL, NULL);
 
   dl = TKMEM_ZALLOC(tk_dl_t);

@@ -76,6 +76,17 @@ TEST(Edit, set_int) {
   widget_destroy(b);
 }
 
+TEST(Edit, action_text) {
+  widget_t* b = edit_create(NULL, 10, 20, 30, 40);
+
+  ASSERT_STREQ(EDIT(b)->action_text, "done");
+  ASSERT_EQ(widget_set_prop_str(b, WIDGET_PROP_ACTION_TEXT, "next"), RET_OK);
+  ASSERT_STREQ(EDIT(b)->action_text, "next");
+  ASSERT_STREQ(widget_get_prop_str(b, WIDGET_PROP_ACTION_TEXT, ""), "next");
+
+  widget_destroy(b);
+}
+
 TEST(Edit, inputable) {
   widget_t* b = edit_create(NULL, 10, 20, 30, 40);
   ASSERT_EQ(b->vt->inputable, TRUE);
@@ -462,4 +473,31 @@ TEST(Edit, clone) {
 
   widget_destroy(w1);
   widget_destroy(w2);
+}
+
+TEST(Edit, value) {
+  value_t v;
+  widget_t* w1 = edit_create(NULL, 10, 20, 30, 40);
+  widget_set_text(w1, L"123");
+  edit_set_input_type(w1, INPUT_INT);
+  ASSERT_EQ(widget_get_prop(w1, WIDGET_PROP_VALUE, &v), RET_OK);
+  ASSERT_EQ(v.type, VALUE_TYPE_INT32);
+  ASSERT_EQ(value_int(&v), 123);
+
+  edit_set_input_type(w1, INPUT_UINT);
+  ASSERT_EQ(widget_get_prop(w1, WIDGET_PROP_VALUE, &v), RET_OK);
+  ASSERT_EQ(v.type, VALUE_TYPE_UINT32);
+  ASSERT_EQ(value_int(&v), 123);
+
+  edit_set_input_type(w1, INPUT_FLOAT);
+  ASSERT_EQ(widget_get_prop(w1, WIDGET_PROP_VALUE, &v), RET_OK);
+  ASSERT_EQ(v.type, VALUE_TYPE_DOUBLE);
+  ASSERT_EQ(value_int(&v), 123);
+
+  edit_set_input_type(w1, INPUT_UFLOAT);
+  ASSERT_EQ(widget_get_prop(w1, WIDGET_PROP_VALUE, &v), RET_OK);
+  ASSERT_EQ(v.type, VALUE_TYPE_DOUBLE);
+  ASSERT_EQ(value_int(&v), 123);
+
+  widget_destroy(w1);
 }

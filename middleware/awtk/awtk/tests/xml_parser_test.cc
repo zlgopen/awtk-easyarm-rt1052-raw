@@ -31,6 +31,10 @@ static void xml_gen_on_end(XmlBuilder* thiz, const char* tag) {
   return;
 }
 
+static void xml_gen_on_error(XmlBuilder* thiz, int line, int row, const char* message) {
+  log_debug("%d:%d %s\n", line, row, message);
+}
+
 static void xml_gen_on_text(XmlBuilder* thiz, const char* text, size_t length) {
   char str[1024];
   assert(length < sizeof(str));
@@ -51,6 +55,7 @@ static XmlBuilder* builder_init(XmlBuilder& b) {
   b.on_start = xml_gen_on_start;
   b.on_end = xml_gen_on_end;
   b.on_text = xml_gen_on_text;
+  b.on_error = xml_gen_on_error;
   b.destroy = xml_gen_destroy;
 
   return &(b);
@@ -132,6 +137,26 @@ TEST(XmlParser, max_attrs) {
               "a9=\"9\" a10=\"10\" a11=\"11\" a12=\"12\" a13=\"13\" a14=\"14\" a15=\"15\" "
               "a16=\"16\" a17=\"17\" a18=\"18\" a19=\"19\" a20=\"20\" a21=\"21\" a22=\"22\" "
               "a23=\"23\" a24=\"24\" ></test>");
+
+  xml_parser_destroy(p);
+}
+
+TEST(XmlParser, space1) {
+  XmlBuilder b;
+  XmlParser* p = xml_parser_create();
+  xml_parser_set_builder(p, builder_init(b));
+
+  test_str_ex(p, "<test a1=\" 1 \" ></test>", "<test a1=\" 1 \" ></test>");
+
+  xml_parser_destroy(p);
+}
+
+TEST(XmlParser, space2) {
+  XmlBuilder b;
+  XmlParser* p = xml_parser_create();
+  xml_parser_set_builder(p, builder_init(b));
+
+  test_str_ex(p, "< test a1 =\" 1 \"></ test >", "<test a1=\" 1 \" ></test>");
 
   xml_parser_destroy(p);
 }

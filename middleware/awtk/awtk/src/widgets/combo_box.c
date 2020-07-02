@@ -253,7 +253,7 @@ static ret_t combo_box_on_key_event(widget_t* widget, key_event_t* evt) {
     if (edit->readonly) {
       ret = RET_STOP;
       combo_box_active(widget);
-    } else if (evt->key == TK_KEY_RETURN) {
+    } else if (key_code_is_enter(evt->key)) {
       ret = RET_STOP;
       combo_box_active(widget);
     }
@@ -335,6 +335,7 @@ TK_DECL_VTABLE(combo_box) = {.size = sizeof(combo_box_t),
                              .inputable = TRUE,
                              .type = WIDGET_TYPE_COMBO_BOX,
                              .focusable = TRUE,
+                             .pointer_cursor = WIDGET_CURSOR_EDIT,
                              .space_key_to_activate = TRUE,
                              .return_key_to_activate = TRUE,
                              .clone_properties = s_combo_box_properties,

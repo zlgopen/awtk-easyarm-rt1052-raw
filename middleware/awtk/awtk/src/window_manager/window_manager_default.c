@@ -128,6 +128,7 @@ ret_t window_manager_default_snap_curr_window(widget_t* widget, widget_t* curr_w
   return_value_if_fail(wm != NULL && curr_win != NULL, RET_BAD_PARAMS);
 
   c = native_window_get_canvas(wm->native_window);
+  window_manager_check_and_layout(widget);
 
 #ifdef WITH_NANOVG_GPU
   vg = lcd_get_vgcanvas(c->lcd);
@@ -153,11 +154,10 @@ ret_t window_manager_default_snap_curr_window(widget_t* widget, widget_t* curr_w
 
 ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_win, bitmap_t* img,
                                               framebuffer_object_t* fbo, bool_t auto_rotate) {
+  rect_t r = {0};
   canvas_t* c = NULL;
 #ifdef WITH_NANOVG_GPU
   vgcanvas_t* vg = NULL;
-#else
-  rect_t r = {0};
 #endif /*WITH_NANOVG_GPU*/
 
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
@@ -169,6 +169,7 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
 
   c = native_window_get_canvas(wm->native_window);
   dialog_highlighter = wm->dialog_highlighter;
+  window_manager_check_and_layout(widget);
 
   WIDGET_FOR_EACH_CHILD_BEGIN_R(widget, iter, i)
   if (iter == prev_win) {
@@ -178,11 +179,13 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
   }
   WIDGET_FOR_EACH_CHILD_END()
 
+  r = rect_init(prev_win->x, prev_win->y, prev_win->w, prev_win->h);
+
 #ifdef WITH_NANOVG_GPU
   vg = lcd_get_vgcanvas(c->lcd);
   ENSURE(vgcanvas_create_fbo(vg, fbo) == RET_OK);
   ENSURE(vgcanvas_bind_fbo(vg, fbo) == RET_OK);
-  canvas_set_clip_rect(c, NULL);
+  canvas_set_clip_rect(c, &r);
   ENSURE(widget_on_paint_background(widget, c) == RET_OK);
   window_manager_paint_system_bar(widget, c);
   {
@@ -203,7 +206,6 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
   ENSURE(vgcanvas_unbind_fbo(vg, fbo) == RET_OK);
   fbo_to_img(fbo, img);
 #else
-  r = rect_init(prev_win->x, prev_win->y, prev_win->w, prev_win->h);
   ENSURE(canvas_begin_frame(c, &r, LCD_DRAW_OFFLINE) == RET_OK);
   canvas_set_clip_rect(c, &r);
   ENSURE(widget_on_paint_background(widget, c) == RET_OK);
@@ -229,6 +231,7 @@ ret_t window_manager_default_snap_prev_window(widget_t* widget, widget_t* prev_w
 
   if (dialog_highlighter != NULL) {
     dialog_highlighter_set_bg(dialog_highlighter, img, fbo);
+    dialog_highlighter_set_bg_clip_rect(dialog_highlighter, &r);
   }
   wm->curr_win = NULL;
   return RET_OK;
@@ -367,6 +370,7 @@ static ret_t on_idle_invalidate(const timer_info_t* info) {
 static ret_t window_manager_check_if_need_open_animation(const idle_info_t* info) {
   widget_t* curr_win = WIDGET(info->ctx);
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(curr_win->parent);
+  return_value_if_fail(wm != NULL, RET_BAD_PARAMS);
 
   window_manager_dispatch_window_event(curr_win, EVT_WINDOW_WILL_OPEN);
   wm->ready_animator = FALSE;
@@ -463,10 +467,6 @@ static ret_t window_manager_idle_destroy_window(const idle_info_t* info) {
   widget_t* win = WIDGET(info->ctx);
   widget_destroy(win);
 
-#ifdef ENABLE_MEM_LEAK_CHECK
-  tk_mem_dump();
-#endif /*ENABLE_MEM_LEAK_CHECK*/
-
   return RET_OK;
 }
 
@@ -553,7 +553,7 @@ static ret_t window_manager_paint_cursor(widget_t* widget, canvas_t* c) {
   bitmap_t bitmap;
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
 
-  if (wm->cursor != NULL) {
+  if (wm->r_cursor.w > 0 && wm->r_cursor.h > 0) {
     return_value_if_fail(image_manager_get_bitmap(image_manager(), wm->cursor, &bitmap) == RET_OK,
                          RET_BAD_PARAMS);
     canvas_draw_icon(c, &bitmap, wm->r_cursor.x, wm->r_cursor.y);
@@ -567,7 +567,7 @@ static ret_t window_manager_update_cursor(widget_t* widget, int32_t x, int32_t y
   uint32_t w = wm->r_cursor.w;
   uint32_t h = wm->r_cursor.h;
 
-  if (wm->cursor != NULL && w > 0 && h > 0) {
+  if (w > 0 && h > 0) {
     uint32_t hw = w >> 1;
     uint32_t hh = h >> 1;
     int32_t oldx = wm->r_cursor.x;
@@ -889,6 +889,10 @@ static ret_t window_manager_default_on_remove_child(widget_t* widget, widget_t* 
     widget_invalidate(top, &r);
   }
 
+  if (widget->destroying) {
+    widget_off_by_ctx(window, widget);
+  }
+
   return RET_FAIL;
 }
 
@@ -896,7 +900,7 @@ static ret_t window_manager_default_get_prop(widget_t* widget, const char* name,
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
   return_value_if_fail(widget != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
-  if (tk_str_eq(name, WIDGET_PROP_CURSOR)) {
+  if (tk_str_eq(name, WIDGET_PROP_POINTER_CURSOR)) {
     value_set_str(v, wm->cursor);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_CANVAS)) {
@@ -911,7 +915,7 @@ static ret_t window_manager_default_get_prop(widget_t* widget, const char* name,
 static ret_t window_manager_default_set_prop(widget_t* widget, const char* name, const value_t* v) {
   return_value_if_fail(widget != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
 
-  if (tk_str_eq(name, WIDGET_PROP_CURSOR)) {
+  if (tk_str_eq(name, WIDGET_PROP_POINTER_CURSOR)) {
     return window_manager_set_cursor(widget, value_str(v));
   }
 
@@ -931,7 +935,6 @@ static ret_t window_manager_default_on_destroy(widget_t* widget) {
 #endif /*WITH_WINDOW_ANIMATORS*/
 
   object_unref(OBJECT(wm->native_window));
-  TKMEM_FREE(wm->cursor);
 
   return RET_OK;
 }
@@ -1181,16 +1184,29 @@ static ret_t window_manager_default_set_cursor(widget_t* widget, const char* cur
   window_manager_default_t* wm = WINDOW_MANAGER_DEFAULT(widget);
   return_value_if_fail(wm != NULL, RET_BAD_PARAMS);
 
-  TKMEM_FREE(wm->cursor);
-  if (cursor != NULL) {
-    bitmap_t bitmap;
-    wm->cursor = tk_str_copy(wm->cursor, cursor);
-
-    return_value_if_fail(image_manager_get_bitmap(image_manager(), cursor, &bitmap) == RET_OK,
-                         RET_BAD_PARAMS);
-    wm->r_cursor.w = bitmap.w;
-    wm->r_cursor.h = bitmap.h;
+#if defined(ENABLE_CURSOR)
+  if (tk_str_eq(cursor, wm->cursor)) {
+    return RET_OK;
   }
+
+  tk_strncpy(wm->cursor, cursor, TK_NAME_LEN);
+  if (cursor != NULL && *cursor) {
+    bitmap_t bitmap;
+    bitmap_t* img = NULL;
+
+    if (image_manager_get_bitmap(image_manager(), cursor, &bitmap) == RET_OK) {
+      img = &bitmap;
+    }
+
+    if (native_window_set_cursor(wm->native_window, cursor, img) != RET_OK) {
+      wm->r_cursor.w = bitmap.w;
+      wm->r_cursor.h = bitmap.h;
+    } else {
+      wm->r_cursor.w = 0;
+      wm->r_cursor.h = 0;
+    }
+  }
+#endif /*ENABLE_CURSOR*/
 
   return RET_OK;
 }

@@ -103,6 +103,18 @@ int32_t tk_str_icmp(const char* a, const char* b);
 int tk_watoi(const wchar_t* str);
 
 /**
+ * @method tk_watoi_n
+ *
+ * 将宽字符串转换为整形。
+ *
+ * @param {const wchar_t*} str 要转换为整形的宽字符串。
+ * @param {uint32_t} len 字符串长度。
+ *
+ * @return {int} 返回转换后的整形。
+ */
+int tk_watoi_n(const wchar_t* str, uint32_t len);
+
+/**
  * @method tk_watob
  *
  * 将宽字符串转换为布尔类型。
@@ -328,8 +340,17 @@ ret_t filename_to_name_ex(const char* filename, char* str, uint32_t size, bool_t
  */
 ret_t xml_file_expand_read(const char* filename, str_t* s);
 
-/*XXX:
- * 本函数仅供内部使用，可以提高速度，但使用不当极度危险。它要求dst为NULL或内存块的首地址，本函数调用之后，dst可能无效，请保留返回的地址*/
+/**
+ * @method tk_str_copy
+ *
+ * 字符串拷贝函数。
+ * > XXX: 要求dst为NULL或内存块的首地址，本函数调用之后，dst可能无效，请保留返回的地址
+ *
+ * @param {const char*} dst 目标字符串。
+ * @param {const char*} src 源字符串。
+ *
+ * @return {char*} 返回指向的复制字符串指针，如果失败则返回NULL。
+ */
 char* tk_str_copy(char* dst, const char* src);
 
 ret_t dummy_destroy(void* data);
@@ -377,6 +398,29 @@ char* tk_str_toupper(char* str);
  * @return {char*} 返回转换后的小写字母字符串。
  */
 char* tk_str_tolower(char* str);
+
+/**
+ * @method tk_wstr_dup_utf8
+ *
+ * 将utf8字符串拷贝为UCS字符串。
+ *
+ * @param {char*} str utf8编码的字符串。
+ *
+ * @return {wchar_t*} 返回UCS字符串(需要调用TKMEM_FREE释放)。
+ */
+wchar_t* tk_wstr_dup_utf8(const char* str);
+
+/**
+ * @method tk_wstr_count_c
+ *
+ * 统计UCS字符串中某个字符出现的次数。
+ *
+ * @param {const wchar_t*} str 字符串。
+ * @param {wchar_t} c 字符。
+ *
+ * @return {uint32_t} 返回字符出现的次数。
+ */
+uint32_t tk_wstr_count_c(const wchar_t* str, wchar_t c);
 
 const char* tk_normalize_key_name(const char* name, char fixed_name[TK_NAME_LEN + 1]);
 
