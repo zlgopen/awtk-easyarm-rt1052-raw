@@ -1,12 +1,85 @@
 # 最新动态
+* 2020/07/16
+  * 完善 bidi 文档。
+  * 修改 mem pool 内存对齐的问题（感谢 imxood 提供补丁）
+
+* 2020/07/15
+  * 完善 app conf 文档。
+
+* 2020/07/14
+  * 修复 gles 的贴图旋转关闭抗锯齿的后导致效果问题（感谢智明提供补丁）
+
+* 2020/07/13
+  * 完善 API 注释（感谢尧燊提供补丁）
+
+* 2020/07/12
+  * 完善 date\_time：增加 date\_time\_get\_month\_name 和 date\_time\_get\_wday\_name。
+  * 增加 [日期选择控件](https://github.com/zlgopen/awtk-widget-date-picker)。
+
+* 2020/07/11
+  * 完善 bidi，widget 支持 bidi 属性。
+  * 完善 hscroll_label 对 bidi 的支持。
+  * 完善 slide view indicator（感谢朝泽提供补丁）。 
+
+* 2020/07/10
+  * 完善 tokenizer。
+  * 完善表达式，增加 iformat/fformat 函数。
+  * 完善资源管理器（感谢俊杰提供补丁）。
+  * 增加离线 canvas（感谢智明提供补丁）。
+
+* 2020/07/09
+  * 基本控件的文本支持双向排版 (Unicode Bidirectional Algorithm)
+  * 完善 font、image 和字符串工具（感谢大恒提供补丁）
+  * 完善 native windows 销毁 lcd 对象。
+  * 完善 expr 支持浮点数和整数格式化。
+   
+* 2020/07/08
+  * 完善软键盘关闭流程。
+  * 完善 stb 预乘处理（感谢智明提供补丁）。
+  * 完善对无效 bitmap 对处理（感谢智明提供补丁）。
+  * 完善字体、主题、字符串和 UI 生成工具（感谢大恒提供补丁）
+  * date time 中增加函数 date\_time\_is\_leap、date\_time\_get\_days 和 date\_time\_get\_wday。
+
+* 2020/07/07
+  * 完善资源生成脚本（感谢朝泽提供补丁）。
+  * 增加 [mvvm 在 stm32](https://github.com/zlgopen/awtk-stm32h743iitx-mvvms) 上的移植。
+  
+* 2020/07/06
+  * 支持图片预乘功能（感谢智明提供补丁）。
+  * 完善 demoui（感谢俊杰提供补丁）。
+  * 完善 xml to ui 工具（感谢俊杰提供补丁）。
+  
+* 2020/07/04-06
+  *增加代码 [编辑控件](https://github.com/zlgopen/awtk-widget-code-edit)。
+
+* 2020/07/03
+  * 完善 graphic\_buffer\_default
+  * 完善焦点快捷键的处理。支持 shift+tab 向后切换焦点。 
+  
+* 2020/07/02
+  * 完善 graphic\_buffer\_default
+  * 增加 tk\_mem\_is\_valid\_addr
+  * 完善 edit 注释（感谢俊杰提供补丁）。
+   *  gif 隐藏后不再刷新。 
+  * 完善 ui loader（感谢 dog2nd_Zhao 提供补丁）。
+
+* 2020/06/30
+  * 完善 font gen（感谢智明提供补丁）。
+  * 完善 image dither（感谢大恒提供补丁）。
+  * add vgcanvas\_get\_text\_metrics.
+   
+* 2020/06/29
+  * 完善 listview layout（感谢尧燊提供补丁）
+	* 完善 input\_type\_to\_keyboard\_name（感谢俊杰提供补丁）
+	·
 * 2020/06/28
-  * 完善font cache（感谢智明提供补丁）。
-  * font\_bitmap\_index\_t中的偏移量改为32位(如果使用位图字体，需要重新生成资源)。
+  * 完善 font cache（感谢智明提供补丁）。
+  * font\_bitmap\_index\_t 中的偏移量改为 32 位（如果使用位图字体，需要重新生成资源）。
   * 修复位图字体空格字膜宽度的不正确的问题（感谢智明提供补丁）。
 
 * 2020/06/27
-  * 完善font cache（感谢智明提供补丁）。
-  * 窗口切换到前台时，将其为窗口管理的target/key\_arget。
+  * 完善 font cache（感谢智明提供补丁）。
+  * 窗口切换到前台时，将其为窗口管理的 target/key\_arget。
 
 * 2020/06/26
   * edit 支持 date/time/time\_full 输入类型。

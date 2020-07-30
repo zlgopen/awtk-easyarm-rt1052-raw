@@ -1171,6 +1171,15 @@ ret_t widget_calc_icon_text_rect(const rect_t* ir, int32_t font_size, float_t te
   return RET_OK;
 }
 
+const char* widget_get_bidi(widget_t* widget) {
+  value_t v;
+  if (widget_get_prop(widget, WIDGET_PROP_BIDI, &v) == RET_OK) {
+    return value_str(&v);
+  }
+
+  return NULL;
+}
+
 ret_t widget_draw_icon_text(widget_t* widget, canvas_t* c, const char* icon, wstr_t* text) {
   rect_t ir;
   wh_t w = 0;
@@ -1237,7 +1246,7 @@ ret_t widget_draw_icon_text(widget_t* widget, canvas_t* c, const char* icon, wst
                                  &r_icon);
 
       canvas_draw_icon_in_rect(c, &img, &r_icon);
-      canvas_draw_text_in_rect(c, text->str, text->size, &r_text);
+      widget_draw_text_in_rect(widget, c, text->str, text->size, &r_text, FALSE);
     } else {
       if (icon_at == ICON_AT_AUTO) {
         widget_calc_icon_text_rect(&ir, font_size, text_size, icon_at, img.w, img.h, spacer, NULL,
@@ -1250,7 +1259,7 @@ ret_t widget_draw_icon_text(widget_t* widget, canvas_t* c, const char* icon, wst
     }
   } else if (text != NULL && text->size > 0) {
     widget_calc_icon_text_rect(&ir, font_size, text_size, icon_at, 0, 0, spacer, &r_text, NULL);
-    canvas_draw_text_in_rect(c, text->str, text->size, &r_text);
+    widget_draw_text_in_rect(widget, c, text->str, text->size, &r_text, FALSE);
   }
 
   return RET_OK;
@@ -1298,7 +1307,7 @@ ret_t widget_fill_rect(widget_t* widget, canvas_t* c, rect_t* r, bool_t bg,
     }
   }
 
-  if (image_name != NULL && r->w > 0 && r->h > 0) {
+  if (image_name != NULL && *image_name && r->w > 0 && r->h > 0) {
     if (widget_load_image(widget, image_name, &img) == RET_OK) {
       draw_type = (image_draw_type_t)style_get_int(style, draw_type_key, draw_type);
       canvas_draw_image_ex(c, &img, draw_type, r);
@@ -2002,8 +2011,31 @@ bool_t widget_is_activate_key(widget_t* widget, key_event_t* e) {
          (widget->vt->return_key_to_activate && key_code_is_enter(e->key));
 }
 
-static bool_t widget_match_key(widget_t* widget, const char* prop, uint32_t key) {
-  const char* value = NULL;
+static bool_t shortcut_fast_match(const char* shortcut, key_event_t* e) {
+  uint32_t key = e->key;
+  const char* kname = strrchr(shortcut, '+');
+  bool_t cmd = strstr(shortcut, "cmd") != NULL;
+  bool_t ctrl = strstr(shortcut, "ctrl") != NULL;
+  bool_t shift = strstr(shortcut, "shift") != NULL;
+  const key_type_value_t* kv = keys_type_find_by_value(key);
+
+  if (kv != NULL) {
+    if (kname == NULL) {
+      kname = shortcut;
+    } else {
+      kname++;
+    }
+
+    if (tk_str_ieq(kname, kv->name) && cmd == e->cmd && ctrl == e->ctrl && shift == e->shift) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+static bool_t widget_match_key(widget_t* widget, const char* prop, key_event_t* e) {
+  const char* shortcut = NULL;
   widget_t* win = widget_get_window(widget);
 
   if (widget_is_window_manager(widget)) {
@@ -2011,41 +2043,37 @@ static bool_t widget_match_key(widget_t* widget, const char* prop, uint32_t key)
   }
 
   return_value_if_fail(win != NULL, FALSE);
-  value = widget_get_prop_str(win, prop, NULL);
-  if (value != NULL) {
-    const key_type_value_t* kv = keys_type_find_by_value(key);
-    if (kv != NULL) {
-      if (tk_str_ieq(value, kv->name)) {
-        return TRUE;
-      }
-    }
+  shortcut = widget_get_prop_str(win, prop, NULL);
+
+  if (shortcut != NULL) {
+    return shortcut_fast_match(shortcut, e);
   }
 
   return FALSE;
 }
 
 static bool_t widget_is_move_focus_prev_key(widget_t* widget, key_event_t* e) {
-  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_PREV_KEY, e->key);
+  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_PREV_KEY, e);
 }
 
 static bool_t widget_is_move_focus_next_key(widget_t* widget, key_event_t* e) {
-  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_NEXT_KEY, e->key);
+  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_NEXT_KEY, e);
 }
 
 static bool_t widget_is_move_focus_up_key(widget_t* widget, key_event_t* e) {
-  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_UP_KEY, e->key);
+  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_UP_KEY, e);
 }
 
 static bool_t widget_is_move_focus_down_key(widget_t* widget, key_event_t* e) {
-  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_DOWN_KEY, e->key);
+  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_DOWN_KEY, e);
 }
 
 static bool_t widget_is_move_focus_left_key(widget_t* widget, key_event_t* e) {
-  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_LEFT_KEY, e->key);
+  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_LEFT_KEY, e);
 }
 
 static bool_t widget_is_move_focus_right_key(widget_t* widget, key_event_t* e) {
-  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_RIGHT_KEY, e->key);
+  return widget_match_key(widget, WIDGET_PROP_MOVE_FOCUS_RIGHT_KEY, e);
 }
 
 static ret_t widget_on_keydown_general(widget_t* widget, key_event_t* e) {
@@ -4006,7 +4034,7 @@ bitmap_t* widget_take_snapshot_rect(widget_t* widget, rect_t* r) {
   vg = lcd_get_vgcanvas(c->lcd);
   return_value_if_fail(c != NULL && vg != NULL, NULL);
 
-  vgcanvas_create_fbo(vg, &fbo);
+  vgcanvas_create_fbo(vg, vg->w, vg->h, &fbo);
   vgcanvas_bind_fbo(vg, &fbo);
   canvas_set_clip_rect(c, r);
   widget_paint(widget, c);
@@ -4122,4 +4150,12 @@ ret_t widget_end_wait_pointer_cursor(widget_t* widget) {
   widget_t* wm = widget_get_window_manager(widget);
 
   return window_manager_end_wait_pointer_cursor(wm);
+}
+
+ret_t widget_draw_text_in_rect(widget_t* widget, canvas_t* c, const wchar_t* str, uint32_t size,
+                               rect_t* r, bool_t ellipses) {
+  const char* bidi_type = widget_get_bidi(widget);
+  return_value_if_fail(widget != NULL && c != NULL && str != NULL && r != NULL, RET_BAD_PARAMS);
+
+  return canvas_draw_text_bidi_in_rect(c, str, size, r, bidi_type, ellipses);
 }

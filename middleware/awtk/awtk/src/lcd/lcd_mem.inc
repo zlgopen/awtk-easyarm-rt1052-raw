@@ -42,7 +42,7 @@ static pixel_t* lcd_mem_init_drawing_fb(lcd_t* lcd, bitmap_t* fb) {
     fb->h = lcd->h;
     fb->buffer = mem->offline_gb;
     fb->format = mem->format;
-    graphic_buffer_attach(mem->offline_gb, mem->offline_fb);
+    graphic_buffer_attach(mem->offline_gb, mem->offline_fb, fb->w, fb->h);
     bitmap_set_line_length(fb, lcd_mem_get_line_length(mem));
   }
 
@@ -68,7 +68,7 @@ static bitmap_t* lcd_mem_init_online_fb(lcd_t* lcd, bitmap_t* fb, lcd_orientatio
   fb->h = h;
   fb->buffer = mem->online_gb;
   fb->format = mem->format;
-  graphic_buffer_attach(mem->online_gb, mem->online_fb);
+  graphic_buffer_attach(mem->online_gb, mem->online_fb, w, h);
   bitmap_set_line_length(fb, tk_max(fb->w * bpp, mem->online_line_length));
 
   return fb;
@@ -308,6 +308,7 @@ static ret_t lcd_mem_end_frame(lcd_t* lcd) {
 
 static ret_t lcd_mem_destroy(lcd_t* lcd) {
   lcd_mem_t* mem = (lcd_mem_t*)lcd;
+  return_value_if_fail(lcd->begin_frame != NULL, RET_BAD_PARAMS);
 
   if (mem->vgcanvas != NULL) {
     vgcanvas_destroy(mem->vgcanvas);
@@ -321,6 +322,7 @@ static ret_t lcd_mem_destroy(lcd_t* lcd) {
   graphic_buffer_destroy(mem->online_gb);
   graphic_buffer_destroy(mem->offline_gb);
 
+  memset(lcd, 0x00, sizeof(lcd_mem_t));
   TKMEM_FREE(lcd);
 
   return RET_OK;

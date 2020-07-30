@@ -528,6 +528,21 @@ ret_t canvas_draw_utf8(canvas_t* c, const char* str, xy_t x, xy_t y);
 ret_t canvas_draw_text_in_rect(canvas_t* c, const wchar_t* str, uint32_t nr, const rect_t* r);
 
 /**
+ * @method canvas_draw_text_bidi_in_rect
+ * 绘制文本(支持Unicode Bidirectional Algorithm)。
+ *
+ * @param {canvas_t*} c canvas对象。
+ * @param {const wchar_t*} str 字符串。
+ * @param {uint32_t} nr 字符数。
+ * @param {const rect_t*} r 矩形区域。
+ * @param {const char*} bidi_type 类型。
+ * @param {bool_t} ellipses 如果目标宽度不够，是否显示省略号。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t canvas_draw_text_bidi_in_rect(canvas_t* c, const wchar_t* str, uint32_t nr, const rect_t* r, const char* bidi_type, bool_t ellipses);
+
+/**
  * @method canvas_draw_utf8_in_rect
  * 绘制文本。
  *
@@ -689,6 +704,20 @@ ret_t canvas_set_font_manager(canvas_t* c, font_manager_t* font_manager);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t canvas_set_assets_manager(canvas_t* c, assets_manager_t* assets_manager);
+
+/**
+ * @method canvas_get_text_metrics
+ * 获取当前字体的度量信息。
+ *
+ * @param {canvas_t*} canvas canvas对象。
+ * @param {float_t*} ascent 用于返回ascent。
+ * @param {float_t*} descent 用于返回descent。
+ * @param {float_t*} line_hight 用于返回line height。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t canvas_get_text_metrics(canvas_t* canvas, float_t* ascent, float_t* descent,
+                              float_t* line_hight);
 
 /**
  * @method canvas_begin_frame

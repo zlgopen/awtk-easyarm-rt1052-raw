@@ -23,6 +23,7 @@
 #include "tkc/mem.h"
 #include "tkc/utf8.h"
 #include "tkc/utils.h"
+#include "base/bidi.h"
 #include "base/canvas.h"
 #include "tkc/time_now.h"
 #include "tkc/color_parser.h"
@@ -1718,6 +1719,58 @@ ret_t canvas_draw_text_in_rect(canvas_t* c, const wchar_t* str, uint32_t nr, con
   return canvas_draw_text(c, str, nr, x, y);
 }
 
+#define STR_ELLIPSES L"..."
+
+static ret_t canvas_draw_text_in_rect_ellipses(canvas_t* c, const wchar_t* str, uint32_t nr,
+                                               const rect_t* r_in, bidi_type_t type) {
+  uint32_t i = 0;
+  uint32_t x = 0;
+  rect_t r = *r_in;
+  float_t text_w = 0;
+  float_t ellipses_w = canvas_measure_text(c, STR_ELLIPSES, wcslen(STR_ELLIPSES));
+
+  for (i = 0; i < nr; i++) {
+    float_t char_w = canvas_measure_text(c, str + i, 1);
+    if ((text_w + char_w + ellipses_w) >= r.w) {
+      break;
+    }
+
+    text_w += char_w;
+  }
+
+  r.w = text_w;
+  canvas_draw_text_in_rect(c, str, i, &r);
+  r.x = text_w;
+  r.w = ellipses_w;
+  canvas_draw_text_in_rect(c, STR_ELLIPSES, wcslen(STR_ELLIPSES), &r);
+
+  return RET_OK;
+}
+
+ret_t canvas_draw_text_bidi_in_rect(canvas_t* c, const wchar_t* str, uint32_t nr,
+                                    const rect_t* r_in, const char* bidi_type, bool_t ellipses) {
+  bidi_t b;
+  ret_t ret = RET_FAIL;
+  float_t text_w = canvas_measure_text(c, str, nr);
+  return_value_if_fail(c != NULL && str != NULL && r_in != NULL, RET_BAD_PARAMS);
+
+  bidi_init(&b, FALSE, FALSE, bidi_type_from_name(bidi_type));
+  if (bidi_log2vis(&b, str, nr) == RET_OK) {
+    float_t text_w = canvas_measure_text(c, b.vis_str, b.vis_str_size);
+    if (ellipses && text_w > r_in->w) {
+      ret = canvas_draw_text_in_rect_ellipses(c, b.vis_str, b.vis_str_size, r_in, b.resolved_type);
+    } else {
+      ret = canvas_draw_text_in_rect(c, b.vis_str, b.vis_str_size, r_in);
+    }
+  } else {
+    assert(!"log2vis failed!");
+  }
+
+  bidi_deinit(&b);
+
+  return ret;
+}
+
 ret_t canvas_draw_utf8_in_rect(canvas_t* c, const char* str, const rect_t* r) {
   wstr_t s;
   ret_t ret = RET_FAIL;
@@ -1798,4 +1851,25 @@ ret_t canvas_reset(canvas_t* c) {
   memset(c, 0x00, sizeof(canvas_t));
 
   return RET_OK;
+}
+
+ret_t canvas_get_text_metrics(canvas_t* c, float_t* ascent, float_t* descent, float_t* line_hight) {
+  return_value_if_fail(c != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(ascent != NULL && descent != NULL && line_hight != NULL, RET_BAD_PARAMS);
+
+  if (c->lcd != NULL && c->lcd->get_text_metrics != NULL) {
+    return c->lcd->get_text_metrics(c->lcd, ascent, descent, line_hight);
+  } else if (c->font != NULL) {
+    font_vmetrics_t vmetrics = font_get_vmetrics(c->font, c->font_size);
+
+    *ascent = vmetrics.ascent;
+    *descent = vmetrics.descent;
+    *line_hight = vmetrics.line_gap + vmetrics.ascent + vmetrics.descent;
+    return RET_OK;
+  } else {
+    *ascent = 0;
+    *descent = 0;
+    *line_hight = 0;
+    return RET_FAIL;
+  }
 }

@@ -122,6 +122,7 @@ ret_t stb_load_image(int32_t subtype, const uint8_t* buff, uint32_t buff_size, b
 }
 
 static ret_t image_loader_stb_load(image_loader_t* l, const asset_info_t* asset, bitmap_t* image) {
+  ret_t ret = RET_OK;
   bool_t require_bgra = FALSE;
   bool_t enable_bgr565 = FALSE;
   bool_t enable_rgb565 = FALSE;
@@ -144,8 +145,15 @@ static ret_t image_loader_stb_load(image_loader_t* l, const asset_info_t* asset,
   require_bgra = TRUE;
 #endif /*WITH_BITMAP_BGRA*/
 
-  return stb_load_image(asset->subtype, asset->data, asset->size, image, require_bgra,
-                        enable_bgr565, enable_rgb565);
+  ret = stb_load_image(asset->subtype, asset->data, asset->size, image, require_bgra, enable_bgr565,
+                       enable_rgb565);
+
+#ifdef WITH_BITMAP_PREMULTI_ALPHA
+  if (ret == RET_OK) {
+    ret = bitmap_premulti_alpha(image);
+  }
+#endif /*WITH_BITMAP_RGB565*/
+  return ret;
 }
 
 static const image_loader_t stb_loader = {.load = image_loader_stb_load};

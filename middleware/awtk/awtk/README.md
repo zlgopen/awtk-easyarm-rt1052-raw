@@ -144,7 +144,7 @@
 * 支持输入法。
 * 支持字符串翻译 （实时生效）。
 * 支持图片翻译 （实时生效）。
-* 文字双向排版 （计划中）。
+* 文字双向排版。
 
 ### 9. 为嵌入式软件定制的 MVVM 框架，彻底分离用户界面和业务逻辑。
 * 性能高。
@@ -295,6 +295,10 @@ pip install Pillow
 * [扩展控件实例：TinyGL](https://github.com/zlgopen/awtk-widget-glview)
 
 * [扩展控件实例：number-label](https://github.com/zlgopen/awtk-widget-number-label)
+
+* [扩展控件实例：代码编辑器](https://github.com/zlgopen/awtk-widget-code-edit)
+
+* [扩展控件实例：日期选择器](https://github.com/zlgopen/awtk-widget-date-picker)
 
 第三方提供：
 

@@ -35,6 +35,10 @@ typedef struct _framebuffer_object_t {
   int id;
   void* handle;
   float_t ratio;
+  bool_t init;
+  int online_fbo;
+  int offline_fbo;
+  rect_t online_dirty_rect;
 } framebuffer_object_t;
 
 struct _vgcanvas_t;
@@ -86,6 +90,8 @@ typedef ret_t (*vgcanvas_set_font_t)(vgcanvas_t* vg, const char* font);
 typedef ret_t (*vgcanvas_set_font_size_t)(vgcanvas_t* vg, float_t size);
 typedef ret_t (*vgcanvas_set_text_align_t)(vgcanvas_t* vg, const char* value);
 typedef ret_t (*vgcanvas_set_text_baseline_t)(vgcanvas_t* vg, const char* value);
+typedef ret_t (*vgcanvas_get_text_metrics_t)(vgcanvas_t* vg, float_t* ascent, float_t* descent,
+                                             float_t* line_hight);
 typedef ret_t (*vgcanvas_fill_text_t)(vgcanvas_t* vg, const char* text, float_t x, float_t y,
                                       float_t max_width);
 typedef float_t (*vgcanvas_measure_text_t)(vgcanvas_t* vg, const char* text);
@@ -123,7 +129,8 @@ typedef wh_t (*vgcanvas_get_height_t)(vgcanvas_t* vg);
 typedef ret_t (*vgcanvas_save_t)(vgcanvas_t* vg);
 typedef ret_t (*vgcanvas_restore_t)(vgcanvas_t* vg);
 
-typedef ret_t (*vgcanvas_create_fbo_t)(vgcanvas_t* vg, framebuffer_object_t* fbo);
+typedef ret_t (*vgcanvas_create_fbo_t)(vgcanvas_t* vg, uint32_t w, uint32_t h,
+                                       framebuffer_object_t* fbo);
 typedef ret_t (*vgcanvas_destroy_fbo_t)(vgcanvas_t* vg, framebuffer_object_t* fbo);
 typedef ret_t (*vgcanvas_bind_fbo_t)(vgcanvas_t* vg, framebuffer_object_t* fbo);
 typedef ret_t (*vgcanvas_unbind_fbo_t)(vgcanvas_t* vg, framebuffer_object_t* fbo);
@@ -169,6 +176,7 @@ typedef struct _vgcanvas_vtable_t {
   vgcanvas_set_font_size_t set_font_size;
   vgcanvas_set_text_align_t set_text_align;
   vgcanvas_set_text_baseline_t set_text_baseline;
+  vgcanvas_get_text_metrics_t get_text_metrics;
   vgcanvas_fill_text_t fill_text;
   vgcanvas_measure_text_t measure_text;
   vgcanvas_draw_image_t draw_image;
@@ -854,6 +862,20 @@ ret_t vgcanvas_set_text_align(vgcanvas_t* vg, const char* value);
 ret_t vgcanvas_set_text_baseline(vgcanvas_t* vg, const char* value);
 
 /**
+ * @method vgcanvas_get_text_metrics
+ * 获取当前字体的度量信息。
+ *
+ * @param {vgcanvas_t*} vg vgcanvas对象。
+ * @param {float_t*} ascent 用于返回ascent。
+ * @param {float_t*} descent 用于返回descent。
+ * @param {float_t*} line_hight 用于返回line height。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t vgcanvas_get_text_metrics(vgcanvas_t* vg, float_t* ascent, float_t* descent,
+                                float_t* line_hight);
+
+/**
  * @method vgcanvas_fill_text
  * 绘制文本。
  *
@@ -1173,7 +1195,7 @@ wh_t vgcanvas_get_height(vgcanvas_t* vgcanvas);
  */
 ret_t vgcanvas_destroy(vgcanvas_t* vg);
 
-ret_t vgcanvas_create_fbo(vgcanvas_t* vg, framebuffer_object_t* fbo);
+ret_t vgcanvas_create_fbo(vgcanvas_t* vg, uint32_t w, uint32_t h, framebuffer_object_t* fbo);
 ret_t vgcanvas_destroy_fbo(vgcanvas_t* vg, framebuffer_object_t* fbo);
 ret_t vgcanvas_bind_fbo(vgcanvas_t* vg, framebuffer_object_t* fbo);
 ret_t vgcanvas_unbind_fbo(vgcanvas_t* vg, framebuffer_object_t* fbo);

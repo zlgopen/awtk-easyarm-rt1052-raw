@@ -34,6 +34,7 @@
 #include "default/inc/ui/auto_play_portrait.data"
 #include "default/inc/ui/back_to_home.data"
 #include "default/inc/ui/basic.data"
+#include "default/inc/ui/bidi.data"
 #include "default/inc/ui/big_font.data"
 #include "default/inc/ui/button.data"
 #include "default/inc/ui/calibration_win.data"
@@ -438,6 +439,7 @@
 #endif /*WITH_VGCANVAS*/
 #ifdef WITH_TRUETYPE_FONT
 #include "default/inc/fonts/default.res"
+#include "default/inc/fonts/trado.res"
 #else /*WITH_TRUETYPE_FONT*/
 #include "default/inc/fonts/default_16.data"
 #include "default/inc/fonts/default_18.data"
@@ -487,6 +489,7 @@ ret_t assets_init_default(void) {
   assets_manager_add(am, ui_auto_play_portrait);
   assets_manager_add(am, ui_back_to_home);
   assets_manager_add(am, ui_basic);
+  assets_manager_add(am, ui_bidi);
   assets_manager_add(am, ui_big_font);
   assets_manager_add(am, ui_button);
   assets_manager_add(am, ui_calibration_win);
@@ -759,6 +762,7 @@ ret_t assets_init_default(void) {
 #endif /*WITH_VGCANVAS*/
 #ifdef WITH_TRUETYPE_FONT
   assets_manager_add(am, font_default);
+  assets_manager_add(am, font_trado);
 #else /*WITH_TRUETYPE_FONT*/
   assets_manager_add(am, font_default_16);
   assets_manager_add(am, font_default_18);

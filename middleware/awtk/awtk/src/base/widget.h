@@ -1394,6 +1394,21 @@ ret_t widget_invalidate_force(widget_t* widget, rect_t* r);
 ret_t widget_paint(widget_t* widget, canvas_t* c);
 
 /**
+ * @method widget_draw_text_in_rect
+ * 在canvas绘制一行文本。
+ * @param {widget_t*} widget 控件对象。
+ * @param {canvas_t*} c 画布对象。
+ * @param {const wchar_t*} str 文本。
+ * @param {uint32_t} size 文本长度。
+ * @param {rect_t*} r 矩形区域。
+ * @param {bool_t} ellipses 宽度不够时是否显示省略号。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+*/
+ret_t widget_draw_text_in_rect(widget_t* widget, canvas_t* c, const wchar_t* str, uint32_t size,
+                               rect_t* r, bool_t ellipses);
+
+/**
  * @method widget_dispatch
  * 分发一个事件。
  * @param {widget_t*} widget 控件对象。
@@ -1402,6 +1417,16 @@ ret_t widget_paint(widget_t* widget, canvas_t* c);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t widget_dispatch(widget_t* widget, event_t* e);
+
+/**
+ * @method widget_dispatch_simple_event
+ * 分发一个简单事件。
+ * @param {widget_t*} widget 控件对象。
+ * @param {uint32_t} type 事件类型。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t widget_dispatch_simple_event(widget_t* widget, uint32_t type);
 
 /**
  * @method widget_dispatch_recursive
@@ -1932,7 +1957,6 @@ ret_t widget_fill_fg_rect(widget_t* widget, canvas_t* c, rect_t* r, image_draw_t
  * @method widget_prepare_text_style
  * 从widget的style中取出字体名称、大小和颜色数据，设置到canvas中。
  *
- * @annotation ["private"]
  * @param {widget_t*} widget 控件对象。
  * @param {canvas_t*} c 画布对象。
  *
@@ -1944,7 +1968,7 @@ ret_t widget_prepare_text_style(widget_t* widget, canvas_t* c);
  * @method widget_measure_text
  * 计算文本的宽度。
  * 字体由控件当前的状态和style决定。
- * @annotation ["private"]
+ *
  * @param {widget_t*} widget 控件对象。
  * @param {wchar_t*} text 文本。
  *
@@ -1955,7 +1979,7 @@ float_t widget_measure_text(widget_t* widget, const wchar_t* text);
 /**
  * @method widget_dispatch_event_to_target_recursive
  * 递归分发事件到targe控件。
- * @annotation ["private"]
+ *
  * @param {widget_t*} widget 控件对象。
  * @param {event_t*}  e 事件对象。
  *
@@ -2504,12 +2528,35 @@ ret_t widget_focus_up(widget_t* widget);
 ret_t widget_focus_down(widget_t* widget);
 ret_t widget_focus_left(widget_t* widget);
 ret_t widget_focus_right(widget_t* widget);
-ret_t widget_dispatch_simple_event(widget_t* widget, uint32_t type);
 
 ret_t widget_set_focused_internal(widget_t* widget, bool_t focused);
 
+/**
+ * @method widget_fill_rounded_rect
+ * 填充区域。
+ * @annotation ["global"]
+ * @param {canvas_t*} c canvas对象。
+ * @param {rect_t*} r 矩形。
+ * @param {color_t*} color 颜色。
+ * @param {uint32_t} radius 圆角半径。
+ *
+ * @return {ret_t} 返回。
+ */
 ret_t widget_fill_rounded_rect(canvas_t* c, rect_t* r, rect_t* bg_r, color_t* color,
                                uint32_t radius);
+
+/**
+ * @method widget_fill_rounded_rect
+ * 绘制边框。
+ * @annotation ["global"]
+ * @param {canvas_t*} c canvas对象。
+ * @param {rect_t*} r 矩形。
+ * @param {color_t*} color 颜色。
+ * @param {uint32_t} radius 圆角半径。
+ * @param {uint32_t} border_width 边宽。
+ *
+ * @return {ret_t} 返回。
+ */
 ret_t widget_stroke_rounded_rect(canvas_t* c, rect_t* r, rect_t* bg_r, color_t* color,
                                  uint32_t radius, uint32_t border_width);
 

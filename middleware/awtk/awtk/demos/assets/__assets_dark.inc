@@ -34,6 +34,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char ui_auto_play_landscape[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_auto_play_portrait[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_back_to_home[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_basic[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char ui_bidi[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_big_font[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_button[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char ui_calibration_win[]);
@@ -438,6 +439,7 @@ extern TK_CONST_DATA_ALIGN(const unsigned char image_pointer_4[]);
 #endif /*WITH_VGCANVAS*/
 #ifdef WITH_TRUETYPE_FONT
 extern TK_CONST_DATA_ALIGN(const unsigned char font_default[]);
+extern TK_CONST_DATA_ALIGN(const unsigned char font_trado[]);
 #else /*WITH_TRUETYPE_FONT*/
 extern TK_CONST_DATA_ALIGN(const unsigned char font_default_16[]);
 extern TK_CONST_DATA_ALIGN(const unsigned char font_default_18[]);
@@ -487,6 +489,7 @@ ret_t assets_init_dark(void) {
   assets_manager_add(am, ui_auto_play_portrait);
   assets_manager_add(am, ui_back_to_home);
   assets_manager_add(am, ui_basic);
+  assets_manager_add(am, ui_bidi);
   assets_manager_add(am, ui_big_font);
   assets_manager_add(am, ui_button);
   assets_manager_add(am, ui_calibration_win);
@@ -759,6 +762,7 @@ ret_t assets_init_dark(void) {
 #endif /*WITH_VGCANVAS*/
 #ifdef WITH_TRUETYPE_FONT
   assets_manager_add(am, font_default);
+  assets_manager_add(am, font_trado);
 #else /*WITH_TRUETYPE_FONT*/
   assets_manager_add(am, font_default_16);
   assets_manager_add(am, font_default_18);
