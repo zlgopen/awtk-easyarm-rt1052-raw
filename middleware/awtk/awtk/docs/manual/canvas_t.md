@@ -9,11 +9,13 @@
 | -------- | ------------ | 
 | <a href="#canvas_t_canvas_begin_frame">canvas\_begin\_frame</a> | 绘制开始。 |
 | <a href="#canvas_t_canvas_cast">canvas\_cast</a> | 转换为canvas对象(供脚本语言使用)。 |
+| <a href="#canvas_t_canvas_clear_rect">canvas\_clear\_rect</a> | 用填充颜色填充指定矩形。 |
 | <a href="#canvas_t_canvas_draw_hline">canvas\_draw\_hline</a> | 画水平线。 |
 | <a href="#canvas_t_canvas_draw_icon">canvas\_draw\_icon</a> | 绘制图标。 |
 | <a href="#canvas_t_canvas_draw_image">canvas\_draw\_image</a> | 绘制图片。 |
 | <a href="#canvas_t_canvas_draw_image_at">canvas\_draw\_image\_at</a> | 在指定位置画图。 |
 | <a href="#canvas_t_canvas_draw_image_ex">canvas\_draw\_image\_ex</a> | 绘制图片。 |
+| <a href="#canvas_t_canvas_draw_image_ex2">canvas\_draw\_image\_ex2</a> | 绘制图片。 |
 | <a href="#canvas_t_canvas_draw_line">canvas\_draw\_line</a> | 画直线。 |
 | <a href="#canvas_t_canvas_draw_points">canvas\_draw\_points</a> | 画多个点。 |
 | <a href="#canvas_t_canvas_draw_text">canvas\_draw\_text</a> | 绘制文本。 |
@@ -23,7 +25,9 @@
 | <a href="#canvas_t_canvas_draw_utf8_in_rect">canvas\_draw\_utf8\_in\_rect</a> | 绘制文本。 |
 | <a href="#canvas_t_canvas_draw_vline">canvas\_draw\_vline</a> | 画垂直线。 |
 | <a href="#canvas_t_canvas_end_frame">canvas\_end\_frame</a> | 绘制结束。 |
-| <a href="#canvas_t_canvas_fill_rect">canvas\_fill\_rect</a> | 填充矩形。 |
+| <a href="#canvas_t_canvas_fill_rect">canvas\_fill\_rect</a> | 绘制矩形。 |
+| <a href="#canvas_t_canvas_fill_rounded_rect">canvas\_fill\_rounded\_rect</a> | 填充区域。 |
+| <a href="#canvas_t_canvas_fill_rounded_rect_ex">canvas\_fill\_rounded\_rect\_ex</a> | 填充区域。 |
 | <a href="#canvas_t_canvas_get_clip_rect">canvas\_get\_clip\_rect</a> | 获取裁剪区。 |
 | <a href="#canvas_t_canvas_get_font_height">canvas\_get\_font\_height</a> | 获取字体的高度。 |
 | <a href="#canvas_t_canvas_get_height">canvas\_get\_height</a> | 获取画布的高度。 |
@@ -48,6 +52,8 @@
 | <a href="#canvas_t_canvas_set_text_color">canvas\_set\_text\_color</a> | 设置文本颜色。 |
 | <a href="#canvas_t_canvas_set_text_color_str">canvas\_set\_text\_color\_str</a> | 设置文本颜色。 |
 | <a href="#canvas_t_canvas_stroke_rect">canvas\_stroke\_rect</a> | 绘制矩形。 |
+| <a href="#canvas_t_canvas_stroke_rounded_rect">canvas\_stroke\_rounded\_rect</a> | 绘制边框。 |
+| <a href="#canvas_t_canvas_stroke_rounded_rect_ex">canvas\_stroke\_rounded\_rect\_ex</a> | 绘制边框。 |
 | <a href="#canvas_t_canvas_translate">canvas\_translate</a> | 平移原点坐标。 |
 | <a href="#canvas_t_canvas_untranslate">canvas\_untranslate</a> | 反向平移原点坐标。 |
 ### 属性
@@ -82,7 +88,7 @@
 * 函数原型：
 
 ```
-ret_t canvas_begin_frame (canvas_t* c, rect_t* dirty_rect, lcd_draw_mode_t draw_mode);
+ret_t canvas_begin_frame (canvas_t* c, const rect_t* dirty_rect, lcd_draw_mode_t draw_mode);
 ```
 
 * 参数说明：
@@ -91,7 +97,7 @@ ret_t canvas_begin_frame (canvas_t* c, rect_t* dirty_rect, lcd_draw_mode_t draw_
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | c | canvas\_t* | canvas对象。 |
-| dirty\_rect | rect\_t* | 脏矩形。 |
+| dirty\_rect | const rect\_t* | 脏矩形。 |
 | draw\_mode | lcd\_draw\_mode\_t | 绘制模式。 |
 #### canvas\_cast 函数
 -----------------------
@@ -112,6 +118,31 @@ canvas_t* canvas_cast (canvas_t* c);
 | -------- | ----- | --------- |
 | 返回值 | canvas\_t* | canvas对象。 |
 | c | canvas\_t* | canvas对象。 |
+#### canvas\_clear\_rect 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="canvas_t_canvas_clear_rect">用填充颜色填充指定矩形。
+
+> 如果lcd的颜色格式带alpha通道，连同alpha的值一起修改。
+
+* 函数原型：
+
+```
+ret_t canvas_clear_rect (canvas_t* c, xy_t x, xy_t y, wh_t w, wh_t h);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| c | canvas\_t* | canvas对象。 |
+| x | xy\_t | x坐标。 |
+| y | xy\_t | y坐标。 |
+| w | wh\_t | 宽度。 |
+| h | wh\_t | 高度。 |
 #### canvas\_draw\_hline 函数
 -----------------------
 
@@ -166,7 +197,7 @@ ret_t canvas_draw_icon (canvas_t* c, bitmap_t* img, xy_t cx, xy_t cy);
 * 函数原型：
 
 ```
-ret_t canvas_draw_image (canvas_t* c, bitmap_t* img, rect_t* src, rect_t* dst);
+ret_t canvas_draw_image (canvas_t* c, bitmap_t* img, const rect_t* src, const rect_t* dst);
 ```
 
 * 参数说明：
@@ -176,8 +207,8 @@ ret_t canvas_draw_image (canvas_t* c, bitmap_t* img, rect_t* src, rect_t* dst);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | c | canvas\_t* | canvas对象。 |
 | img | bitmap\_t* | 图片对象。 |
-| src | rect\_t* | 源区域。 |
-| dst | rect\_t* | 目的区域。 |
+| src | const rect\_t* | 源区域。 |
+| dst | const rect\_t* | 目的区域。 |
 #### canvas\_draw\_image\_at 函数
 -----------------------
 
@@ -210,7 +241,7 @@ ret_t canvas_draw_image_at (canvas_t* c, bitmap_t* img, xy_t x, xy_t y);
 * 函数原型：
 
 ```
-ret_t canvas_draw_image_ex (canvas_t* c, bitmap_t* img, image_draw_type_t draw_type, rect_t* dst);
+ret_t canvas_draw_image_ex (canvas_t* c, bitmap_t* img, image_draw_type_t draw_type, const rect_t* dst);
 ```
 
 * 参数说明：
@@ -221,7 +252,30 @@ ret_t canvas_draw_image_ex (canvas_t* c, bitmap_t* img, image_draw_type_t draw_t
 | c | canvas\_t* | canvas对象。 |
 | img | bitmap\_t* | 图片对象。 |
 | draw\_type | image\_draw\_type\_t | 绘制类型。 |
-| dst | rect\_t* | 目的区域。 |
+| dst | const rect\_t* | 目的区域。 |
+#### canvas\_draw\_image\_ex2 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="canvas_t_canvas_draw_image_ex2">绘制图片。
+
+* 函数原型：
+
+```
+ret_t canvas_draw_image_ex2 (canvas_t* c, bitmap_t* img, image_draw_type_t draw_type, const rect_t* src, const rect_t* dst);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| c | canvas\_t* | canvas对象。 |
+| img | bitmap\_t* | 图片对象。 |
+| draw\_type | image\_draw\_type\_t | 绘制类型。 |
+| src | const rect\_t* | 源区域。 |
+| dst | const rect\_t* | 目的区域。 |
 #### canvas\_draw\_line 函数
 -----------------------
 
@@ -299,7 +353,7 @@ ret_t canvas_draw_text (canvas_t* c, const wchar_t* str, uint32_t nr, xy_t x, xy
 * 函数原型：
 
 ```
-ret_t canvas_draw_text_bidi_in_rect (canvas_t* c, const wchar_t* str, uint32_t nr, const rect_t* r);
+ret_t canvas_draw_text_bidi_in_rect (canvas_t* c, const wchar_t* str, uint32_t nr, const rect_t* r, const char* bidi_type, bool_t ellipses);
 ```
 
 * 参数说明：
@@ -311,6 +365,8 @@ ret_t canvas_draw_text_bidi_in_rect (canvas_t* c, const wchar_t* str, uint32_t n
 | str | const wchar\_t* | 字符串。 |
 | nr | uint32\_t | 字符数。 |
 | r | const rect\_t* | 矩形区域。 |
+| bidi\_type | const char* | 类型。 |
+| ellipses | bool\_t | 如果目标宽度不够，是否显示省略号。 |
 #### canvas\_draw\_text\_in\_rect 函数
 -----------------------
 
@@ -426,7 +482,7 @@ ret_t canvas_end_frame (canvas_t* c);
 
 * 函数功能：
 
-> <p id="canvas_t_canvas_fill_rect">填充矩形。
+> <p id="canvas_t_canvas_fill_rect">绘制矩形。
 
 * 函数原型：
 
@@ -444,6 +500,55 @@ ret_t canvas_fill_rect (canvas_t* c, xy_t x, xy_t y, wh_t w, wh_t h);
 | y | xy\_t | y坐标。 |
 | w | wh\_t | 宽度。 |
 | h | wh\_t | 高度。 |
+#### canvas\_fill\_rounded\_rect 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="canvas_t_canvas_fill_rounded_rect">填充区域。
+
+* 函数原型：
+
+```
+ret_t canvas_fill_rounded_rect (canvas_t* c, const rect_t* r, const color_t* color, uint32_t radius);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| c | canvas\_t* | canvas对象。 |
+| r | const rect\_t* | 矩形。 |
+| color | const color\_t* | 颜色。 |
+| radius | uint32\_t | 圆角半径。 |
+#### canvas\_fill\_rounded\_rect\_ex 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="canvas_t_canvas_fill_rounded_rect_ex">填充区域。
+半径半径小于等于2，则表示该角为直角，如果全部角都为直角则返回RET_FAIL。（如果全是直角，该函数效率没有canvas_fill_rect函数快）
+如果各个半径都不一样的话，就是会使用vg，如果不支持vg就会返回RET_FAIL（直角的情况除外）。
+
+* 函数原型：
+
+```
+ret_t canvas_fill_rounded_rect_ex (canvas_t* c, const rect_t* r, const color_t* color, uint32_t radius_tl, uint32_t radius_tr, uint32_t radius_bl, uint32_t radius_br);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| c | canvas\_t* | canvas对象。 |
+| r | const rect\_t* | 矩形。 |
+| color | const color\_t* | 颜色。 |
+| radius\_tl | uint32\_t | 左上角圆角半径。 |
+| radius\_tr | uint32\_t | 右上角圆角半径。 |
+| radius\_bl | uint32\_t | 左下角圆角半径。 |
+| radius\_br | uint32\_t | 右下角圆角半径。 |
 #### canvas\_get\_clip\_rect 函数
 -----------------------
 
@@ -937,6 +1042,58 @@ ret_t canvas_stroke_rect (canvas_t* c, xy_t x, xy_t y, wh_t w, wh_t h);
 | y | xy\_t | y坐标。 |
 | w | wh\_t | 宽度。 |
 | h | wh\_t | 高度。 |
+#### canvas\_stroke\_rounded\_rect 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="canvas_t_canvas_stroke_rounded_rect">绘制边框。
+
+* 函数原型：
+
+```
+ret_t canvas_stroke_rounded_rect (canvas_t* c, const rect_t* r, const color_t* color, uint32_t radius, uint32_t border_width);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| c | canvas\_t* | canvas对象。 |
+| r | const rect\_t* | 矩形。 |
+| color | const color\_t* | 颜色。 |
+| radius | uint32\_t | 圆角半径。 |
+| border\_width | uint32\_t | 边宽。 |
+#### canvas\_stroke\_rounded\_rect\_ex 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="canvas_t_canvas_stroke_rounded_rect_ex">绘制边框。
+半径半径小于等于2，则表示该角为直角，如果全部角都为直角则返回RET_FAIL。（如果全是直角，该函数效率没有canvas_stroke_rect函数快）
+如果各个半径都不一样的话，就是会使用vg，如果不支持vg就会返回RET_FAIL（直角的情况除外）。
+
+* 函数原型：
+
+```
+ret_t canvas_stroke_rounded_rect_ex (canvas_t* c, const rect_t* r, const color_t* color, uint32_t radius_tl, uint32_t radius_tr, uint32_t radius_bl, uint32_t radius_br, uint32_t border_width, uint32_t border_model);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| c | canvas\_t* | canvas对象。 |
+| r | const rect\_t* | 矩形。 |
+| color | const color\_t* | 颜色。 |
+| radius\_tl | uint32\_t | 左上角圆角半径。 |
+| radius\_tr | uint32\_t | 右上角圆角半径。 |
+| radius\_bl | uint32\_t | 左下角圆角半径。 |
+| radius\_br | uint32\_t | 右下角圆角半径。 |
+| border\_width | uint32\_t | 边宽。 |
+| border\_model | uint32\_t | 边框类型。 |
 #### canvas\_translate 函数
 -----------------------
 

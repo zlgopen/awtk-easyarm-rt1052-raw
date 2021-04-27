@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  data_reader
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,7 +44,7 @@ typedef struct _data_reader_vtable_t {
  * @class data_reader_t
  * 数据读取接口。
  *
- * >用于抽象flash等外部设备。
+ * >对可读的媒介，如内存、文件、flash、资源和其它媒介提供一个统一的读取接口。
  *
  */
 struct _data_reader_t {

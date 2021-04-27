@@ -17,7 +17,7 @@ button\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均适�
 ```
 
 > 更多用法请参考：
-[button.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/button.xml)
+[button.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/button.xml)
 
 在c代码中使用函数button\_create创建按钮控件。如：
 
@@ -45,7 +45,7 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 
 > 更多用法请参考：
 [theme
-default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L31)
+default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L31)
 ----------------------------------
 ### 函数
 <p id="button_t_methods">
@@ -55,6 +55,7 @@ default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/st
 | <a href="#button_t_button_cast">button\_cast</a> | 转换为button对象(供脚本语言使用)。 |
 | <a href="#button_t_button_create">button\_create</a> | 创建button对象 |
 | <a href="#button_t_button_set_enable_long_press">button\_set\_enable\_long\_press</a> | 设置是否启用长按事件。 |
+| <a href="#button_t_button_set_long_press_time">button\_set\_long\_press\_time</a> | 设置触发长按事件的时间。 |
 | <a href="#button_t_button_set_repeat">button\_set\_repeat</a> | 设置触发EVT\_CLICK事件的时间间隔。为0则不重复触发EVT\_CLICK事件。 |
 ### 属性
 <p id="button_t_properties">
@@ -62,6 +63,7 @@ default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/st
 | 属性名称 | 类型 | 说明 | 
 | -------- | ----- | ------------ | 
 | <a href="#button_t_enable_long_press">enable\_long\_press</a> | bool\_t | 是否启用长按事件，为true时才触发长按事件。 |
+| <a href="#button_t_long_press_time">long\_press\_time</a> | uint32\_t | 触发长按事件的时间(ms) |
 | <a href="#button_t_repeat">repeat</a> | int32\_t | 重复触发EVT\_CLICK事件的时间间隔。 |
 ### 事件
 <p id="button_t_events">
@@ -132,6 +134,26 @@ ret_t button_set_enable_long_press (widget_t* widget, bool_t enable_long_press);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | enable\_long\_press | bool\_t | 是否启用长按事件。 |
+#### button\_set\_long\_press\_time 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="button_t_button_set_long_press_time">设置触发长按事件的时间。
+
+* 函数原型：
+
+```
+ret_t button_set_long_press_time (widget_t* widget, uint32_t long_press_time);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| long\_press\_time | uint32\_t | 触发长按事件的时间(毫秒)。 |
 #### button\_set\_repeat 函数
 -----------------------
 
@@ -160,6 +182,22 @@ ret_t button_set_repeat (widget_t* widget, int32_t repeat);
 缺省不启用。
 
 * 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
+#### long\_press\_time 属性
+-----------------------
+> <p id="button_t_long_press_time">触发长按事件的时间(ms)
+
+* 类型：uint32\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |

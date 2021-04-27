@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  system info
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -170,6 +170,17 @@ ret_t system_info_deinit(void);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t system_info_set_font_scale(system_info_t* info, float_t font_scale);
+
+/**
+ * @method system_info_set_app_root
+ * 设置app root。
+ *
+ * @param {system_info_t* info} info system_info对象。
+ * @param {const char*} app_root app root。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t system_info_set_app_root(system_info_t* info, const char* app_root);
 
 /**
  * @method system_info_set_default_font

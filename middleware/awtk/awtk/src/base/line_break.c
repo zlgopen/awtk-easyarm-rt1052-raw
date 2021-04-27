@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  line break and work break algorithm.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,7 +50,9 @@ break_type_t line_break_check(wchar_t c1, wchar_t c2) {
     case LINEBREAK_NOBREAK: {
       return LINE_BREAK_NO;
     }
-    default: { return LINE_BREAK_ALLOW; }
+    default: {
+      return LINE_BREAK_ALLOW;
+    }
   }
 }
 
@@ -96,3 +98,55 @@ break_type_t word_break_check(wchar_t c1, wchar_t c2) {
   return LINE_BREAK_NO;
 }
 #endif /*WITH_UNICODE_BREAK*/
+
+uint32_t line_break_count(const wchar_t* str) {
+  uint32_t lines = 1;
+  const wchar_t* p = str;
+
+  while (*p) {
+    if (*p == '\r') {
+      p++;
+      if (*p == '\n') {
+        p++;
+      }
+      lines++;
+    } else if (*p == '\n') {
+      p++;
+      lines++;
+    } else {
+      p++;
+    }
+  }
+
+  return lines;
+}
+
+ret_t line_break(const wchar_t* str, line_break_on_line_t on_line, void* ctx) {
+  uint32_t i = 0;
+  uint32_t line_len = 0;
+  const wchar_t* end = str;
+  const wchar_t* start = str;
+  uint32_t lines = line_break_count(str);
+
+  for (i = 0; (i < lines) && *start; i++) {
+    while (*end != '\r' && *end != '\n' && *end) {
+      end++;
+    }
+    line_len = end - start;
+
+    on_line(ctx, i, start, line_len);
+
+    if (*end == '\r') {
+      end++;
+      if (*end == '\n') {
+        end++;
+      }
+    } else {
+      end++;
+    }
+
+    start = end;
+  }
+
+  return RET_OK;
+}

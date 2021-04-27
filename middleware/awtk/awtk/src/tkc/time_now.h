@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  time
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,6 +51,15 @@ uint64_t time_now_s(void);
  * @return {uint64_t} 返回当前时间(毫秒)。
  */
 uint64_t time_now_ms(void);
+
+/**
+ * @method time_now_us
+ * 获取当前时间(微秒)。
+ * @annotation ["scriptable", "static"]
+ *
+ * @return {uint64_t} 返回当前时间(微秒)。
+ */
+uint64_t time_now_us(void);
 
 END_C_DECLS
 

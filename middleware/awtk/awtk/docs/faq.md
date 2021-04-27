@@ -108,7 +108,7 @@ ret_t widget_set_opacity(widget_t* widget, uint8_t opacity);
 
 #### 8. 如何定制缺省软键盘界面？
 
-软键盘可以根据自己的情况进行调整，可以修改 demos/assets/default/raw/ui/kb_default.xml。
+软键盘可以根据自己的情况进行调整，可以修改 design/default/ui/kb_default.xml。
 
 * 修改 active 的值可以改变初始页面。
 
@@ -219,3 +219,88 @@ COMMON_CCFLAGS=COMMON_CCFLAGS+' -DNATIVE_WINDOW_BORDERLESS=1 '
 * 从 assets/default/raw/styles/default.xml 中去掉不必要的。
 
 * 去掉不必要的图片。一些控件去掉了，相应的图片也没有必要了。
+
+#### 16. 内存不够，内部 flash 不够，如何加载大字体文件？
+
+请参考：[自定义字体加载器：加载部分字体](https://github.com/zlgopen/awtk-custom-font-loader)
+
+#### 17. 如何在打开新窗口时关闭当前窗口？
+
+使用下面的函数即可：
+
+```c
+/**
+ * @method window_open_and_close
+ * @annotation ["constructor", "scriptable"]
+ * 从资源文件中加载并创建 window 对象。本函数在 ui_loader/ui_builder_default 里实现。
+ * @param {const char*} name window 的名称。
+ * @param {widget_t*} to_close 关闭该窗口。
+ *
+ * @return {widget_t*} 对象。
+ */
+widget_t* window_open_and_close(const char* name, widget_t* to_close);
+```
+
+#### 18. 如何设置当前的语言？
+
+使用下面的函数即可：
+
+```c
+/**
+ * @method locale_info_change
+ * 设置当前的国家和语言。
+ * @annotation ["scriptable"]
+ * @param {locale_info_t*} locale_info locale_info 对象。
+ * @param {char*} language 语言。
+ * @param {char*} country 国家或地区。
+ *
+ * @return {ret_t} 返回 RET_OK 表示成功，否则表示失败。
+ */
+ret_t locale_info_change(locale_info_t* locale_info, const char* language, const char* country)
+```
+
+#### 19. 如何将板子键盘的键值映射到 AWTK？
+
+请参考：
+
+* [Linux 系统](https://github.com/zlgopen/awtk-linux-fb/blob/master/awtk-port/input_thread.c)
+* [嵌入式系统](https://github.com/zlgopen/awtk-stm32h743iitx-mvvm/blob/master/docs/stm32h743iitx_port.md) 的 11 节。
+
+#### 20. 如何定制软键盘/候选字的风格？
+
+请修改下面的文件，并重新生成资源：
+
+```
+design/default/styles/keyboard.xml
+```
+
+#### 21.如何处理：Cannot find module 'glob'
+
+一般来说，执行下面的命令即可：
+
+```
+npm install -g glob
+```
+
+
+在Linux/MacOS上，有时仍然出现错误，可以通过下面的命令，设置NODE_PATH环境变量：
+
+
+```
+export NODE_PATH="$(npm root -g)"
+```
+
+#### 22.如何处理 ImportError: No module named PIL
+
+这个需要安装Pillow模块(python)，运行下面的命令可以安装：
+
+```
+pip3 install Pillow
+```
+
+如果系统同时安装了python2，可以加个alias。
+
+```
+alias python=python3
+```
+

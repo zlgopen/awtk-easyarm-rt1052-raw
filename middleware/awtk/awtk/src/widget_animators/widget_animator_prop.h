@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  animate widget by change its prop
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,8 +33,8 @@ BEGIN_C_DECLS
 typedef struct _widget_animator_prop_t {
   widget_animator_t base;
 
-  float_t to;
-  float_t from;
+  double to;
+  double from;
   char prop_name[TK_NAME_LEN + 1];
 } widget_animator_prop_t;
 
@@ -56,12 +56,12 @@ widget_animator_t* widget_animator_prop_create(widget_t* widget, uint32_t durati
  * @method widget_animator_prop_set_params
  * 设置动画对象的参数。
  * @param {widget_animator_t*} animator 动画对象本身。
- * @param {float_t} from prop起始值。
- * @param {float_t} to prop结束值。
+ * @param {double} from prop起始值。
+ * @param {double} to prop结束值。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t widget_animator_prop_set_params(widget_animator_t* animator, float_t from, float_t to);
+ret_t widget_animator_prop_set_params(widget_animator_t* animator, double from, double to);
 
 END_C_DECLS
 

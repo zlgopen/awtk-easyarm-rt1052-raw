@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  tab_button
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -72,7 +72,7 @@ BEGIN_C_DECLS
  * 标签按钮一般放在标签按钮分组中，布局由标签按钮分组控件决定，不需要指定自己的布局参数和坐标。
  *
  * > 更多用法请参考：
- * [tab control](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
+ * [tab control](https://github.com/zlgopen/awtk/blob/master/design/default/ui/)
  *
  * 可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：
  *
@@ -119,6 +119,7 @@ typedef struct _tab_button_t {
 
   /*private*/
   widget_t* ui;
+  bool_t pressed;
 } tab_button_t;
 
 /**

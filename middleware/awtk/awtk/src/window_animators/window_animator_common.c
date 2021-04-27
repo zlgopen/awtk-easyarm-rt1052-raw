@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window animator common used functions.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -97,25 +97,16 @@ ret_t window_animator_to_right_draw_curr(window_animator_t* wa) {
   return lcd_draw_image(c->lcd, &(wa->curr_img), rect_scale(&src, wa->ratio), &dst);
 }
 
-static bool_t window_animator_is_overlap(window_animator_t* wa);
 static ret_t window_animator_paint_system_bar(window_animator_t* wa);
 static ret_t window_animator_update_percent(window_animator_t* wa);
 static ret_t window_animator_draw_prev_window(window_animator_t* wa);
 static ret_t window_animator_draw_curr_window(window_animator_t* wa);
 
 static ret_t window_animator_open_destroy(window_animator_t* wa) {
-#ifdef WITH_NANOVG_GPU
-  vgcanvas_t* vg = lcd_get_vgcanvas(wa->canvas->lcd);
-  if (wa->dialog_highlighter == NULL) {
-    vgcanvas_destroy_fbo(vg, &(wa->prev_fbo));
-  }
-  vgcanvas_destroy_fbo(vg, &(wa->curr_fbo));
-#else
   if (wa->dialog_highlighter == NULL) {
     bitmap_destroy(&(wa->prev_img));
   }
   bitmap_destroy(&(wa->curr_img));
-#endif /*WITH_NANOVG_GPU*/
 
   memset(wa, 0x00, sizeof(window_animator_t));
   TKMEM_FREE(wa);
@@ -128,12 +119,6 @@ static ret_t window_animator_close_destroy(window_animator_t* wa) {
   widget_destroy(wa->curr_win);
 
   return window_animator_open_destroy(wa);
-}
-
-static bool_t window_animator_is_overlap(window_animator_t* wa) {
-  return_value_if_fail(wa != NULL && wa->vt != NULL, FALSE);
-
-  return wa->vt->overlap;
 }
 
 ret_t window_animator_update(window_animator_t* wa, uint32_t time_ms) {
@@ -157,9 +142,6 @@ ret_t window_animator_update(window_animator_t* wa, uint32_t time_ms) {
 
 ret_t window_animator_destroy(window_animator_t* wa) {
   return_value_if_fail(wa != NULL, RET_FAIL);
-#ifdef AWTK_WEB
-  EM_ASM_INT({ return VGCanvas.animateEnd(); }, 0);
-#endif /*AWTK_WEB*/
 
   if (wa->open) {
     return window_animator_open_destroy(wa);
@@ -190,43 +172,6 @@ static ret_t window_animator_paint_system_bar(window_animator_t* wa) {
   return RET_OK;
 }
 
-static ret_t window_animator_begin_frame_normal(window_animator_t* wa) {
-#ifdef WITH_NANOVG_GPU
-  ENSURE(canvas_begin_frame(wa->canvas, NULL, LCD_DRAW_ANIMATION) == RET_OK);
-#else
-  rect_t r;
-  widget_t* wm = wa->curr_win->parent;
-  r = rect_init(wm->x, wm->y, wm->w, wm->h);
-  ENSURE(canvas_begin_frame(wa->canvas, &r, LCD_DRAW_ANIMATION) == RET_OK);
-#endif
-
-  return window_animator_paint_system_bar(wa);
-}
-
-static ret_t window_animator_begin_frame_overlap(window_animator_t* wa) {
-#ifdef WITH_NANOVG_GPU
-  ENSURE(canvas_begin_frame(wa->canvas, NULL, LCD_DRAW_ANIMATION) == RET_OK);
-#else
-  rect_t r;
-  widget_t* w = NULL;
-
-  if (wa->percent > 0) {
-    w = wa->curr_win;
-  } else {
-    w = wa->curr_win->parent;
-  }
-
-  if (dialog_highlighter_is_dynamic(wa->dialog_highlighter)) {
-    w = wa->curr_win->parent;
-  }
-
-  r = rect_init(w->x, w->y, w->w, w->h);
-  ENSURE(canvas_begin_frame(wa->canvas, &r, LCD_DRAW_ANIMATION_OVERLAP) == RET_OK);
-#endif
-
-  return window_animator_paint_system_bar(wa);
-}
-
 #ifdef WITH_WINDOW_ANIMATORS
 static ret_t window_animator_init(window_animator_t* wa) {
   ret_t ret = RET_NOT_IMPL;
@@ -242,7 +187,6 @@ static ret_t window_animator_init(window_animator_t* wa) {
 ret_t window_animator_prepare(window_animator_t* wa, canvas_t* c, widget_t* prev_win,
                               widget_t* curr_win) {
   widget_t* wm = prev_win->parent;
-  bool_t auto_rotate = !window_animator_is_overlap(wa);
 
   wa->canvas = c;
   wa->prev_win = prev_win;
@@ -251,8 +195,8 @@ ret_t window_animator_prepare(window_animator_t* wa, canvas_t* c, widget_t* prev
   wa->duration = wa->duration ? wa->duration : 500;
 
   window_animator_init(wa);
-  window_manager_snap_prev_window(wm, prev_win, &(wa->prev_img), &(wa->prev_fbo), auto_rotate);
-  window_manager_snap_curr_window(wm, curr_win, &(wa->curr_img), &(wa->curr_fbo), auto_rotate);
+  window_manager_snap_prev_window(wm, prev_win, &(wa->prev_img));
+  window_manager_snap_curr_window(wm, curr_win, &(wa->curr_img));
   wa->dialog_highlighter = window_manager_get_dialog_highlighter(wm);
 
   return RET_OK;
@@ -277,10 +221,6 @@ window_animator_t* window_animator_create(bool_t open, const window_animator_vta
   wa->open = open;
   wa->easing = easing_get(EASING_CUBIC_OUT);
 
-#ifdef AWTK_WEB
-  EM_ASM_INT({ return VGCanvas.animateBegin(); }, 0);
-#endif /*AWTK_WEB*/
-
   return wa;
 }
 
@@ -295,26 +235,27 @@ static ret_t window_animator_update_percent_default(window_animator_t* wa) {
 }
 
 static ret_t window_animator_update_percent(window_animator_t* wa) {
+  ret_t ret = RET_OK;
   return_value_if_fail(wa != NULL && wa->vt != NULL, RET_BAD_PARAMS);
 
   if (wa->vt->update_percent != NULL) {
-    return wa->vt->update_percent(wa);
+    ret = wa->vt->update_percent(wa);
   } else {
-    return window_animator_update_percent_default(wa);
+    ret = window_animator_update_percent_default(wa);
   }
+  if (wa->percent >= 1) {
+    wa->percent = 0.999f;
+  } else if (wa->percent < 0) {
+    wa->percent = 0.0f;
+  }
+  return ret;
 }
 
 static ret_t window_animator_draw_prev_window(window_animator_t* wa) {
   return_value_if_fail(wa != NULL && wa->vt != NULL && wa->vt->draw_prev_window, RET_BAD_PARAMS);
 
   if (wa->dialog_highlighter != NULL) {
-    float_t percent = wa->percent;
-    /*always < 1 to tell highlighter that it is animating.*/
-    if (percent >= 1) {
-      percent = 0.999;
-    }
-
-    return dialog_highlighter_draw(wa->dialog_highlighter, percent);
+    return dialog_highlighter_draw(wa->dialog_highlighter, wa->percent);
   } else {
     return wa->vt->draw_prev_window(wa);
   }
@@ -339,11 +280,9 @@ ret_t window_animator_overlap_default_draw_prev(window_animator_t* wa) {
 ret_t window_animator_begin_frame(window_animator_t* wa) {
   return_value_if_fail(wa != NULL, RET_OK);
 
-  if (window_animator_is_overlap(wa)) {
-    return window_animator_begin_frame_overlap(wa);
-  } else {
-    return window_animator_begin_frame_normal(wa);
-  }
+  ENSURE(canvas_begin_frame(wa->canvas, NULL, LCD_DRAW_ANIMATION) == RET_OK);
+
+  return window_animator_paint_system_bar(wa);
 }
 
 ret_t window_animator_end_frame(window_animator_t* wa) {

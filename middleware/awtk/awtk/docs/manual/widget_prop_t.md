@@ -11,9 +11,18 @@
 | WIDGET\_PROP\_Y | Y坐标。 |
 | WIDGET\_PROP\_W | 宽度。 |
 | WIDGET\_PROP\_H | 高度。 |
+| WIDGET\_PROP\_DESIGN\_W | 窗口设计时宽度。 |
+| WIDGET\_PROP\_DESIGN\_H | 窗口设计时宽度。 |
+| WIDGET\_PROP\_AUTO\_SCALE\_CHILDREN\_X | 窗口大小与设计时大小不同时，是否自动调整子控件的x坐标。 |
+| WIDGET\_PROP\_AUTO\_SCALE\_CHILDREN\_Y | 窗口大小与设计时大小不同时，是否自动调整子控件的y坐标。 |
+| WIDGET\_PROP\_AUTO\_SCALE\_CHILDREN\_W | 窗口大小与设计时大小不同时，是否自动调整子控件的宽度。 |
+| WIDGET\_PROP\_AUTO\_SCALE\_CHILDREN\_H | 窗口大小与设计时大小不同时，是否自动调整子控件的高度。 |
+| WIDGET\_PROP\_INPUTING | inputing。 |
+| WIDGET\_PROP\_ALWAYS\_ON\_TOP | always on top。 |
 | WIDGET\_PROP\_CARET\_X | caret x。 |
 | WIDGET\_PROP\_CARET\_Y | caret y。 |
 | WIDGET\_PROP\_DIRTY\_RECT\_TOLERANCE | 脏矩形超出控件本身大小的最大范围。 |
+| WIDGET\_PROP\_BIDI | bidi type(rtl,ltr,auto,wrtl,wltr,lro,rlo)。 |
 | WIDGET\_PROP\_CANVAS | Canvas。 |
 | WIDGET\_PROP\_LOCALIZE\_OPTIONS | Canvas。 |
 | WIDGET\_PROP\_NATIVE\_WINDOW | Native Window。 |
@@ -22,6 +31,8 @@
 | WIDGET\_PROP\_OPACITY | 不透明度。 |
 | WIDGET\_PROP\_MIN\_W | 最小宽度。 |
 | WIDGET\_PROP\_MAX\_W | 最大宽度。 |
+| WIDGET\_PROP\_AUTO\_ADJUST\_SIZE | 根据子控件和文本自动调整大小。 |
+| WIDGET\_PROP\_SINGLE\_INSTANCE | 窗口是否保持单例。 |
 | WIDGET\_PROP\_CHILDREN\_LAYOUT | 子控件布局参数。 |
 | WIDGET\_PROP\_LAYOUT | 子控件布局参数(过时)。 |
 | WIDGET\_PROP\_SELF\_LAYOUT | 控件布局参数。 |
@@ -34,7 +45,10 @@
 | WIDGET\_PROP\_CLOSABLE | 是否可以关闭。 |
 | WIDGET\_PROP\_POINTER\_CURSOR | 鼠标指针。 |
 | WIDGET\_PROP\_VALUE | 值。 |
+| WIDGET\_PROP\_REVERSE | 进度条反向显示。 |
 | WIDGET\_PROP\_LENGTH | 长度。 |
+| WIDGET\_PROP\_LINE\_WRAP | 自动换行。 |
+| WIDGET\_PROP\_WORD\_WRAP | 是否允许单词中换行。 |
 | WIDGET\_PROP\_TEXT | 文本。 |
 | WIDGET\_PROP\_TR\_TEXT | 待翻译文本。 |
 | WIDGET\_PROP\_STYLE | style。 |
@@ -64,8 +78,11 @@
 | WIDGET\_PROP\_KEYBOARD | 自定义软键盘资源名称。 |
 | WIDGET\_PROP\_DEFAULT\_FOCUSED\_CHILD | 缺省获得焦点的子控件(可用控件名或类型)。 |
 | WIDGET\_PROP\_READONLY | 只读模式。 |
+| WIDGET\_PROP\_CANCELABLE | 是否可取消。 |
 | WIDGET\_PROP\_PASSWORD\_VISIBLE | 密码是否可见。 |
 | WIDGET\_PROP\_ACTIVE | 是否处于active状态。 |
+| WIDGET\_PROP\_CURR\_PAGE | 当前页。 |
+| WIDGET\_PROP\_PAGE\_MAX\_NUMBER | 页面最大个数。 |
 | WIDGET\_PROP\_VERTICAL | 是否为垂直模式。 |
 | WIDGET\_PROP\_SHOW\_TEXT | 是否显示文本。 |
 | WIDGET\_PROP\_XOFFSET | X方向的偏移。 |
@@ -77,6 +94,7 @@
 | WIDGET\_PROP\_AUTO\_FIX | 是否启用自动更正功能。 |
 | WIDGET\_PROP\_SELECT\_NONE\_WHEN\_FOCUSED | 编辑器在获得焦点时是否不选中文本。 |
 | WIDGET\_PROP\_OPEN\_IM\_WHEN\_FOCUSED | 编辑器在获得焦点时是否打开输入法。 |
+| WIDGET\_PROP\_CLOSE\_IM\_WHEN\_BLURED | 编辑器在失去焦点时是否关闭输入法。 |
 | WIDGET\_PROP\_X\_MIN | X最小值。 |
 | WIDGET\_PROP\_X\_MAX | X最大值。 |
 | WIDGET\_PROP\_Y\_MIN | Y最小值。 |
@@ -99,7 +117,9 @@
 | WIDGET\_PROP\_XSLIDABLE | X方向是否可拖动。 |
 | WIDGET\_PROP\_YSLIDABLE | Y方向是否可拖动。 |
 | WIDGET\_PROP\_REPEAT | 重复次数。 |
+| WIDGET\_PROP\_LONG\_PRESS\_TIME | 触发长按事件的时间(ms)。 |
 | WIDGET\_PROP\_ENABLE\_LONG\_PRESS | 是否启用长按。 |
+| WIDGET\_PROP\_CLICK\_THROUGH | 是否启用点击穿透。 |
 | WIDGET\_PROP\_ANIMATABLE | 是否启用动画。 |
 | WIDGET\_PROP\_AUTO\_HIDE\_SCROLL\_BAR | 是否自动隐藏滚动条。 |
 | WIDGET\_PROP\_IMAGE | 图片名称。 |
@@ -124,6 +144,7 @@
 | WIDGET\_PROP\_SELECTED\_INDEX | 被选中项的索引。 |
 | WIDGET\_PROP\_CLOSE\_WHEN\_CLICK | 点击窗口时关闭窗口。 |
 | WIDGET\_PROP\_CLOSE\_WHEN\_CLICK\_OUTSIDE | 点击窗口外部时关闭窗口。 |
+| WIDGET\_PROP\_CLOSE\_WHEN\_TIMEOUT | 超时后关闭窗口。 |
 | WIDGET\_PROP\_LINE\_GAP | 行间距。 |
 | WIDGET\_PROP\_BG\_COLOR | 背景颜色(仅仅使用于color tile)。 |
 | WIDGET\_PROP\_BORDER\_COLOR | 边框颜色(仅仅使用于color tile)。 |
@@ -132,7 +153,7 @@
 | WIDGET\_PROP\_FOCUSED | 是否为焦点控件。 |
 | WIDGET\_PROP\_FOCUS | (过时请用focused)。 |
 | WIDGET\_PROP\_FOCUSABLE | 是否支持焦点停留。 |
-| WIDGET\_PROP\_WITH\_FOCUS\_STATE | 是否支持焦点状态(如果希望style支持焦点状态，但有不希望焦点停留，可用本属性)。 |
+| WIDGET\_PROP\_WITH\_FOCUS\_STATE | 是否支持焦点状态(如果希望style支持焦点状态，但又不希望焦点停留，可用本属性)。 |
 | WIDGET\_PROP\_MOVE\_FOCUS\_PREV\_KEY | 将焦点移到前一个的键值。 |
 | WIDGET\_PROP\_MOVE\_FOCUS\_NEXT\_KEY | 将焦点移到后一个的键值。 |
 | WIDGET\_PROP\_MOVE\_FOCUS\_UP\_KEY | 将焦点向上移动的键值。 |

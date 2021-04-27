@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  text_selector
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,8 @@ BEGIN_C_DECLS
 typedef struct _text_selector_option_t {
   int32_t value;
   struct _text_selector_option_t* next;
-  wchar_t text[2];
+  char* tr_text;
+  wstr_t text;
 } text_selector_option_t;
 
 /**
@@ -51,7 +52,7 @@ typedef struct _text_selector_option_t {
  * ```
  *
  * > 更多用法请参考：[text\_selector.xml](
- * https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/text_selector.xml)
+ * https://github.com/zlgopen/awtk/blob/master/design/default/ui/text_selector.xml)
  *
  * 在c代码中使用函数text\_selector\_create创建文本选择器控件。如：
  *
@@ -74,7 +75,7 @@ typedef struct _text_selector_option_t {
  * ```
  *
  * > 更多用法请参考：[theme default](
- * https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L443)
+ * https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L443)
  *
  */
 typedef struct _text_selector_t {
@@ -83,7 +84,7 @@ typedef struct _text_selector_t {
   /**
    * @property {uint32_t} visible_nr
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 可见的选项数量(只能是3或者5，缺省为5)。
+   * 可见的选项数量(只能是1或者3或者5，缺省为5)。
    */
   uint32_t visible_nr;
 
@@ -103,14 +104,39 @@ typedef struct _text_selector_t {
    */
   char* options;
 
+  /**
+   * @property {float_t} yspeed_scale
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * y偏移速度比例。
+   */
+  float_t yspeed_scale;
+
+  /**
+   * @property {bool_t} localize_options
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否本地化(翻译)选项(缺省为FALSE)。
+   */
+  bool_t localize_options;
+
+  /**
+   * @property {bool_t} loop_options
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否循环选项(缺省为FALSE)。
+   */
+  bool_t loop_options;
+
   /*private*/
+  bool_t pressed;
+  bool_t is_init;
   str_t text;
   int32_t ydown;
   int32_t yoffset;
   int32_t yoffset_save;
-  bool_t pressed;
   velocity_t velocity;
   widget_animator_t* wa;
+  int32_t draw_widget_y;
+  int32_t draw_widget_h;
+  uint32_t locale_info_id;
   text_selector_option_t* option_items;
 } text_selector_t;
 
@@ -190,6 +216,21 @@ ret_t text_selector_append_option(widget_t* widget, int32_t value, const char* t
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t text_selector_set_options(widget_t* widget, const char* options);
+
+/**
+ * @method text_selector_set_range_options_ex
+ * 设置一系列的整数选项。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget text_selector对象。
+ * @param {int32_t} start 起始值。
+ * @param {uint32_t} nr 个数。
+ * @param {int32_t} step 步长。
+ * @param {const char*} format 选项的格式化。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t text_selector_set_range_options_ex(widget_t* widget, int32_t start, uint32_t nr, int32_t step,
+                                         const char* format);
 
 /**
  * @method text_selector_set_range_options
@@ -279,8 +320,43 @@ ret_t text_selector_set_selected_index(widget_t* widget, uint32_t index);
  */
 ret_t text_selector_set_visible_nr(widget_t* widget, uint32_t visible_nr);
 
+/**
+ * @method text_selector_set_localize_options
+ * 设置是否本地化(翻译)选项。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget text_selector对象。
+ * @param {bool_t} localize_options 是否本地化(翻译)选项。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t text_selector_set_localize_options(widget_t* widget, bool_t localize_options);
+
+/**
+ * @method text_selector_set_loop_options
+ * 设置是否循环选项。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget text_selector对象。
+ * @param {bool_t} loop_options 是否循环选项。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t text_selector_set_loop_options(widget_t* widget, bool_t loop_options);
+
+/**
+ * @method text_selector_set_yspeed_scale
+ * 设置Y轴偏移速度比例。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {float_t} yspeed_scale y偏移速度比例。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t text_selector_set_yspeed_scale(widget_t* widget, float_t yspeed_scale);
+
 #define TEXT_SELECTOR_PROP_VISIBLE_NR "visible_nr"
 #define WIDGET_TYPE_TEXT_SELECTOR "text_selector"
+#define TEXT_SELECTOR_PROP_LOOP_OPTIONS "loop_options"
+#define TEXT_SELECTOR_PROP_Y_SPEED_SCALE "yspeed_scale"
 #define TEXT_SELECTOR(widget) ((text_selector_t*)(text_selector_cast(WIDGET(widget))))
 
 /*public for subclass and runtime type check*/

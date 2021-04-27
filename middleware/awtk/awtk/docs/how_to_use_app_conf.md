@@ -465,6 +465,23 @@ app_conf_on_changed(app_conf_changed, NULL);
 
 > 回调函数在修改配置的线程调用。如果是后台线程修改配置，在配置变化时，需要更新界面，此时需要用 idle_queue 进行串行化。
 
+3.8 恢复出厂设置
+
+用默认配置文件替换当前配置文件，并重新加载。
+
+```c
+/**
+ * @method app_conf_reset
+ *
+ * 恢复出厂设置。
+ *
+ * @annotation ["global"]
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t app_conf_reset(void);
+```
+
 ## 6. 释放配置相关资源。
 
 ```c
@@ -586,13 +603,13 @@ ret_t application_exit() {
 
 ## 8. 缺省配置
   
-  * 位置。缺省配置放到资源中，位于：demos/assets/default/raw/data
+  * 位置。缺省配置放到资源中，位于：design/default/data
   
   * 命名：应用程序名 + '.' + 文件扩展名。
 
   * 文件扩展名与初始化时指定的格式一致。 
 
-比如，下面的例子中，应用程序名 demo，扩展名为 json。所以对应的缺省配置文件为：demos/assets/default/raw/demo.json
+比如，下面的例子中，应用程序名 demo，扩展名为 json。所以对应的缺省配置文件为：design/default/demo.json
 
 ```c
   ENSURE(app_conf_init_json("demo") == RET_OK);

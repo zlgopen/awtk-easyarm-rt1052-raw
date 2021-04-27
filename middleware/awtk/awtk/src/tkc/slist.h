@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  single link list
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -119,6 +119,23 @@ void* slist_find(slist_t* slist, void* ctx);
 ret_t slist_remove(slist_t* slist, void* ctx);
 
 /**
+ * @method slist_remove_with_compare
+ * 删除满足条件的元素。
+ * 备注：
+ * 如果队列中符合条件的元素不足 remove_size，移除最后一个符合条件的元素后返回 RET_OK。
+ * 如果队列中符合条件的元素大于 remove_size，在队列中移除 remove_size 个元素后返回 RET_OK。
+ * remove_size 为负数则会移除所有符合条件的元素。
+ * @param {slist_t*} slist 单向链表对象。
+ * @param {void*} ctx 比较函数的上下文。
+ * @param {tk_compare_t} compare 元素比较函数。
+ * @param {int32_t} remove_size 删除个数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t slist_remove_with_compare(slist_t* slist, void* ctx, tk_compare_t compare,
+                                int32_t remove_size);
+
+/**
  * @method slist_remove_all
  * 删除全部元素。
  * @param {slist_t*} slist 单向链表对象。
@@ -136,6 +153,17 @@ ret_t slist_remove_all(slist_t* slist);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t slist_append(slist_t* slist, void* data);
+
+/**
+ * @method slist_insert
+ * 插入一个元素。
+ * @param {slist_t*} slist 单向链表对象。
+ * @param {uint32_t} index 位置序数。
+ * @param {void*} data 待追加的元素。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t slist_insert(slist_t* slist, uint32_t index, void* data);
 
 /**
  * @method slist_prepend
@@ -157,6 +185,24 @@ ret_t slist_prepend(slist_t* slist, void* data);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t slist_foreach(slist_t* slist, tk_visit_t visit, void* ctx);
+
+/**
+ * @method slist_tail_pop
+ * 弹出最后一个元素。
+ * @param {slist_t*} slist 单向链表对象。
+ *
+ * @return {ret_t} 成功返回最后一个元素，失败返回NULL。
+ */
+void* slist_tail_pop(slist_t* slist);
+
+/**
+ * @method slist_head_pop
+ * 弹出第一个元素。
+ * @param {slist_t*} slist 单向链表对象。
+ *
+ * @return {ret_t} 成功返回最后一个元素，失败返回NULL。
+ */
+void* slist_head_pop(slist_t* slist);
 
 /**
  * @method slist_size

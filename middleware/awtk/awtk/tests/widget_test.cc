@@ -9,6 +9,7 @@
 #include "base/window.h"
 #include "widgets/pages.h"
 #include "base/style_const.h"
+#include "base/style_mutable.h"
 #include "font_dummy.h"
 #include "lcd_log.h"
 #include <stdlib.h>
@@ -481,17 +482,21 @@ TEST(Widget, widget_get_state_for_style) {
 TEST(Widget, update_style1) {
   widget_t* w = window_create(NULL, 0, 0, 400, 300);
   widget_t* b = button_create(NULL, 1, 0, 10, 20);
-  style_const_t* style = (style_const_t*)(b->astyle);
 
-  ASSERT_EQ(style->data, (const unsigned char*)NULL);
+  ASSERT_EQ(b->astyle == NULL, TRUE);
   widget_use_style(b, "edit_clear");
-  ASSERT_EQ(style->data, (const unsigned char*)NULL);
+  ASSERT_EQ(b->astyle == NULL, TRUE);
+  widget_set_style_color(b, "bg_color", 0xff00ff00);
+  ASSERT_EQ(b->astyle != NULL, TRUE);
+  ASSERT_EQ(style_is_mutable(b->astyle), TRUE);
 
   widget_add_child(w, b);
   ASSERT_EQ(b->need_update_style, TRUE);
   ASSERT_EQ(widget_update_style(b), RET_OK);
   ASSERT_EQ(b->need_update_style, FALSE);
-  ASSERT_NE(style->data, (const unsigned char*)NULL);
+  ASSERT_EQ(style_is_mutable(b->astyle), TRUE);
+  style_mutable_t* style = (style_mutable_t*)(b->astyle);
+  ASSERT_EQ(style->default_style != NULL, TRUE);
 
   widget_destroy(w);
 }
@@ -500,18 +505,21 @@ TEST(Widget, update_style2) {
   widget_t* w = window_create(NULL, 0, 0, 400, 300);
   widget_t* g = group_box_create(NULL, 0, 0, 100, 200);
   widget_t* b = button_create(g, 1, 0, 10, 20);
-  style_const_t* style = (style_const_t*)(b->astyle);
 
-  ASSERT_EQ(style->data, (const unsigned char*)NULL);
+  ASSERT_EQ(b->astyle == NULL, TRUE);
   widget_use_style(b, "edit_clear");
-  ASSERT_EQ(style->data, (const unsigned char*)NULL);
+  ASSERT_EQ(b->astyle == NULL, TRUE);
+  widget_set_style_color(b, "bg_color", 0xff00ff00);
+  ASSERT_EQ(b->astyle != NULL, TRUE);
+  ASSERT_EQ(style_is_mutable(b->astyle), TRUE);
 
   widget_add_child(w, g);
 
   ASSERT_EQ(b->need_update_style, TRUE);
   ASSERT_EQ(widget_update_style(b), RET_OK);
   ASSERT_EQ(b->need_update_style, FALSE);
-  ASSERT_NE(style->data, (const unsigned char*)NULL);
+  style_mutable_t* style = (style_mutable_t*)(b->astyle);
+  ASSERT_EQ(style->default_style != NULL, TRUE);
 
   widget_destroy(w);
 }
@@ -1227,6 +1235,7 @@ TEST(Widget, exec) {
   ASSERT_EQ(widget_set_prop_str(w, WIDGET_PROP_EXEC, NULL), RET_NOT_FOUND);
 
   widget_destroy(w);
+  idle_dispatch();
 }
 
 TEST(Widget, tr_text) {
@@ -1276,4 +1285,37 @@ TEST(Widget, set_child_text_with_double) {
   ASSERT_EQ(wcs_cmp(label->text.str, L"12.3000kg"), 0);
 
   widget_destroy(view);
+}
+
+TEST(Widget, is_parent_of) {
+  widget_t* view = view_create(NULL, 0, 0, 0, 0);
+  widget_t* label = label_create(view, 0, 0, 0, 0);
+  widget_t* button = button_create(label, 0, 0, 0, 0);
+  widget_set_name(label, "aaa");
+
+  ASSERT_EQ(widget_is_parent_of(view, label), TRUE);
+  ASSERT_EQ(widget_is_direct_parent_of(view, label), TRUE);
+
+  ASSERT_EQ(widget_is_parent_of(view, button), TRUE);
+  ASSERT_EQ(widget_is_direct_parent_of(view, button), FALSE);
+
+  ASSERT_EQ(widget_is_parent_of(label, view), FALSE);
+  ASSERT_EQ(widget_is_direct_parent_of(label, view), FALSE);
+
+  widget_destroy(view);
+}
+
+TEST(Widget, get_text_utf8) {
+  char text[32];
+  widget_t* w = button_create(NULL, 0, 0, 0, 0);
+
+  widget_set_text(w, L"ok");
+  ASSERT_EQ(widget_get_text_utf8(w, text, sizeof(text)), RET_OK);
+  ASSERT_STREQ(text, "ok");
+
+  widget_set_text(w, L"中文");
+  ASSERT_EQ(widget_get_text_utf8(w, text, sizeof(text)), RET_OK);
+  ASSERT_STREQ(text, "中文");
+
+  widget_destroy(w);
 }

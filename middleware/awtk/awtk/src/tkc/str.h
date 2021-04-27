@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  string
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -82,7 +82,6 @@ str_t* str_init(str_t* str, uint32_t capacity);
 /**
  * @method str_extend
  * 扩展字符串到指定的容量。
- * @annotation ["constructor"]
  * @param {str_t*} str str对象。
  * @param {uint32_t} capacity 初始容量。
  *
@@ -401,6 +400,29 @@ ret_t str_to_int(str_t* str, int32_t* v);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t str_to_float(str_t* str, double* v);
+
+/**
+ * @method str_encode_hex
+ * 把二进制的数据编码成16进制格式的字符串。
+ * @param {str_t*} str str对象。
+ * @param {const uint8_t*} data 数据。
+ * @param {uint32_t} size 数据长度。
+ * @param {const char*} format 格式(如:"%02x" 表示生成小写)
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t str_encode_hex(str_t* str, const uint8_t* data, uint32_t size, const char* format);
+
+/**
+ * @method str_encode_hex
+ * 把16进制格式的字符串解码成字符串。
+ * @param {str_t*} str str对象。
+ * @param {uint8_t*} data 数据缓存区(返回)。
+ * @param {uint32_t} size 数据最大长度。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t str_decode_hex(str_t* str, uint8_t* data, uint32_t size);
 
 /**
  * @method str_end_with

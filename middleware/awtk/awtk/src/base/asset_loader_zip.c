@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  asset_loader_zip
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,7 @@
 #include "miniz/miniz.h"
 #include "miniz/miniz_zip.h"
 #include "base/asset_loader_zip.h"
+#include "base/assets_manager.h"
 
 typedef struct _asset_loader_zip_t {
   asset_loader_t asset_loader;
@@ -77,13 +78,26 @@ static void* miniz_awtk_realloc_func(void* opaque, void* address, size_t items, 
   return TKMEM_REALLOC(address, items * size);
 }
 
+static bool_t asset_loader_zip_exist(asset_loader_t* loader, const char* path) {
+  asset_loader_zip_t* zip = (asset_loader_zip_t*)loader;
+  const char* res_root = assets_manager_get_res_root(assets_manager());
+  uint32_t res_root_len = res_root == NULL ? 0 : strlen(res_root);
+  const char* p = path + ((res_root_len == 0) ? 0 : (res_root_len + 1));
+  int file_index = mz_zip_reader_locate_file(&(zip->archive), p, NULL, 0);
+
+  return file_index >= 0;
+}
+
 static asset_info_t* asset_loader_zip_load(asset_loader_t* loader, uint16_t type, uint16_t subtype,
                                            const char* path, const char* name) {
   size_t size = 0;
   void* data = NULL;
   asset_info_t* info = NULL;
   asset_loader_zip_t* zip = (asset_loader_zip_t*)loader;
-  int file_index = mz_zip_reader_locate_file(&(zip->archive), path, NULL, 0);
+  const char* res_root = assets_manager_get_res_root(assets_manager());
+  uint32_t res_root_len = res_root == NULL ? 0 : strlen(res_root);
+  const char* p = path + ((res_root_len == 0) ? 0 : (res_root_len + 1));
+  int file_index = mz_zip_reader_locate_file(&(zip->archive), p, NULL, 0);
 
   if (file_index < 0) {
     return NULL;
@@ -119,7 +133,9 @@ static ret_t asset_loader_zip_destroy(asset_loader_t* loader) {
 }
 
 static const asset_loader_vtable_t s_asset_loader_zip_vtable = {
-    .load = asset_loader_zip_load, .destroy = asset_loader_zip_destroy};
+    .load = asset_loader_zip_load,
+    .exist = asset_loader_zip_exist,
+    .destroy = asset_loader_zip_destroy};
 
 static asset_loader_zip_t* asset_loader_zip_create_default(void) {
   asset_loader_zip_t* zip = TKMEM_ZALLOC(asset_loader_zip_t);

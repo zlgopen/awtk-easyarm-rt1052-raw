@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  lcd_mem_special
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,7 +28,7 @@
 #include "lcd/lcd_mem_bgr888.h"
 #include "lcd/lcd_mem_rgb888.h"
 
-static ret_t lcd_mem_special_begin_frame(lcd_t* lcd, rect_t* dr) {
+static ret_t lcd_mem_special_begin_frame(lcd_t* lcd, const rect_t* dr) {
   lcd_mem_special_t* special = (lcd_mem_special_t*)lcd;
   lcd_t* mem = (lcd_t*)(special->lcd_mem);
   mem->draw_mode = lcd->draw_mode;
@@ -76,7 +76,16 @@ static ret_t lcd_mem_special_fill_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t 
   return lcd_fill_rect(mem, x, y, w, h);
 }
 
-static ret_t lcd_mem_special_draw_glyph(lcd_t* lcd, glyph_t* glyph, rect_t* src, xy_t x, xy_t y) {
+static ret_t lcd_mem_special_clear_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
+  lcd_mem_special_t* special = (lcd_mem_special_t*)lcd;
+  lcd_t* mem = (lcd_t*)(special->lcd_mem);
+  mem->fill_color = lcd->fill_color;
+
+  return lcd_clear_rect(mem, x, y, w, h);
+}
+
+static ret_t lcd_mem_special_draw_glyph(lcd_t* lcd, glyph_t* glyph, const rect_t* src, xy_t x,
+                                        xy_t y) {
   lcd_mem_special_t* special = (lcd_mem_special_t*)lcd;
   lcd_t* mem = (lcd_t*)(special->lcd_mem);
   mem->text_color = lcd->text_color;
@@ -92,7 +101,8 @@ static ret_t lcd_mem_special_draw_image_matrix(lcd_t* lcd, draw_image_info_t* in
   return lcd_draw_image_matrix(mem, info);
 }
 
-static ret_t lcd_mem_special_draw_image(lcd_t* lcd, bitmap_t* img, rect_t* src, rect_t* dst) {
+static ret_t lcd_mem_special_draw_image(lcd_t* lcd, bitmap_t* img, const rect_t* src,
+                                        const rect_t* dst) {
   lcd_mem_special_t* special = (lcd_mem_special_t*)lcd;
   lcd_t* mem = (lcd_t*)(special->lcd_mem);
 
@@ -201,6 +211,10 @@ static ret_t lcd_mem_special_resize(lcd_t* lcd, wh_t w, wh_t h, uint32_t line_le
   lcd_destroy((lcd_t*)(special->lcd_mem));
   special->lcd_mem = lcd_mem_special_create_lcd_mem(w, h, special->format);
 
+  if (special->lcd_mem != NULL) {
+    special->lcd_mem->base.flush = NULL;
+  }
+
   if (special->on_resize != NULL) {
     special->on_resize(lcd, w, h, line_length);
   }
@@ -235,6 +249,7 @@ lcd_t* lcd_mem_special_create(wh_t w, wh_t h, bitmap_format_t fmt, lcd_flush_t o
   lcd->draw_vline = lcd_mem_special_draw_vline;
   lcd->draw_hline = lcd_mem_special_draw_hline;
   lcd->fill_rect = lcd_mem_special_fill_rect;
+  lcd->clear_rect = lcd_mem_special_clear_rect;
   lcd->draw_image = lcd_mem_special_draw_image;
   lcd->draw_image_matrix = lcd_mem_special_draw_image_matrix;
   lcd->draw_glyph = lcd_mem_special_draw_glyph;

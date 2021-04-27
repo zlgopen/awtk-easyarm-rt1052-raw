@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input stream base on serial
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,11 +24,15 @@
 #include "streams/serial/istream_serial.h"
 
 static int32_t tk_istream_serial_read(tk_istream_t* stream, uint8_t* buff, uint32_t max_size) {
+  int32_t ret = 0;
   tk_istream_serial_t* istream_serial = TK_ISTREAM_SERIAL(stream);
-  int32_t ret = serial_read(istream_serial->fd, buff, max_size);
 
+  errno = 0;
+  ret = serial_read(istream_serial->fd, buff, max_size);
   if (ret < 0) {
-    istream_serial->is_broken = TRUE;
+    if (errno != EAGAIN) {
+      istream_serial->is_broken = TRUE;
+    }
   }
 
   return ret;

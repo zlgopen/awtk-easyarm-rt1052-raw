@@ -29,40 +29,40 @@ static ret_t gen_one(const char* in_filename, const char* out_filename, const ch
     uint8_t* input_buff = NULL;
     input_buff = (uint8_t*)read_file(in_filename, &size);
     return_value_if_fail(input_buff != NULL, RET_FAIL);
-    if (end_with(in_filename, ".ttf")) {
+    if (case_end_with(in_filename, ".ttf")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_FONT, ASSET_TYPE_FONT_TTF, input_buff,
                           size);
-    } else if (end_with(in_filename, ".png")) {
+    } else if (case_end_with(in_filename, ".png")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_PNG, input_buff,
                           size);
-    } else if (end_with(in_filename, ".bmp")) {
+    } else if (case_end_with(in_filename, ".bmp")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_BMP, input_buff,
                           size);
-    } else if (end_with(in_filename, ".jpg")) {
+    } else if (case_end_with(in_filename, ".jpg")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_JPG, input_buff,
                           size);
-    } else if (end_with(in_filename, ".jpeg")) {
+    } else if (case_end_with(in_filename, ".jpeg")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_JPG, input_buff,
                           size);
-    } else if (end_with(in_filename, ".gif")) {
+    } else if (case_end_with(in_filename, ".gif")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_GIF, input_buff,
                           size);
-    } else if (end_with(in_filename, ".lz4")) {
+    } else if (case_end_with(in_filename, ".lz4")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_LZ4, input_buff,
                           size);
-    } else if (end_with(in_filename, ".webp")) {
+    } else if (case_end_with(in_filename, ".webp")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_WEBP, input_buff,
                           size);
-    } else if (end_with(in_filename, ".js")) {
+    } else if (case_end_with(in_filename, ".js")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_SCRIPT, ASSET_TYPE_SCRIPT_JS, input_buff,
                           size);
-    } else if (end_with(in_filename, ".lua")) {
+    } else if (case_end_with(in_filename, ".lua")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_SCRIPT, ASSET_TYPE_SCRIPT_LUA, input_buff,
                           size);
-    } else if (end_with(in_filename, ".py")) {
+    } else if (case_end_with(in_filename, ".py")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_SCRIPT, ASSET_TYPE_SCRIPT_PYTHON,
                           input_buff, size);
-    } else if (end_with(in_filename, ".xml")) {
+    } else if (case_end_with(in_filename, ".xml")) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_XML, 0, input_buff, size);
     } else if (strstr(in_filename, "images") != NULL) {
       output_res_c_source(out_filename, theme, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_OTHER, input_buff,
@@ -76,16 +76,16 @@ static ret_t gen_one(const char* in_filename, const char* out_filename, const ch
         name++;
       }
 
-      if (end_with(in_filename, ".txt")) {
+      if (case_end_with(in_filename, ".txt")) {
         output_res_c_source_ex(out_filename, theme, ASSET_TYPE_DATA, ASSET_TYPE_DATA_TEXT,
                                input_buff, size, name);
-      } else if (end_with(in_filename, ".json")) {
+      } else if (case_end_with(in_filename, ".json")) {
         output_res_c_source_ex(out_filename, theme, ASSET_TYPE_DATA, ASSET_TYPE_DATA_JSON,
                                input_buff, size, name);
-      } else if (end_with(in_filename, ".bin")) {
+      } else if (case_end_with(in_filename, ".bin")) {
         output_res_c_source_ex(out_filename, theme, ASSET_TYPE_DATA, ASSET_TYPE_DATA_BIN,
                                input_buff, size, name);
-      } else if (end_with(in_filename, ".dat")) {
+      } else if (case_end_with(in_filename, ".dat")) {
         output_res_c_source_ex(out_filename, theme, ASSET_TYPE_DATA, ASSET_TYPE_DATA_DAT,
                                input_buff, size, name);
       } else {
@@ -98,10 +98,10 @@ static ret_t gen_one(const char* in_filename, const char* out_filename, const ch
   return RET_OK;
 }
 
-static ret_t gen_floder(const char* in_flodername, const char* out_flodername, const char* theme,
-                        const char* extname, bool_t data_floder) {
+static ret_t gen_folder(const char* in_foldername, const char* out_foldername, const char* theme,
+                        const char* extname, bool_t data_folder) {
   ret_t ret = RET_OK;
-  fs_dir_t* dir = fs_open_dir(os_fs(), in_flodername);
+  fs_dir_t* dir = fs_open_dir(os_fs(), in_foldername);
   fs_item_t item;
   char in_name[MAX_PATH] = {0};
   char out_name[MAX_PATH] = {0};
@@ -112,18 +112,21 @@ static ret_t gen_floder(const char* in_flodername, const char* out_flodername, c
       path_extname(item.name, ext_array, MAX_PATH);
       str_init(&str_name, 0);
       str_set(&str_name, item.name);
-      if (!data_floder) {
+      if (!data_folder) {
         str_replace(&str_name, ext_array, "");
       }
       filter_name(str_name.str);
       str_append(&str_name, extname);
 
-      path_build(in_name, MAX_PATH, in_flodername, item.name, NULL);
-      path_build(out_name, MAX_PATH, out_flodername, str_name.str, NULL);
+      path_build(in_name, MAX_PATH, in_foldername, item.name, NULL);
+      path_build(out_name, MAX_PATH, out_foldername, str_name.str, NULL);
       ret = gen_one(in_name, out_name, theme);
       str_reset(&str_name);
       if (ret == RET_FAIL) {
-        GEN_ERROR(in_name);
+        printf(
+            "gen fail, filename = %s! desc = the resource file is empty, please confirm that the "
+            "resource file has saved data.!\n",
+            in_name);
         break;
       }
     }
@@ -132,9 +135,9 @@ static ret_t gen_floder(const char* in_flodername, const char* out_flodername, c
   return ret;
 }
 
-bool_t is_data_floder(const char* floder_name) {
+bool_t is_data_folder(const char* folder_name) {
   char basename[MAX_PATH] = {0};
-  path_basename(floder_name, basename, MAX_PATH);
+  path_basename(folder_name, basename, MAX_PATH);
   return tk_str_eq(basename, "data");
 }
 
@@ -176,11 +179,14 @@ int wmain(int argc, wchar_t* argv[]) {
   fs_stat(os_fs(), in_filename, &in_stat_info);
   fs_stat(os_fs(), out_filename, &out_stat_info);
   if (in_stat_info.is_dir == TRUE && out_stat_info.is_dir == TRUE) {
-    gen_floder(in_filename, out_filename, theme_name.str, str_extname.str,
-               is_data_floder(in_filename));
+    gen_folder(in_filename, out_filename, theme_name.str, str_extname.str,
+               is_data_folder(in_filename));
   } else if (in_stat_info.is_reg_file == TRUE) {
     if (gen_one(in_filename, out_filename, theme_name.str) == RET_FAIL) {
-      GEN_ERROR(in_filename);
+      printf(
+          "gen fail, filename = %s! desc = the resource file is empty, please confirm that the "
+          "resource file has saved data.!\n",
+          in_filename);
     }
   } else {
     GEN_ERROR(in_filename);

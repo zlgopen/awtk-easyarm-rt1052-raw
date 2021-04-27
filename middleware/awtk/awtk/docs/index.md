@@ -22,7 +22,6 @@
 * [AWTK 中的输入法](input_method.md)
 * [AWTK 硬件资源需求评估](hardware_req.md)
 * [AWTK 中的一些惯例](conventions.md)
-* [使用 Qt Designer 构建 AWTK 的界面](qt-designer.md)
 * [对话框高亮策略](dialog_highlight.md)
 * [控件焦点相关问题](widget_focus.md)
 * [AWTK 中的颜色格式](color_format.md)
@@ -32,7 +31,7 @@
 * [键值映射](map_key.md)
 * [应用程序的入口函数](awtk_main.md)
 * [资源打包](assets_zip.md)
-* [LCD 密度与图片的对应关系](../demos/assets/default/raw/images/README.md)
+* [LCD 密度与图片的对应关系](../design/default/images/README.md)
 * [slide_view/pages 各个页面缺省的焦点控件](pages_slide_view_default_focused_child_for_each_page.md)
 ### 2.HowTos
 * [AWTK 调试技巧](debug_tips.md)

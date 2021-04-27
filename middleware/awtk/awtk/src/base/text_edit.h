@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  text_edit
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,16 @@
 #include "base/widget.h"
 
 BEGIN_C_DECLS
+
+#define TEXT_EDIT_GET_STYLE_MARGIN(style, out_value, type)             \
+  {                                                                    \
+    if ((out_value) == 0) {                                            \
+      (out_value) = style_get_int((style), STYLE_ID_MARGIN_##type, 0); \
+    }                                                                  \
+    if ((out_value) == 0) {                                            \
+      (out_value) = style_get_int((style), STYLE_ID_MARGIN, 0);        \
+    }                                                                  \
+  }
 
 /**
  * @class text_edit_state_t
@@ -57,7 +67,6 @@ typedef ret_t (*text_edit_on_state_changed_t)(void* ctx, text_edit_state_t* stat
  * @class text_edit_t
  */
 typedef struct _text_edit_t {
-  canvas_t* c;
   widget_t* widget;
 
 } text_edit_t;
@@ -265,10 +274,11 @@ ret_t text_edit_set_mask(text_edit_t* text_edit, bool_t mask);
  * 设置提示信息。
  * @param {text_edit_t*} text_edit text_edit对象。
  * @param {const char*} tips 提示信息。
+ * @param {bool_t} mlines 提示信息是否多行显示。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t text_edit_set_tips(text_edit_t* text_edit, const char* tips);
+ret_t text_edit_set_tips(text_edit_t* text_edit, const char* tips, bool_t mlines);
 
 /**
  * @method text_edit_set_mask_char

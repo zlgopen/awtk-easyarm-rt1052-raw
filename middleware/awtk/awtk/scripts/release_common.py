@@ -29,15 +29,15 @@ def init(exe, assets_root, bin_root):
     EXE_NAME = exe
     BIN_DIR = joinPath(bin_root, 'bin')
     OUTPUT_DIR = joinPath(CWD, 'release')
-    ASSETS_DIR = joinPath(assets_root, 'assets')
+    ASSETS_DIR = joinPath(assets_root, 'res/assets')
 
     if not os.path.exists(BIN_DIR):
         BIN_DIR = joinPath(bin_root, 'build/bin')
 
     if not os.path.exists(ASSETS_DIR):
-        ASSETS_DIR = joinPath(assets_root, 'demos/assets')
+        ASSETS_DIR = joinPath(assets_root, 'assets')
     if not os.path.exists(ASSETS_DIR):
-        ASSETS_DIR = joinPath(assets_root, '../awtk/demos/assets')
+        ASSETS_DIR = joinPath(assets_root, '../awtk/res/assets')
     if not os.path.exists(ASSETS_DIR):
         print(ASSETS_DIR + ' not exist.')
         sys.exit()
@@ -107,7 +107,12 @@ def copyExe():
 def copyAssets():
     copyFiles(ASSETS_DIR, '', OUTPUT_DIR, 'assets/')	
 
+def cleanFiles():
+    d = joinPath(OUTPUT_DIR, 'assets/default/inc')
+    shutil.rmtree(d, True)
+
 
 def release():
     copyExe()
     copyAssets()
+    cleanFiles()

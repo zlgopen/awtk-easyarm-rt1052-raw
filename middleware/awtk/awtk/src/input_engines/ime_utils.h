@@ -4,7 +4,7 @@
  * Author: AWTK Develop Team
  * Brief:  t9 input method helper functions
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,10 +35,10 @@ typedef struct _table_entry_t {
   const char** words;
 } table_entry_t;
 
-uint32_t table_search(const table_entry_t* items, uint32_t items_nr, const char* keys,
-                      wbuffer_t* result, bool_t exact);
+uint32_t ime_utils_table_search(const table_entry_t* items, uint32_t items_nr, const char* keys,
+                                wbuffer_t* result, bool_t exact, bool_t result_extendable);
 
-ret_t input_engine_add_chars(wbuffer_t* wb, const wchar_t** table, char c);
+uint32_t ime_utils_add_chars(wbuffer_t* wb, const wchar_t** table, char c, bool_t wb_extendable);
 
 END_C_DECLS
 

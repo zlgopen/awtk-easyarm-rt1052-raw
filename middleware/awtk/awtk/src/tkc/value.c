@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  generic value type
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -20,6 +20,7 @@
  */
 
 #include "tkc/mem.h"
+#include "tkc/utf8.h"
 #include "tkc/value.h"
 #include "tkc/utils.h"
 #include "tkc/object.h"
@@ -37,7 +38,9 @@ bool_t value_bool(const value_t* v) {
     case VALUE_TYPE_WSTRING: {
       return tk_watob(v->value.wstr);
     }
-    default: { return value_int(v) ? TRUE : FALSE; }
+    default: {
+      return value_int(v) ? TRUE : FALSE;
+    }
   }
 }
 
@@ -172,6 +175,8 @@ int64_t value_int64(const value_t* v) {
 
   if (v->type == VALUE_TYPE_INT64) {
     return v->value.i64;
+  } else if (v->type == VALUE_TYPE_UINT64) {
+    return v->value.u64;
   } else {
     return (int64_t)value_int(v);
   }
@@ -190,6 +195,8 @@ uint64_t value_uint64(const value_t* v) {
 
   if (v->type == VALUE_TYPE_UINT64) {
     return v->value.u64;
+  } else if (v->type == VALUE_TYPE_INT64) {
+    return v->value.i64;
   } else {
     return (uint64_t)value_int(v);
   }
@@ -354,6 +361,9 @@ double value_double(const value_t* v) {
     case VALUE_TYPE_WSTRING: {
       return (double)tk_watof(v->value.wstr);
     }
+    case VALUE_TYPE_BOOL: {
+      return value_bool(v) ? 1 : 0;
+    }
     default:
       break;
   }
@@ -373,6 +383,16 @@ value_t* value_dup_str(value_t* v, const char* value) {
 
   value_init(v, VALUE_TYPE_STRING);
   v->value.str = tk_strdup(value);
+  v->free_handle = TRUE;
+
+  return v;
+}
+
+value_t* value_dup_str_with_len(value_t* v, const char* value, uint32_t len) {
+  return_value_if_fail(v != NULL, NULL);
+
+  value_init(v, VALUE_TYPE_STRING);
+  v->value.str = tk_strndup(value, len);
   v->free_handle = TRUE;
 
   return v;
@@ -419,18 +439,21 @@ ret_t value_deep_copy(value_t* dst, const value_t* src) {
 
   switch (dst->type) {
     case VALUE_TYPE_STRING: {
-      dst->value.str = tk_strdup(src->value.str);
+      dst->value.str = src->value.str != NULL ? tk_strdup(src->value.str) : NULL;
       dst->free_handle = dst->value.str != NULL;
       break;
     }
     case VALUE_TYPE_BINARY:
     case VALUE_TYPE_UBJSON: {
       if (src->value.binary_data.data != NULL) {
-        dst->value.binary_data.data = TKMEM_ALLOC(src->value.binary_data.size);
-        return_value_if_fail(dst->value.binary_data.data != NULL, RET_OOM);
-        memcpy(dst->value.binary_data.data, src->value.binary_data.data,
-               src->value.binary_data.size);
+        uint32_t size = src->value.binary_data.size;
+        void* data = TKMEM_ALLOC(size);
+        return_value_if_fail(data != NULL, RET_OOM);
+
         dst->free_handle = TRUE;
+        dst->value.binary_data.data = data;
+        dst->value.binary_data.size = size;
+        memcpy(data, src->value.binary_data.data, size);
       } else {
         dst->free_handle = FALSE;
       }
@@ -503,7 +526,9 @@ int value_int(const value_t* v) {
     case VALUE_TYPE_WSTRING: {
       return tk_watoi(v->value.wstr);
     }
-    default: { assert(!"not supported type"); }
+    default: {
+      assert(!"not supported type");
+    }
   }
 
   return 0;
@@ -553,13 +578,17 @@ bool_t value_equal(const value_t* v, const value_t* other) {
       return tk_fequal(v->value.f32, other->value.f32);
     }
     case VALUE_TYPE_DOUBLE: {
-      return tk_fequal(v->value.f64, other->value.f64);
+      return tk_lfequal(v->value.f64, other->value.f64);
     }
     case VALUE_TYPE_STRING: {
       return (v->value.str == other->value.str) || tk_str_eq(v->value.str, other->value.str);
     }
     case VALUE_TYPE_WSTRING: {
       return (v->value.wstr == other->value.wstr) || tk_wstr_eq(v->value.wstr, other->value.wstr);
+    }
+    case VALUE_TYPE_BINARY:
+    case VALUE_TYPE_UBJSON: {
+      return (v->value.binary_data.data == other->value.binary_data.data);
     }
     case VALUE_TYPE_OBJECT: {
       return object_compare(v->value.object, other->value.object) == 0;
@@ -601,7 +630,9 @@ ret_t value_reset(value_t* v) {
         break;
       }
       case VALUE_TYPE_OBJECT: {
-        object_unref(v->value.object);
+        object_t* obj = v->value.object;
+        v->value.object = NULL;
+        OBJECT_UNREF(obj);
         break;
       }
       default:
@@ -626,10 +657,8 @@ ret_t value_destroy(value_t* v) {
 value_t* value_set_object(value_t* v, object_t* value) {
   return_value_if_fail(v != NULL && value != NULL, NULL);
 
-  v->type = VALUE_TYPE_OBJECT;
   v->value.object = value;
-
-  return v;
+  return value_init(v, VALUE_TYPE_OBJECT);
 }
 
 object_t* value_object(const value_t* v) {
@@ -684,6 +713,22 @@ value_t* value_set_binary_data(value_t* v, void* data, uint32_t size) {
   return value_init(v, VALUE_TYPE_BINARY);
 }
 
+value_t* value_dup_binary_data(value_t* v, const void* data, uint32_t size) {
+  void* new_data = NULL;
+  return_value_if_fail(v != NULL && data != NULL, NULL);
+
+  new_data = TKMEM_ALLOC(size);
+  return_value_if_fail(new_data != NULL, NULL);
+  memcpy(new_data, data, size);
+
+  value_init(v, VALUE_TYPE_BINARY);
+  v->value.binary_data.data = new_data;
+  v->value.binary_data.size = size;
+  v->free_handle = TRUE;
+
+  return v;
+}
+
 binary_data_t* value_binary_data(const value_t* v) {
   return_value_if_fail(v != NULL, NULL);
   return_value_if_fail(v->type == VALUE_TYPE_BINARY, NULL);
@@ -705,4 +750,97 @@ binary_data_t* value_ubjson(const value_t* v) {
   return_value_if_fail(v->type == VALUE_TYPE_UBJSON, NULL);
 
   return (binary_data_t*)&(v->value.binary_data);
+}
+
+const char* value_str_ex(const value_t* v, char* buff, uint32_t size) {
+  return_value_if_fail(v != NULL && buff != NULL && size > 0, NULL);
+
+  if (v->type == VALUE_TYPE_STRING) {
+    return value_str(v);
+  } else if (v->type == VALUE_TYPE_DOUBLE || v->type == VALUE_TYPE_FLOAT32 ||
+             v->type == VALUE_TYPE_FLOAT) {
+    tk_snprintf(buff, size, "%lf", value_double(v));
+  } else if (v->type == VALUE_TYPE_WSTRING) {
+    tk_utf8_from_utf16(value_wstr(v), buff, size);
+  } else if (v->type == VALUE_TYPE_BOOL) {
+    tk_snprintf(buff, size, "%s", value_bool(v) ? "true" : "false");
+  } else if (v->type == VALUE_TYPE_UINT8 || v->type == VALUE_TYPE_UINT16 ||
+             v->type == VALUE_TYPE_UINT32) {
+    tk_snprintf(buff, size, "%u", value_uint32(v));
+  } else if (v->type == VALUE_TYPE_UINT64) {
+    tk_snprintf(buff, size, "%" PRIu64, value_uint64(v));
+  } else if (v->type == VALUE_TYPE_INT64) {
+    tk_snprintf(buff, size, "%" PRId64, value_int64(v));
+  } else if (v->type == VALUE_TYPE_BINARY) {
+    binary_data_t* bin = value_binary_data(v);
+    if (bin != NULL) {
+      tk_snprintf(buff, size, "binary(%p:%u)", bin->data, bin->size);
+    } else {
+      tk_snprintf(buff, size, "(null)");
+    }
+  } else if (v->type == VALUE_TYPE_POINTER) {
+    tk_snprintf(buff, size, "%p", value_pointer(v));
+  } else if (v->type == VALUE_TYPE_OBJECT) {
+    object_t* obj = value_object(v);
+    if (obj != NULL) {
+      tk_snprintf(buff, size, "object(%p:%s)", obj, obj->vt->type);
+    }
+  } else {
+    tk_snprintf(buff, size, "%d", value_int(v));
+  }
+
+  return buff;
+}
+
+uint32_t value_type_size(value_type_t type) {
+  switch (type) {
+    case VALUE_TYPE_INT8: {
+      return sizeof(int8_t);
+    }
+    case VALUE_TYPE_UINT8: {
+      return sizeof(uint8_t);
+    }
+    case VALUE_TYPE_INT16: {
+      return sizeof(int16_t);
+    }
+    case VALUE_TYPE_UINT16: {
+      return sizeof(uint16_t);
+    }
+    case VALUE_TYPE_INT32: {
+      return sizeof(int32_t);
+    }
+    case VALUE_TYPE_UINT32: {
+      return sizeof(uint32_t);
+    }
+    case VALUE_TYPE_INT64: {
+      return sizeof(int64_t);
+    }
+    case VALUE_TYPE_UINT64: {
+      return sizeof(uint64_t);
+    }
+    case VALUE_TYPE_FLOAT: {
+      return sizeof(float_t);
+    }
+    case VALUE_TYPE_FLOAT32: {
+      return sizeof(float);
+    }
+    case VALUE_TYPE_DOUBLE: {
+      return sizeof(double);
+    }
+    case VALUE_TYPE_OBJECT:
+    case VALUE_TYPE_STRING:
+    case VALUE_TYPE_WSTRING:
+    case VALUE_TYPE_POINTER: {
+      return sizeof(void*);
+    }
+    case VALUE_TYPE_BINARY: {
+      return sizeof(binary_data_t);
+    }
+    case VALUE_TYPE_SIZED_STRING: {
+      return sizeof(sized_str_t);
+    }
+    default: {
+      return sizeof(void*);
+    }
+  }
 }

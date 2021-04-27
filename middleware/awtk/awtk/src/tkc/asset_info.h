@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  asset info
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,7 +22,11 @@
 #ifndef TK_ASSET_INFO_H
 #define TK_ASSET_INFO_H
 
+#ifdef LOAD_ASSET_WITH_MMAP
+#include "tkc/mmap.h"
+#else
 #include "tkc/types_def.h"
+#endif /*LOAD_ASSET_WITH_MMAP*/
 
 BEGIN_C_DECLS
 
@@ -81,6 +85,11 @@ typedef enum _asset_type_t {
    */
   ASSET_TYPE_SCRIPT,
 
+  /**
+   * @const ASSET_TYPE_FLOW
+   * 流图资源。
+   */
+  ASSET_TYPE_FLOW,
   /**
    * @const ASSET_TYPE_DATA
    * 其它数据资源。
@@ -300,7 +309,12 @@ typedef struct _asset_info_t {
    * 名称。
    */
   char name[TK_NAME_LEN + 1];
+#ifdef LOAD_ASSET_WITH_MMAP
+  uint8_t* data;
+  mmap_t* map;
+#else
   uint8_t data[4];
+#endif /*LOAD_ASSET_WITH_MMAP*/
 } asset_info_t;
 
 /**
@@ -352,6 +366,17 @@ ret_t asset_info_unref(asset_info_t* info);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t asset_info_ref(asset_info_t* info);
+
+/**
+ * @method asset_info_get_formatted_name
+ *
+ * 把资源名字格式化为符合标准长度的字符串。
+ *
+ * @param {const char*} name 未格式化名字。
+ *
+ * @return {ret_t} 返回格式化后的名字。
+ */
+const char* asset_info_get_formatted_name(const char* name);
 
 END_C_DECLS
 

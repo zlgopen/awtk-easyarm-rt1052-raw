@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ BEGIN_C_DECLS
  * ```
  *
  * >
- * 更多用法请参考：[window.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
+ * 更多用法请参考：[window.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/)
  *
  * 在c代码中使用函数window\_create创建窗口。如：
  *
@@ -67,7 +67,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L0)
+ * default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L0)
  */
 typedef struct _window_t {
   window_base_t window;
@@ -109,15 +109,30 @@ widget_t* window_create_default(void);
  * @method window_set_fullscreen
  * 设置为全屏窗口。
  *
- *>这里全屏是指与LCD相同大小，而非让SDL窗口全屏。
+ *>如果app_type是SIMULATOR，全屏是指与LCD相同大小，而非让SDL窗口全屏。
  *
- * @annotation ["deconstructor", "scriptable"]
+ * @annotation ["scriptable"]
  * @param {widget_t*} widget window对象。
  * @param {bool_t} fullscreen 是否全屏。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t window_set_fullscreen(widget_t* widget, bool_t fullscreen);
+
+/**
+ * @method window_set_auto_scale_children
+ * 当设计分辨率和实际分辨率不一致时，自动调整子控件的位置和大小。
+ *
+ * > 当子控件有self_layout参数或者子控件的父控件有children_layout参数时，不会自动调整。
+ *
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget window对象。
+ * @param {uint32_t} design_w 设计时宽度。
+ * @param {uint32_t} design_h 设计时高度。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t window_set_auto_scale_children(widget_t* widget, uint32_t design_w, uint32_t design_h);
 
 /**
  * @method window_open

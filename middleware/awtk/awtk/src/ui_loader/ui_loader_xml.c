@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  default ui_loader
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -193,8 +193,12 @@ static void xml_loader_on_start_widget(XmlBuilder* thiz, const char* tag, const 
     }
 
     if (!is_precedence_prop(tag, key)) {
-      ENSURE(str_decode_xml_entity(&(b->str), value) == RET_OK);
-      str_unescape(&(b->str));
+      if (str_decode_xml_entity(&(b->str), value) == RET_OK) {
+        str_unescape(&(b->str));
+      } else {
+        log_warn("decode xml entiry %s failed\n", value);
+      }
+
       ui_builder_on_widget_prop(b->ui_builder, key, b->str.str);
     }
 

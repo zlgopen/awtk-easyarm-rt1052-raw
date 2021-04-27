@@ -13,7 +13,7 @@ mledit\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均适�
 ```
 
 > 更多用法请参考：[mledit.xml](
-https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/mledit.xml)
+https://github.com/zlgopen/awtk/blob/master/design/default/ui/mledit.xml)
 
 在c代码中使用函数mledit\_create创建多行编辑器控件。如：
 
@@ -33,10 +33,13 @@ time\_clock一般不需要设置style。
 | -------- | ------------ | 
 | <a href="#mledit_t_mledit_cast">mledit\_cast</a> | 转换为mledit对象(供脚本语言使用)。 |
 | <a href="#mledit_t_mledit_create">mledit\_create</a> | 创建mledit对象 |
+| <a href="#mledit_t_mledit_set_cancelable">mledit\_set\_cancelable</a> | 设置编辑器是否为可撤销修改。 |
+| <a href="#mledit_t_mledit_set_close_im_when_blured">mledit\_set\_close\_im\_when\_blured</a> | 设置编辑器是否在失去焦点时关闭输入法。 |
 | <a href="#mledit_t_mledit_set_cursor">mledit\_set\_cursor</a> | 设置编辑器光标位置。 |
 | <a href="#mledit_t_mledit_set_focus">mledit\_set\_focus</a> | 设置为焦点。 |
 | <a href="#mledit_t_mledit_set_keyboard">mledit\_set\_keyboard</a> | 设置自定义软键盘名称。 |
 | <a href="#mledit_t_mledit_set_max_lines">mledit\_set\_max\_lines</a> | 设置编辑器的最大行数。 |
+| <a href="#mledit_t_mledit_set_open_im_when_focused">mledit\_set\_open\_im\_when\_focused</a> | 设置编辑器是否在获得焦点时打开输入法。 |
 | <a href="#mledit_t_mledit_set_readonly">mledit\_set\_readonly</a> | 设置编辑器是否为只读。 |
 | <a href="#mledit_t_mledit_set_scroll_line">mledit\_set\_scroll\_line</a> | 设置编辑器滚动速度。 |
 | <a href="#mledit_t_mledit_set_tips">mledit\_set\_tips</a> | 设置编辑器的输入提示。 |
@@ -47,15 +50,14 @@ time\_clock一般不需要设置style。
 
 | 属性名称 | 类型 | 说明 | 
 | -------- | ----- | ------------ | 
-| <a href="#mledit_t_bottom_margin">bottom\_margin</a> | uint8\_t | 下边距。 |
+| <a href="#mledit_t_cancelable">cancelable</a> | bool\_t | 是否支持撤销编辑。如果为TRUE，在失去焦点之前可以撤销所有修改(恢复获得焦点之前的内容)。 |
+| <a href="#mledit_t_close_im_when_blured">close\_im\_when\_blured</a> | bool\_t | 是否在失去焦点时关闭输入法(默认是)。 |
 | <a href="#mledit_t_keyboard">keyboard</a> | char* | 自定义软键盘名称。 |
-| <a href="#mledit_t_left_margin">left\_margin</a> | uint8\_t | 左边距。 |
 | <a href="#mledit_t_max_lines">max\_lines</a> | uint32\_t | 最大行数。 |
+| <a href="#mledit_t_open_im_when_focused">open\_im\_when\_focused</a> | bool\_t | 获得焦点时打开输入法。 |
 | <a href="#mledit_t_readonly">readonly</a> | bool\_t | 编辑器是否为只读。 |
-| <a href="#mledit_t_right_margin">right\_margin</a> | uint8\_t | 右边距。 |
 | <a href="#mledit_t_scroll_line">scroll\_line</a> | uint32\_t | 鼠标一次滚动行数。 |
 | <a href="#mledit_t_tips">tips</a> | char* | 输入提示。 |
-| <a href="#mledit_t_top_margin">top\_margin</a> | uint8\_t | 上边距。 |
 | <a href="#mledit_t_tr_tips">tr\_tips</a> | char* | 保存用于翻译的提示信息。 |
 | <a href="#mledit_t_wrap_word">wrap\_word</a> | bool\_t | 是否自动折行。 |
 ### 事件
@@ -107,6 +109,46 @@ widget_t* mledit_create (widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 | y | xy\_t | y坐标 |
 | w | wh\_t | 宽度 |
 | h | wh\_t | 高度 |
+#### mledit\_set\_cancelable 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="mledit_t_mledit_set_cancelable">设置编辑器是否为可撤销修改。
+
+* 函数原型：
+
+```
+ret_t mledit_set_cancelable (widget_t* widget, bool_t cancelable);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+| cancelable | bool\_t | 是否为可撤销修。 |
+#### mledit\_set\_close\_im\_when\_blured 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="mledit_t_mledit_set_close_im_when_blured">设置编辑器是否在失去焦点时关闭输入法。
+
+* 函数原型：
+
+```
+ret_t mledit_set_close_im_when_blured (widget_t* widget, bool_t close_im_when_blured);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+| close\_im\_when\_blured | bool\_t | 是否是否在失去焦点时关闭输入法。在失去焦点时关闭输入法。 |
 #### mledit\_set\_cursor 函数
 -----------------------
 
@@ -187,6 +229,29 @@ ret_t mledit_set_max_lines (widget_t* widget, uint32_t max_lines);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | widget对象。 |
 | max\_lines | uint32\_t | 最大行数。 |
+#### mledit\_set\_open\_im\_when\_focused 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="mledit_t_mledit_set_open_im_when_focused">设置编辑器是否在获得焦点时打开输入法。
+
+> * 设置默认焦点时，打开窗口时不弹出软键盘。
+> * 用键盘切换焦点时，编辑器获得焦点时不弹出软键盘。
+
+* 函数原型：
+
+```
+ret_t mledit_set_open_im_when_focused (widget_t* widget, bool_t open_im_when_focused);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+| open\_im\_when\_focused | bool\_t | 是否在获得焦点时打开输入法。 |
 #### mledit\_set\_readonly 函数
 -----------------------
 
@@ -287,11 +352,30 @@ ret_t mledit_set_wrap_word (widget_t* widget, bool_t wrap_word);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | widget对象。 |
 | wrap\_word | bool\_t | 是否自动折行。 |
-#### bottom\_margin 属性
+#### cancelable 属性
 -----------------------
-> <p id="mledit_t_bottom_margin">下边距。
+> <p id="mledit_t_cancelable">是否支持撤销编辑。如果为TRUE，在失去焦点之前可以撤销所有修改(恢复获得焦点之前的内容)。
 
-* 类型：uint8\_t
+> * 1.一般配合keyboard的"cancel"按钮使用。
+> * 2.为TRUE时，如果内容有变化，会设置编辑器的状态为changed，所以此时编辑器需要支持changed状态的style。
+
+* 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
+#### close\_im\_when\_blured 属性
+-----------------------
+> <p id="mledit_t_close_im_when_blured">是否在失去焦点时关闭输入法(默认是)。
+
+* 类型：bool\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -319,22 +403,6 @@ ret_t mledit_set_wrap_word (widget_t* widget, bool_t wrap_word);
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
-#### left\_margin 属性
------------------------
-> <p id="mledit_t_left_margin">左边距。
-
-* 类型：uint8\_t
-
-| 特性 | 是否支持 |
-| -------- | ----- |
-| 可直接读取 | 是 |
-| 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
-| 可在XML中设置 | 是 |
-| 可通过widget\_get\_prop读取 | 是 |
-| 可通过widget\_set\_prop修改 | 是 |
 #### max\_lines 属性
 -----------------------
 > <p id="mledit_t_max_lines">最大行数。
@@ -351,9 +419,11 @@ ret_t mledit_set_wrap_word (widget_t* widget, bool_t wrap_word);
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
-#### readonly 属性
+#### open\_im\_when\_focused 属性
 -----------------------
-> <p id="mledit_t_readonly">编辑器是否为只读。
+> <p id="mledit_t_open_im_when_focused">获得焦点时打开输入法。
+
+> 主要用于没有指针设备的情况，否则每次切换焦点时都打开输入法。
 
 * 类型：bool\_t
 
@@ -367,11 +437,11 @@ ret_t mledit_set_wrap_word (widget_t* widget, bool_t wrap_word);
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
-#### right\_margin 属性
+#### readonly 属性
 -----------------------
-> <p id="mledit_t_right_margin">右边距。
+> <p id="mledit_t_readonly">编辑器是否为只读。
 
-* 类型：uint8\_t
+* 类型：bool\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -404,22 +474,6 @@ ret_t mledit_set_wrap_word (widget_t* widget, bool_t wrap_word);
 > <p id="mledit_t_tips">输入提示。
 
 * 类型：char*
-
-| 特性 | 是否支持 |
-| -------- | ----- |
-| 可直接读取 | 是 |
-| 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
-| 可在XML中设置 | 是 |
-| 可通过widget\_get\_prop读取 | 是 |
-| 可通过widget\_set\_prop修改 | 是 |
-#### top\_margin 属性
------------------------
-> <p id="mledit_t_top_margin">上边距。
-
-* 类型：uint8\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |

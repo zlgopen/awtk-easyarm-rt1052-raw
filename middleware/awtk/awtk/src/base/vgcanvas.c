@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  vector graphics canvas interface.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -37,6 +37,12 @@ ret_t vgcanvas_reset(vgcanvas_t* vg) {
   return_value_if_fail(vg != NULL && vg->vt->reset != NULL, RET_BAD_PARAMS);
 
   return vg->vt->reset(vg);
+}
+
+ret_t vgcanvas_reset_curr_state(vgcanvas_t* vg) {
+  return_value_if_fail(vg != NULL && vg->vt->reset_curr_state != NULL, RET_BAD_PARAMS);
+
+  return vg->vt->reset_curr_state(vg);
 }
 
 ret_t vgcanvas_flush(vgcanvas_t* vg) {
@@ -384,7 +390,7 @@ ret_t vgcanvas_set_miter_limit(vgcanvas_t* vg, float_t value) {
   return vg->vt->set_miter_limit(vg, value);
 }
 
-ret_t vgcanvas_begin_frame(vgcanvas_t* vg, rect_t* dirty_rect) {
+ret_t vgcanvas_begin_frame(vgcanvas_t* vg, const rect_t* dirty_rect) {
   return_value_if_fail(vg != NULL && vg->vt->begin_frame != NULL, RET_BAD_PARAMS);
 
   return vg->vt->begin_frame(vg, dirty_rect);
@@ -408,10 +414,10 @@ ret_t vgcanvas_end_frame(vgcanvas_t* vg) {
   return vg->vt->end_frame(vg);
 }
 
-ret_t vgcanvas_create_fbo(vgcanvas_t* vg, uint32_t w, uint32_t h, framebuffer_object_t* fbo) {
+ret_t vgcanvas_create_fbo(vgcanvas_t* vg, uint32_t w, uint32_t h, bool_t custom_draw_model,
+                          framebuffer_object_t* fbo) {
   return_value_if_fail(vg != NULL && vg->vt->create_fbo != NULL && fbo != NULL, RET_BAD_PARAMS);
-
-  return vg->vt->create_fbo(vg, w, h, fbo);
+  return vg->vt->create_fbo(vg, w, h, custom_draw_model, fbo);
 }
 
 ret_t vgcanvas_destroy_fbo(vgcanvas_t* vg, framebuffer_object_t* fbo) {
@@ -482,7 +488,8 @@ ret_t fbo_to_img(framebuffer_object_t* fbo, bitmap_t* img) {
   return RET_OK;
 }
 
-ret_t vgcanvas_fbo_to_bitmap(vgcanvas_t* vg, framebuffer_object_t* fbo, bitmap_t* img, rect_t* r) {
+ret_t vgcanvas_fbo_to_bitmap(vgcanvas_t* vg, framebuffer_object_t* fbo, bitmap_t* img,
+                             const rect_t* r) {
   return_value_if_fail(vg != NULL && fbo != NULL && img != NULL, RET_BAD_PARAMS);
   if (vg->vt != NULL && vg->vt->fbo_to_bitmap != NULL) {
     return vg->vt->fbo_to_bitmap(vg, fbo, img, r);
@@ -517,4 +524,11 @@ ret_t vgcanvas_get_text_metrics(vgcanvas_t* vg, float_t* ascent, float_t* descen
   return_value_if_fail(vg->vt->get_text_metrics != NULL, RET_BAD_PARAMS);
 
   return vg->vt->get_text_metrics(vg, ascent, descent, line_hight);
+}
+
+ret_t vgcanvas_clear_cache(vgcanvas_t* vg) {
+  return_value_if_fail(vg != NULL && vg->vt != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(vg->vt->clear_cache != NULL, RET_BAD_PARAMS);
+
+  return vg->vt->clear_cache(vg);
 }

@@ -22,7 +22,7 @@ slide\_view\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均
 ```
 
 > 更多用法请参考：[slide_view.xml](
-https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/slide_view.xml)
+https://github.com/zlgopen/awtk/blob/master/design/default/ui/slide_view.xml)
 
 在c代码中使用函数slide\_view\_create创建滑动视图控件。如：
 
@@ -45,7 +45,7 @@ https://github.com/zlgopen/awtk-c-demos/blob/master/demos/slide_view.c)
 > 如果希望背景图片跟随滚动，请将背景图片设置到页面上，否则设置到slide\_view上。
 
 > 更多用法请参考：[theme default](
-https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L458)
+https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L458)
 ----------------------------------
 ### 函数
 <p id="slide_view_t_methods">
@@ -54,7 +54,8 @@ https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/defa
 | -------- | ------------ | 
 | <a href="#slide_view_t_slide_view_cast">slide\_view\_cast</a> | 转换为slide_view对象(供脚本语言使用)。 |
 | <a href="#slide_view_t_slide_view_create">slide\_view\_create</a> | 创建slide_view对象 |
-| <a href="#slide_view_t_slide_view_set_active">slide\_view\_set\_active</a> | 设置当前页的序号。 |
+| <a href="#slide_view_t_slide_view_set_active">slide\_view\_set\_active</a> | 设置当前页的序号(默认启用动画)。 |
+| <a href="#slide_view_t_slide_view_set_active_ex">slide\_view\_set\_active\_ex</a> | 设置当前页的序号。 |
 | <a href="#slide_view_t_slide_view_set_anim_hint">slide\_view\_set\_anim\_hint</a> | 设置页面切换动画。 |
 | <a href="#slide_view_t_slide_view_set_auto_play">slide\_view\_set\_auto\_play</a> | 设置为自动播放模式。 |
 | <a href="#slide_view_t_slide_view_set_loop">slide\_view\_set\_loop</a> | 设置循环切换模式。 |
@@ -122,7 +123,7 @@ widget_t* slide_view_create (widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 
 * 函数功能：
 
-> <p id="slide_view_t_slide_view_set_active">设置当前页的序号。
+> <p id="slide_view_t_slide_view_set_active">设置当前页的序号(默认启用动画)。
 
 * 函数原型：
 
@@ -137,6 +138,27 @@ ret_t slide_view_set_active (widget_t* widget, uint32_t index);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | slide\_view对象。 |
 | index | uint32\_t | 当前页的序号。 |
+#### slide\_view\_set\_active\_ex 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="slide_view_t_slide_view_set_active_ex">设置当前页的序号。
+
+* 函数原型：
+
+```
+ret_t slide_view_set_active_ex (widget_t* widget, uint32_t index, bool_t animate);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | slide\_view对象。 |
+| index | uint32\_t | 当前页的序号。 |
+| animate | bool\_t | 是否启用动画。 |
 #### slide\_view\_set\_anim\_hint 函数
 -----------------------
 

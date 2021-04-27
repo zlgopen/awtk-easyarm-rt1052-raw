@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input method interface.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -112,7 +112,12 @@ typedef enum _input_type_t {
    * @const INPUT_CUSTOM_PASSWORD
    * 使用自定义的密码软键盘。字符串属性值：custom_password
    */
-  INPUT_CUSTOM_PASSWORD
+  INPUT_CUSTOM_PASSWORD,
+  /**
+   * @const INPUT_ASCII
+   * 纯英文文本。字符串属性值：ascii
+   */
+  INPUT_ASCII,
 } input_type_t;
 
 /**
@@ -130,13 +135,24 @@ typedef struct _im_commit_event_t {
   const char* text;
 
   /**
-   * @property {bool_t} replace;
+   * @property {bool_t} replace
    * @annotation ["readable"]
    * 是否替换原来的文本。
    */
   bool_t replace;
 
 } im_commit_event_t;
+
+/**
+ * @method im_commit_event_init
+ * 初始化im_commit事件。
+ * @param {im_commit_event_t*} e 事件对象。
+ * @param {const char*} text 文本。
+ * @param {bool_t} replace 是否替代当前的内容。
+ *
+ * @return {event_t*} 返回事件对象。
+ */
+event_t* im_commit_event_init(im_commit_event_t* e, const char* text, bool_t replace);
 
 /**
  * @class im_action_button_info_event_t
@@ -181,9 +197,9 @@ typedef struct _im_candidates_event_t {
   uint32_t candidates_nr;
 
   /**
-   * @property {int32_t} selected;
+   * @property {int32_t} selected
    * @annotation ["readable"]
-   * 缺省选中某个候选字，小余0不选择任何候选字 。
+   * 缺省选中某个候选字，小于0不选择任何候选字。
    */
   int32_t selected;
 } im_candidates_event_t;
@@ -530,9 +546,6 @@ input_method_t* input_method(void);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t input_method_set(input_method_t* im);
-
-/*public for internal use*/
-event_t* im_commit_event_init(im_commit_event_t* e, const char* text, bool_t replace);
 
 #define IM_LANG_DIGIT "123"
 #define IM_LANG_LOWER "abc"

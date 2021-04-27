@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  thread
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,6 +34,16 @@ typedef struct _tk_thread_t tk_thread_t;
 typedef void* (*tk_thread_entry_t)(void* args);
 
 BEGIN_C_DECLS
+
+typedef enum _tk_thread_priority_t {
+  TK_THREAD_PRIORITY_NORMAL = 0x0,
+  TK_THREAD_PRIORITY_IDLE,
+  TK_THREAD_PRIORITY_LOWEST,
+  TK_THREAD_PRIORITY_BELOW_NORAML,
+  TK_THREAD_PRIORITY_ABOVE_NORAML,
+  TK_THREAD_PRIORITY_HIGHEST,
+  TK_THREAD_PRIORITY_TIME_CRITICAL,
+} tk_thread_priority_t;
 
 /**
  * @method tk_thread_create
@@ -76,11 +86,24 @@ ret_t tk_thread_set_stack_size(tk_thread_t* thread, uint32_t stack_size);
  *
  * > 部分平台支持。
  * @param {tk_thread_t*} thread thread对象。
- * @param {uint32_t}  priority 优先级。
+ * @param {tk_thread_priority_t}  priority 优先级。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t tk_thread_set_priority(tk_thread_t* thread, uint32_t priority);
+ret_t tk_thread_set_priority(tk_thread_t* thread, tk_thread_priority_t priority);
+
+/**
+ * @method tk_thread_get_priority_from_platform
+ * 获取平台相关的优先级
+ * 
+ * > 部分平台支持。
+ * > 根据 AWTK 通用优先级枚举获取平台相关的优先级
+ * @annotation ["static"]
+ * @param {tk_thread_priority_t}  priority 优先级。
+ *
+ * @return {int32_t} 返回平台相关的优先级。
+ */
+int32_t tk_thread_get_priority_from_platform(tk_thread_priority_t priority);
 
 /**
  * @method tk_thread_start
@@ -94,6 +117,7 @@ ret_t tk_thread_start(tk_thread_t* thread);
 /**
  * @method tk_thread_join
  * 等待线程退出。
+ * 必须调用 tk_thread_destroy 函数来释放线程资源，以免出现内存泄漏的问题。
  * @param {tk_thread_t*}    thread thread对象。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
@@ -112,6 +136,7 @@ void* tk_thread_get_args(tk_thread_t* thread);
 /**
  * @method tk_thread_destroy
  * 销毁thread对象。
+ * 在销毁对象前必须调用 tk_thread_join 函数等待退出线程
  * @param {tk_thread_t*}    thread thread对象。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。

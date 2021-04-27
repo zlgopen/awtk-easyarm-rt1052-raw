@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  button
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [button.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/button.xml)
+ * [button.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/button.xml)
  *
  * 在c代码中使用函数button\_create创建按钮控件。如：
  *
@@ -73,7 +73,7 @@ BEGIN_C_DECLS
  *
  * > 更多用法请参考：
  * [theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L31)
+ * default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L31)
  *
  */
 typedef struct _button_t {
@@ -97,6 +97,14 @@ typedef struct _button_t {
    *
    */
   bool_t enable_long_press;
+
+  /**
+   * @property {uint32_t} long_press_time
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 触发长按事件的时间(ms)
+   *
+   */
+  uint32_t long_press_time;
 
   /*private*/
   int32_t timer_id;
@@ -148,6 +156,17 @@ widget_t* button_cast(widget_t* widget);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t button_set_repeat(widget_t* widget, int32_t repeat);
+
+/**
+ * @method button_set_long_press_time
+ * 设置触发长按事件的时间。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {uint32_t}  long_press_time 触发长按事件的时间(毫秒)。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t button_set_long_press_time(widget_t* widget, uint32_t long_press_time);
 
 /**
  * @method button_set_enable_long_press

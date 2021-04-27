@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  data_writer
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,8 +46,15 @@ static ret_t data_writer_file_destroy(data_writer_t* writer) {
   return RET_OK;
 }
 
+static ret_t data_writer_file_truncate(data_writer_t* writer, uint64_t size) {
+  data_writer_file_t* file = (data_writer_file_t*)writer;
+
+  return fs_file_truncate(file->file, size);
+}
+
 static const data_writer_vtable_t s_data_writer_file_vtable = {
     .write = data_writer_file_write,
+    .truncate = data_writer_file_truncate,
     .destroy = data_writer_file_destroy,
 };
 

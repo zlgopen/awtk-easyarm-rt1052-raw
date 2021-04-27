@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dynamic libaray api
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +21,7 @@
 
 #include "tkc/dl.h"
 #include "tkc/mem.h"
+#include "tkc/utils.h"
 
 #if defined(ANDROID) || defined(IOS) || defined(MACOS) || defined(LINUX)
 #include <dlfcn.h>
@@ -61,6 +62,10 @@ ret_t tk_dl_close(tk_dl_t* dl) {
   return RET_OK;
 }
 
+const char* tk_dl_error(void) {
+  return dlerror();
+}
+
 #elif defined(WIN32)
 struct _tk_dl_t {
   HMODULE h;
@@ -89,6 +94,10 @@ void* tk_dl_sym(tk_dl_t* dl, const char* name) {
   return_value_if_fail(dl != NULL && name != NULL, NULL);
 
   return GetProcAddress(dl->h, name);
+}
+
+const char* tk_dl_error(void) {
+  return NULL;
 }
 
 ret_t tk_dl_close(tk_dl_t* dl) {

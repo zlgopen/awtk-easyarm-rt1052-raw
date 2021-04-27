@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  a simple main loop
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * this program is distributed in the hope that it will be useful,
  * but without any warranty; without even the implied warranty of
@@ -63,6 +63,7 @@ main_loop_simple_t* main_loop_simple_init(int w, int h, main_loop_queue_event_t 
 ret_t main_loop_simple_reset(main_loop_simple_t* loop);
 ret_t main_loop_post_key_event(main_loop_t* l, bool_t pressed, uint8_t key);
 ret_t main_loop_post_pointer_event(main_loop_t* l, bool_t pressed, xy_t x, xy_t y);
+ret_t main_loop_post_multi_gesture_event(main_loop_t* l, multi_gesture_event_t* event);
 
 END_C_DECLS
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  rich_text_parser
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is dirich_text_parseributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -160,7 +160,8 @@ static void xml_rich_text_destroy(XmlBuilder* thiz) {
   return;
 }
 
-static XmlBuilder* builder_init(xml_builder_t* b) {
+static XmlBuilder* builder_init(xml_builder_t* b, const char* font_name, uint16_t font_size,
+                                color_t color, align_v_t align_v) {
   int32_t i = 0;
   memset(b, 0x00, sizeof(xml_builder_t));
 
@@ -173,24 +174,25 @@ static XmlBuilder* builder_init(xml_builder_t* b) {
 
   for (i = 0; i < MAX_FONT_LEVEL; i++) {
     rich_text_font_t* iter = b->fonts + i;
-
-    iter->size = TK_DEFAULT_FONT_SIZE;
-    iter->color = color_init(0, 0, 0, 0xff);
-    iter->align_v = ALIGN_V_BOTTOM;
+    iter->size = font_size;
+    iter->color = color;
+    iter->align_v = align_v;
+    iter->name = font_name == NULL ? NULL : tk_strdup(font_name);
   }
   str_init(&(b->temp), 100);
 
   return &(b->builder);
 }
 
-rich_text_node_t* rich_text_parse(const char* str, uint32_t size) {
+rich_text_node_t* rich_text_parse(const char* str, uint32_t size, const char* font_name,
+                                  uint16_t font_size, color_t color, align_v_t align_v) {
   xml_builder_t b;
   XmlParser* parser = NULL;
   rich_text_node_t* node = NULL;
   return_value_if_fail(str != NULL, NULL);
 
   parser = xml_parser_create();
-  xml_parser_set_builder(parser, builder_init(&b));
+  xml_parser_set_builder(parser, builder_init(&b, font_name, font_size, color, align_v));
   xml_parser_set_trim_text(parser, FALSE);
   xml_parser_parse(parser, str, size);
 

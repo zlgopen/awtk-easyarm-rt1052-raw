@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  func_call_parser
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is difunc_call_parseributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,7 +50,7 @@ ret_t func_call_parser_parse(func_call_parser_t* parser) {
     token = tokenizer_next(tokenizer);
     tk_strncpy(name, token, TK_NAME_LEN);
 
-    ENSURE(tokenizer_has_more(tokenizer));
+    return_value_if_fail(tokenizer_has_more(tokenizer), RET_BAD_PARAMS);
     token = tokenizer_next(tokenizer);
 
     if (parser->on_param != NULL) {

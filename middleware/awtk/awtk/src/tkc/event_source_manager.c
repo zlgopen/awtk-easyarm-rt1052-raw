@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event manager manager
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -126,8 +126,8 @@ uint32_t event_source_manager_get_wakeup_time(event_source_manager_t* manager) {
       }
     }
   } else {
-    wakeup_time = 16;
+    wakeup_time = TK_DEFAULT_WAIT_TIME;
   }
 
-  return tk_min(16, wakeup_time);
+  return tk_min(TK_DEFAULT_WAIT_TIME, wakeup_time);
 }

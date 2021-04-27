@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  socket helper functions
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -40,7 +40,7 @@ BEGIN_C_DECLS
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t socket_init();
+ret_t socket_init(void);
 
 /**
  * @method socket_deinit
@@ -49,7 +49,7 @@ ret_t socket_init();
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t socket_deinit();
+ret_t socket_deinit(void);
 
 /**
  * @method socket_close
@@ -111,7 +111,7 @@ ret_t socket_set_blocking(int sock, bool_t blocking);
 struct sockaddr* socket_resolve(const char* host, int port, struct sockaddr_in* addr);
 
 /**
- * @class udp_t
+ * @class tcp_t
  * @annotation ["fake"]
  */
 

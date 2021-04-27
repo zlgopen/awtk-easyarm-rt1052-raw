@@ -1,5 +1,16 @@
 ﻿#include "gtest/gtest.h"
 #include "tkc/date_time.h"
+#include "tkc/object_date_time.h"
+
+TEST(DateTime, convert) {
+  uint64_t now = time(0);
+  date_time_t* dt = date_time_create();
+
+  ASSERT_EQ(date_time_from_time(dt, now), RET_OK);
+  ASSERT_EQ(date_time_to_time(dt), now);
+
+  date_time_destroy(dt);
+}
 
 TEST(DateTime, leap) {
   ASSERT_EQ(date_time_is_leap(1904), TRUE);
@@ -57,6 +68,7 @@ TEST(DateTime, wday_name) {
 }
 
 TEST(DateTime, wday) {
+  ASSERT_EQ(date_time_get_wday(2020, 1, 1), 3);
   ASSERT_EQ(date_time_get_wday(2020, 7, 8), 3);
   ASSERT_EQ(date_time_get_wday(2020, 7, 9), 4);
   ASSERT_EQ(date_time_get_wday(2020, 7, 10), 5);
@@ -80,4 +92,94 @@ TEST(DateTime, wday) {
   ASSERT_EQ(date_time_get_wday(1000, 7, 12), 6);
   ASSERT_EQ(date_time_get_wday(1000, 7, 13), 0);
   ASSERT_EQ(date_time_get_wday(1000, 7, 14), 1);
+}
+
+TEST(DateTime, from_time) {
+  date_time_t dt;
+  date_time_t now;
+  time_t t = time(0);
+  date_time_init(&now);
+  ASSERT_EQ(date_time_from_time(&dt, t), RET_OK);
+  ASSERT_EQ(dt.year, now.year);
+  ASSERT_EQ(dt.month, now.month);
+  ASSERT_EQ(dt.day, now.day);
+  ASSERT_EQ(dt.hour, now.hour);
+}
+
+TEST(DateTime, set_time) {
+  date_time_t now;
+  date_time_init(&now);
+  date_time_set(&now);
+}
+
+TEST(DateTime, delta) {
+  date_time_t dt;
+  date_time_init(&dt);
+  dt.day = 20;
+  date_time_add_delta(&dt, 24 * 3600);
+  ASSERT_EQ(dt.day, 21);
+  date_time_add_delta(&dt, -24 * 3600);
+  ASSERT_EQ(dt.day, 20);
+
+  dt.year = 2020;
+  dt.month = 11;
+  dt.day = 20;
+  date_time_add_delta(&dt, 24 * 3600);
+  ASSERT_EQ(dt.day, 21);
+  date_time_add_delta(&dt, -24 * 3600);
+  ASSERT_EQ(dt.day, 20);
+
+  dt.year = 2020;
+  dt.month = 11;
+  dt.day = 1;
+  date_time_add_delta(&dt, -24 * 3600);
+  ASSERT_EQ(dt.day, 31);
+
+  dt.year = 2020;
+  dt.month = 12;
+  dt.day = 31;
+  date_time_add_delta(&dt, 24 * 3600);
+  ASSERT_EQ(dt.day, 1);
+  ASSERT_EQ(dt.year, 2021);
+
+  dt.year = 2020;
+  dt.month = 12;
+  dt.day = 31;
+  dt.hour = 23;
+  dt.minute = 50;
+  date_time_add_delta(&dt, 3600);
+  ASSERT_EQ(dt.day, 1);
+  ASSERT_EQ(dt.year, 2021);
+
+  dt.year = 2020;
+  dt.month = 1;
+  dt.day = 1;
+  dt.hour = 1;
+  date_time_add_delta(&dt, -2 * 3600);
+  ASSERT_EQ(dt.day, 31);
+  ASSERT_EQ(dt.year, 2019);
+}
+
+TEST(DateTime, object) {
+  object_t* obj = object_date_time_create();
+
+  ASSERT_EQ(object_set_prop_int(obj, "year", 2020), RET_OK);
+  ASSERT_EQ(object_get_prop_int(obj, "year", 0), 2020);
+
+  ASSERT_EQ(object_set_prop_int(obj, "month", 1), RET_OK);
+  ASSERT_EQ(object_get_prop_int(obj, "month", 0), 1);
+
+  ASSERT_EQ(object_set_prop_int(obj, "day", 1), RET_OK);
+  ASSERT_EQ(object_get_prop_int(obj, "day", 0), 1);
+
+  ASSERT_EQ(object_set_prop_int(obj, "hour", 2), RET_OK);
+  ASSERT_EQ(object_get_prop_int(obj, "hour", 0), 2);
+
+  ASSERT_EQ(object_set_prop_int(obj, "minute", 3), RET_OK);
+  ASSERT_EQ(object_get_prop_int(obj, "minute", 0), 3);
+
+  ASSERT_EQ(object_set_prop_int(obj, "second", 4), RET_OK);
+  ASSERT_EQ(object_get_prop_int(obj, "second", 0), 4);
+
+  OBJECT_UNREF(obj);
 }

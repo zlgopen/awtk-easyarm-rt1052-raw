@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  slider
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,7 +43,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [basic](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/basic.xml)
+ * [basic](https://github.com/zlgopen/awtk/blob/master/design/default/ui/basic.xml)
  *
  * 在c代码中使用函数slider\_create创建滑块控件。如：
  *
@@ -68,7 +68,7 @@ BEGIN_C_DECLS
  *
  * > 更多用法请参考：
  * [theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L179)
+ * default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L179)
  *
  */
 typedef struct _slider_t {
@@ -141,6 +141,7 @@ typedef struct _slider_t {
   double saved_value;
   point_t down;
   rect_t dragger_rect;
+  uint64_t last_user_action_time;
 
 } slider_t;
 
@@ -261,6 +262,18 @@ TK_EXTERN_VTABLE(slider);
 /*public for test*/
 ret_t slider_dec(widget_t* widget);
 ret_t slider_inc(widget_t* widget);
+
+/**
+ * @method slider_set_value_internal
+ * 设置滑块的值(public for test)。
+ *
+ * @param {widget_t*} widget 控件对象。
+ * @param {double}  value 值。
+ * @param {event_type_t} etype 触发事件。
+ * @param {bool_t} force 不管有没有变化都设置。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t slider_set_value_internal(widget_t* widget, double value, event_type_t etype, bool_t force);
 
 END_C_DECLS

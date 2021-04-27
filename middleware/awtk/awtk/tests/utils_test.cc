@@ -1,6 +1,8 @@
 ﻿#include <string>
 #include "tkc/mem.h"
 #include "tkc/utils.h"
+#include "tkc/object_default.h"
+#include "tkc/object_array.h"
 #include "gtest/gtest.h"
 
 using std::string;
@@ -9,11 +11,20 @@ TEST(Utils, basic) {
   char str[32];
 
   ASSERT_EQ(tk_atoi("100"), 100);
+  ASSERT_EQ(tk_atoi("0xff"), 0xff);
+  ASSERT_EQ(tk_atoi("0x1"), 0x1);
+  ASSERT_EQ(tk_atoi("0xf"), 0xf);
+  ASSERT_EQ(tk_atoi("0Xf"), 0xf);
+  ASSERT_EQ(tk_atoi("0b11"), 3);
+  ASSERT_EQ(tk_atoi("0B101"), 5);
   ASSERT_EQ(tk_watoi(L"100"), 100);
   ASSERT_EQ(tk_atof("100"), 100);
   ASSERT_EQ(tk_atof("1e2"), 100);
   ASSERT_EQ(tk_watof(L"100"), 100);
 
+  ASSERT_EQ(tk_atol("0x1122334455667788"), 0x1122334455667788);
+  ASSERT_EQ(tk_atol("1122334455667788"), 1122334455667788);
+  ASSERT_EQ(tk_atol("-1122334455667788"), -1122334455667788);
   ASSERT_EQ(strcmp(tk_itoa(str, sizeof(str), tk_atoi("100")), "100"), 0);
 }
 
@@ -164,6 +175,17 @@ TEST(Utils, tk_strncpy) {
   ASSERT_EQ(string(tk_strncpy(dst, str, strlen(str) + 1)), string(str));
 }
 
+TEST(Utils, tk_strncpy_s) {
+  char dst[32];
+  const char* str = "hello world";
+
+  ASSERT_EQ(tk_strncpy_s(dst, 0, str, 4), (const char*)NULL);
+  ASSERT_EQ(string(tk_strncpy_s(dst, 1, str, 4)), string(""));
+  ASSERT_EQ(string(tk_strncpy_s(dst, 2, str, 4)), string("h"));
+  ASSERT_EQ(string(tk_strncpy_s(dst, 3, str, strlen(str))), string("he"));
+  ASSERT_EQ(string(tk_strncpy_s(dst, sizeof(dst), str, strlen(str) + 1)), string(str));
+}
+
 TEST(Utils, filename_to_name) {
   char name[TK_NAME_LEN + 1];
 
@@ -206,6 +228,52 @@ TEST(Utils, sscanf) {
   ASSERT_EQ(r, 0x12);
   ASSERT_EQ(g, 0x34);
   ASSERT_EQ(b, 0x56);
+}
+
+TEST(Utils, xml_file_expand) {
+  str_t s;
+  str_init(&s, 0);
+  const char* filename = "./tests/testdata/main.xml";
+  const char* xml_string =
+      "<window><?include filename=\"button.xml\"?><?include filename=\"label.xml\"?></window>";
+  const char* xml_string_1 =
+      "<window><mledit text=\"<?include filename=\"button.xml\"?>\"/><?include "
+      "filename=\"label.xml\"?></window>";
+  const char* xml_string_2 =
+      "<window><mledit text=\"<?include filename=\"button.xml\"?>\"/><?include "
+      "filename=\"label.xml\"?><mledit text=\"<?include filename=\"button.xml\"?>\"/></window>";
+  const char* xml_string_3 =
+      "<window><mledit><property name=\"text\"><?include "
+      "filename=\"button.xml\"?></property></mledit><?include filename=\"label.xml\"?></window>";
+
+  ASSERT_EQ(xml_file_expand(filename, &s, xml_string), RET_OK);
+  str_replace(&s, "\r\n", "\n");
+  ASSERT_EQ(string(s.str), "<window><button />\n<label />\n</window>");
+  str_reset(&s);
+
+  str_init(&s, 0);
+  ASSERT_EQ(xml_file_expand(filename, &s, xml_string_1), RET_OK);
+  str_replace(&s, "\r\n", "\n");
+  ASSERT_EQ(string(s.str),
+            "<window><mledit text=\"<?include filename=\"button.xml\"?>\"/><label />\n</window>");
+  str_reset(&s);
+
+  str_init(&s, 0);
+  ASSERT_EQ(xml_file_expand(filename, &s, xml_string_2), RET_OK);
+  str_replace(&s, "\r\n", "\n");
+  ASSERT_EQ(string(s.str),
+            "<window><mledit text=\"<?include filename=\"button.xml\"?>\"/><label />\n<mledit "
+            "text=\"<?include filename=\"button.xml\"?>\"/></window>");
+  str_reset(&s);
+
+  str_init(&s, 0);
+  ASSERT_EQ(xml_file_expand(filename, &s, xml_string_3), RET_OK);
+  str_replace(&s, "\r\n", "\n");
+  ASSERT_EQ(string(s.str),
+            "<window><mledit><property name=\"text\"><?include "
+            "filename=\"button.xml\"?></property></mledit><label />\n</window>");
+
+  str_reset(&s);
 }
 
 TEST(Utils, xml_file_expand_read) {
@@ -367,4 +435,76 @@ TEST(Utils, tk_watoi_n) {
   ASSERT_EQ(tk_watoi_n(L"1234", 2), 12);
   ASSERT_EQ(tk_watoi_n(L"1234", 3), 123);
   ASSERT_EQ(tk_watoi_n(L"1234", 4), 1234);
+}
+
+TEST(Utils, image_region_parse) {
+  rect_t r;
+  ASSERT_EQ(image_region_parse(100, 100, "xywh(1,2,3,4)", &r), RET_OK);
+  ASSERT_EQ(r.x, 1);
+  ASSERT_EQ(r.y, 2);
+  ASSERT_EQ(r.w, 3);
+  ASSERT_EQ(r.h, 4);
+
+  ASSERT_EQ(image_region_parse(200, 200, "xywh(0,0,106,72)", &r), RET_OK);
+  ASSERT_EQ(r.x, 0);
+  ASSERT_EQ(r.y, 0);
+  ASSERT_EQ(r.w, 106);
+  ASSERT_EQ(r.h, 72);
+
+  ASSERT_EQ(image_region_parse(100, 100, "grid(4,4,0,0)", &r), RET_OK);
+  ASSERT_EQ(r.x, 0);
+  ASSERT_EQ(r.y, 0);
+  ASSERT_EQ(r.w, 25);
+  ASSERT_EQ(r.h, 25);
+
+  ASSERT_EQ(image_region_parse(100, 100, "grid(4,4,1,0)", &r), RET_OK);
+  ASSERT_EQ(r.x, 0);
+  ASSERT_EQ(r.y, 25);
+  ASSERT_EQ(r.w, 25);
+  ASSERT_EQ(r.h, 25);
+
+  ASSERT_EQ(image_region_parse(100, 100, "grid(4,4,1,1)", &r), RET_OK);
+  ASSERT_EQ(r.x, 25);
+  ASSERT_EQ(r.y, 25);
+  ASSERT_EQ(r.w, 25);
+  ASSERT_EQ(r.h, 25);
+
+  ASSERT_EQ(image_region_parse(100, 100, "grid(4,4,3,3)", &r), RET_OK);
+  ASSERT_EQ(r.x, 75);
+  ASSERT_EQ(r.y, 75);
+  ASSERT_EQ(r.w, 25);
+  ASSERT_EQ(r.h, 25);
+}
+
+TEST(Utils, to_json) {
+  str_t str;
+  value_t v;
+  object_t* obj = object_default_create();
+  object_t* addr = object_default_create();
+  object_t* arr = object_array_create();
+  object_set_prop_str(obj, "name", "jim");
+  object_set_prop_int(obj, "age", 100);
+
+  object_set_prop_int(arr, "-1", 1);
+  object_set_prop_int(arr, "-1", 2);
+  object_set_prop_str(arr, "-1", "abc");
+  value_set_wstr(&v, L"hello");
+  object_set_prop(arr, "-1", &v);
+
+  object_set_prop_str(addr, "country", "zh");
+  object_set_prop_str(addr, "city", "sz");
+
+  object_set_prop_object(obj, "addr", addr);
+  object_set_prop_object(obj, "arr", arr);
+
+  str_init(&str, 1000);
+  ASSERT_EQ(object_to_json(obj, &str), RET_OK);
+  ASSERT_STREQ(str.str,
+               "{\"addr\":{\"city\":\"sz\",\"country\":\"zh\"},\"age\":100,\"arr\":[1,2,\"abc\","
+               "\"hello\"],\"name\":\"jim\"}");
+
+  str_reset(&str);
+  OBJECT_UNREF(obj);
+  OBJECT_UNREF(arr);
+  OBJECT_UNREF(addr);
 }

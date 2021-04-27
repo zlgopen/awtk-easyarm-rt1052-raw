@@ -74,6 +74,7 @@ TEST(IOStreamSHDLC, small) {
   ASSERT_EQ(memcmp(rbuff, sbuff, data_size), 0);
 
   tk_thread_join(t);
+  tk_thread_destroy(t);
 
   OBJECT_UNREF(a_tcp);
   OBJECT_UNREF(a_io);
@@ -89,7 +90,6 @@ TEST(IOStreamSHDLC, large) {
   tk_iostream_t* b_tcp = tk_iostream_tcp_create(socks[1]);
   tk_iostream_t* b_io = tk_iostream_shdlc_create(b_tcp);
   tk_istream_t* is = tk_iostream_get_istream(a_io);
-  tk_ostream_t* os = tk_iostream_get_ostream(a_io);
   tk_thread_t* t = tk_thread_create(server_thread_entry1, b_io);
 
   data_size = sizeof(rbuff);
@@ -99,6 +99,7 @@ TEST(IOStreamSHDLC, large) {
   ASSERT_EQ(memcmp(rbuff, sbuff, data_size), 0);
 
   tk_thread_join(t);
+  tk_thread_destroy(t);
 
   OBJECT_UNREF(a_tcp);
   OBJECT_UNREF(a_io);
@@ -136,9 +137,11 @@ TEST(IOStreamSHDLC, noisy) {
   ASSERT_EQ(memcmp(rbuff, sbuff, data_size), 0);
 
   tk_thread_join(t);
+  tk_thread_destroy(t);
 
   OBJECT_UNREF(a_tcp);
   OBJECT_UNREF(a_io);
   OBJECT_UNREF(b_tcp);
   OBJECT_UNREF(b_io);
+  OBJECT_UNREF(b_noisy);
 }

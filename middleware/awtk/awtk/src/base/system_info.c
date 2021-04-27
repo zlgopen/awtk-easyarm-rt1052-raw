@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  system info
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,9 +47,9 @@ static bool_t app_root_is_valid(const char* app_root) {
   return path_exist(res_root);
 }
 
-static ret_t system_info_set_app_root(system_info_t* info, const char* app_root) {
+ret_t system_info_set_app_root(system_info_t* info, const char* app_root) {
   if (app_root != NULL) {
-    info->app_root = tk_strdup(app_root);
+    info->app_root = tk_str_copy(info->app_root, app_root);
     log_debug("app_root=%s\n", app_root);
   }
 
@@ -98,10 +98,12 @@ static ret_t system_info_normalize_app_root_try_path(system_info_t* info, char* 
 
   if (!app_root_is_valid(path)) {
     path_build(app_root, MAX_PATH, path, "res", NULL);
+    log_debug("try set app_root:%s\n", app_root);
     if (app_root_is_valid(app_root)) {
       return system_info_set_app_root(info, app_root);
     } else {
       path_build(app_root, MAX_PATH, path, "demos", NULL);
+      log_debug("try set app_root:%s\n", app_root);
       if (app_root_is_valid(app_root)) {
         return system_info_set_app_root(info, app_root);
       } else {
@@ -149,8 +151,14 @@ static ret_t system_info_normalize_app_root(system_info_t* info, const char* app
   return RET_FAIL;
 }
 #else
+ret_t system_info_set_app_root(system_info_t* info, const char* app_root) {
+  info->app_root = tk_str_copy(info->app_root, app_root);
+
+  return RET_OK;
+}
+
 static ret_t system_info_normalize_app_root(system_info_t* info, const char* app_root_default) {
-  info->app_root = tk_strdup(app_root_default);
+  info->app_root = tk_str_copy(info->app_root, app_root_default);
 
   return RET_OK;
 }

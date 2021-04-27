@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  sdl2 implemented lcd interface/
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -62,8 +62,8 @@ static ret_t lcd_sdl2_mono_flush(lcd_t* lcd) {
   int pitch = 0;
   void* addr = NULL;
   lcd_mono_t* mono = (lcd_mono_t*)(lcd);
-  rect_t* dr = &(lcd->dirty_rect);
-  rect_t* fps_r = &(lcd->fps_rect);
+  const rect_t* dr = &(lcd->dirty_rect);
+  const rect_t* fps_r = &(lcd->fps_rect);
   mono_info_t* info = (mono_info_t*)(mono->ctx);
 
   memset(&src, 0x00, sizeof(src));
@@ -115,6 +115,20 @@ static ret_t lcd_sdl2_mono_destroy(lcd_t* lcd) {
   mono->ctx = NULL;
 
   return RET_OK;
+}
+
+ret_t lcd_sdl2_mono_reinit(lcd_t* lcd, wh_t w, wh_t h, uint32_t line_length) {
+  mono_info_t* info = NULL;
+  lcd_mono_t* mono = (lcd_mono_t*)(lcd);
+  return_value_if_fail(mono != NULL, RET_BAD_PARAMS);
+
+  info = (mono_info_t*)(mono->ctx);
+  return_value_if_fail(info != NULL, RET_BAD_PARAMS);
+  (void)line_length;
+
+  SDL_DestroyTexture(info->texture);
+
+  return mono_info_create_texture(info, w, h);
 }
 
 lcd_t* lcd_sdl2_mono_init(SDL_Renderer* render) {

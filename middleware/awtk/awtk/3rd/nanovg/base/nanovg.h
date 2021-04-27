@@ -153,6 +153,7 @@ enum NVGimageFlags {
 // frame buffer size. In that case you would set windowWidth/Height to the window size
 // devicePixelRatio to: frameBufferWidth / windowWidth.
 void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio);
+void nvgBeginFrameEx(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio, int reset);
 
 // Cancels drawing the current frame.
 void nvgCancelFrame(NVGcontext* ctx);
@@ -699,6 +700,7 @@ struct NVGparams {
 	void (*setLineCap)(void* uptr, int lineCap);
 	void (*setLineJoin)(void* uptr, int lineJoin);
 
+	int (*clearCache)(void* uptr);
 	int (*renderCreate)(void* uptr);
 	int (*findTexture)(void* uptr, const void* data);
 	void (*setStateXfrom)(void* uptr, float* xform);
@@ -735,6 +737,8 @@ NVGparams* nvgGetParams(NVGcontext* ctx);
 int nvgCreateImageRaw(NVGcontext* ctx, int w, int h, int format, int stride, int imageFlags, const unsigned char* data);
 
 int nvgFindTextureRaw(NVGcontext* ctx, const void* data);
+
+int nvgClearCache(NVGcontext* ctx);
 
 #ifdef __cplusplus
 }

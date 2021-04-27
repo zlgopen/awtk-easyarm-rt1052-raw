@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input stream base on serial
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,11 +25,15 @@
 
 static int32_t tk_ostream_serial_write(tk_ostream_t* stream, const uint8_t* buff,
                                        uint32_t max_size) {
+  int32_t ret = 0;
   tk_ostream_serial_t* ostream_serial = TK_OSTREAM_SERIAL(stream);
-  int32_t ret = serial_write(ostream_serial->fd, buff, max_size);
 
+  errno = 0;
+  ret = serial_write(ostream_serial->fd, buff, max_size);
   if (ret < 0) {
-    ostream_serial->is_broken = TRUE;
+    if (errno != EAGAIN) {
+      ostream_serial->is_broken = TRUE;
+    }
   }
 
   return ret;

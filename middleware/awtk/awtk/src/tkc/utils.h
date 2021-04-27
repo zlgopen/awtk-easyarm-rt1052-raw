@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  utils struct and utils functions.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +23,7 @@
 #define TK_UTILS_H
 
 #include "tkc/str.h"
+#include "tkc/rect.h"
 #include "tkc/types_def.h"
 
 BEGIN_C_DECLS
@@ -37,13 +38,35 @@ BEGIN_C_DECLS
 /**
  * @method tk_atoi
  *
- * 将字符串转换为整形。
+ * 将字符串转换为整型数。
  *
- * @param {const char*} str 要转换为整形的字符串。
+ * @param {const char*} str 要转换为整型数的字符串。
  *
- * @return {int} 返回转换后的整形。
+ * @return {int32_t} 返回转换后的整型。
  */
-int tk_atoi(const char* str);
+int32_t tk_atoi(const char* str);
+
+/**
+ * @method tk_atol
+ *
+ * 将字符串转换为整型。
+ *
+ * @param {const char*} str 要转换为整型的字符串。
+ *
+ * @return {int64_t} 返回转换后的整型。
+ */
+int64_t tk_atol(const char* str);
+
+/**
+ * @method tk_atoul
+ *
+ * 将字符串转换为整型。
+ *
+ * @param {const char*} str 要转换为整型的字符串。
+ *
+ * @return {uint64_t} 返回转换后的整型。
+ */
+uint64_t tk_atoul(const char* str);
 
 /**
  * @method tk_atob
@@ -94,23 +117,23 @@ int32_t tk_str_icmp(const char* a, const char* b);
 /**
  * @method tk_watoi
  *
- * 将宽字符串转换为整形。
+ * 将宽字符串转换为整型。
  *
- * @param {const wchar_t*} str 要转换为整形的宽字符串。
+ * @param {const wchar_t*} str 要转换为整型的宽字符串。
  *
- * @return {int} 返回转换后的整形。
+ * @return {int} 返回转换后的整型。
  */
 int tk_watoi(const wchar_t* str);
 
 /**
  * @method tk_watoi_n
  *
- * 将宽字符串转换为整形。
+ * 将宽字符串转换为整型。
  *
- * @param {const wchar_t*} str 要转换为整形的宽字符串。
+ * @param {const wchar_t*} str 要转换为整型的宽字符串。
  * @param {uint32_t} len 字符串长度。
  *
- * @return {int} 返回转换后的整形。
+ * @return {int} 返回转换后的整型。
  */
 int tk_watoi_n(const wchar_t* str, uint32_t len);
 
@@ -150,11 +173,11 @@ const char* tk_skip_to_num(const char* str);
 /**
  * @method tk_itoa
  *
- * 将整形转换为字符串。
+ * 将整型转换为字符串。
  *
  * @param {char*} str 保存字符串缓冲区。
  * @param {int} len 缓冲区大小。
- * @param {int} n 要转换的整形。
+ * @param {int} n 要转换的整型。
  *
  * @return {const char*} 返回字符串。
  */
@@ -174,17 +197,43 @@ const char* tk_itoa(char* str, int len, int n);
 const char* tk_ftoa(char* str, int len, double f);
 
 /**
- * @method tk_strtol
+ * @method tk_strtoi
  *
- * 将字符串转换为长整形。
+ * 将字符串转换为整型。
  *
- * @param {const char*} str 要转换为长整形的字符串。
+ * @param {const char*} str 要转换为整型的字符串。
  * @param {const char**} end 对类型char*的对象的引用。
  * @param {int} base 基数。
  *
- * @return {long} 返回转换后的长整形。
+ * @return {int32_t} 返回转换后的整型。
+ */
+int32_t tk_strtoi(const char* str, const char** end, int base);
+
+/**
+ * @method tk_strtol
+ *
+ * 将字符串转换为长整型。
+ *
+ * @param {const char*} str 要转换为长整型的字符串。
+ * @param {const char**} end 对类型char*的对象的引用。
+ * @param {int} base 基数。
+ *
+ * @return {long} 返回转换后的长整型。
  */
 long tk_strtol(const char* str, const char** end, int base);
+
+/**
+ * @method tk_strtoll
+ *
+ * 将字符串转换为长整型。
+ *
+ * @param {const char*} str 要转换为长整型的字符串。
+ * @param {const char**} end 对类型char*的对象的引用。
+ * @param {int} base 基数。
+ *
+ * @return {int64_t} 返回转换后的长整型。
+ */
+int64_t tk_strtoll(const char* str, const char** end, int base);
 
 /**
  * @method tk_strcpy
@@ -201,15 +250,31 @@ char* tk_strcpy(char* dst, const char* src);
 /**
  * @method tk_strncpy
  *
- * 将src所指向的字符串复制到dst，最多复制len个字符串。
+ * 将src所指向的字符串复制到dst，最多复制len个字符串，并在[len]位置添加'\0'。
+ *
+ *> 请确保dst的长度>=(len+1)
  *
  * @param {char*} dst 目标字符串。
- * @param {const char*} src 原字符串。
+ * @param {const char*} src 源字符串。
  * @param {size_t} len 要复制的字符串个数。
  *
  * @return {char*} 返回目标字符串。
  */
 char* tk_strncpy(char* dst, const char* src, size_t len);
+
+/**
+ * @method tk_strncpy_s
+ *
+ * 将src所指向的字符串复制到dst，最多复制min(dst_len-1, src_len)个字符串，并在[len]位置添加'\0'。
+ *
+ * @param {char*} dst 目标字符串。
+ * @param {size_t} dst_len 目标字符串内存长度。
+ * @param {const char*} src 源字符串。
+ * @param {size_t} src_len 要复制的字符串个数。
+ *
+ * @return {char*} 返回目标字符串。
+ */
+char* tk_strncpy_s(char* dst, size_t dst_len, const char* src, size_t src_len);
 
 /**
  * @method tk_strdup
@@ -357,9 +422,23 @@ void* tk_pixel_copy(void* dst, const void* src, uint32_t size, uint8_t bpp);
  * @param {size_t} size 拷贝字节数。
  * @param {const char*} format 格式化字符串。
  *
- * @return {int} 返回格式化后的字符串长度+1。
+ * @return {int} 返回格式化后的字符串长度。
  */
 int tk_snprintf(char* str, size_t size, const char* format, ...);
+
+/**
+ * @method tk_vsnprintf
+ *
+ * 将可变参数ap按照format格式化字符串，并将字符串复制到str中。
+ *
+ * @param {char*} str 目标字符串。
+ * @param {size_t} size 拷贝字节数。
+ * @param {const char*} format 格式化字符串。
+ * @param {va_list} ap 可变参数。
+ *
+ * @return {int} 返回格式化后的字符串长度。
+ */
+int tk_vsnprintf(char* str, size_t size, const char* format, va_list ap);
 
 /**
  * @method tk_sscanf
@@ -425,12 +504,61 @@ ret_t xml_file_expand_read(const char* filename, str_t* s);
  */
 char* tk_str_copy(char* dst, const char* src);
 
+/**
+ * @method dummy_destroy
+ * 
+ * 空的destroy函数。
+ * @param {void*} data 数据。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t dummy_destroy(void* data);
+
+/**
+ * @method default_destroy
+ * 
+ * 缺省的destroy函数。释放data指向的内存。
+ * @param {void*} data 数据。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t default_destroy(void* data);
+
+/**
+ * @method pointer_compare
+ * 
+ * 指针比较。
+ *
+ * @param {const void*} a 数据a。
+ * @param {const void*} b 数据b。
+ *
+ * @return {int} 返回0表示相等，返回负数表示小于，返回整数表示大于。
+ */
 int pointer_compare(const void* a, const void* b);
+
+/**
+ * @method compare_always_equal
+ * 
+ * 始终返回相等。
+ *
+ * @param {const void*} a 数据a。
+ * @param {const void*} b 数据b。
+ *
+ * @return {int} 始终返回0。
+ */
 int compare_always_equal(const void* a, const void* b);
 
+/**
+ * @method tk_is_valid_name
+ *
+ * 判断是否是有效的属性名。
+ *
+ * @param {const char*} name 名字字符串。
+ *
+ * @return {bool_t} 如果名称有效返回TRUE，否则返回FALSE。
+ */
 bool_t tk_is_valid_name(const char* name);
+
 ret_t tk_replace_locale(const char* name, char out[TK_NAME_LEN + 1], const char* locale);
 
 /**
@@ -444,9 +572,45 @@ ret_t tk_replace_locale(const char* name, char out[TK_NAME_LEN + 1], const char*
  * @return {bool_t} 返回TRUE表示是；否则表示不是。
  */
 bool_t tk_str_start_with(const char* str, const char* prefix);
+
+/**
+ * @method tk_under_score_to_camel
+ *
+ * 将下划线名字转成驼峰名字。
+ *
+ * @param {const char*} name 下划线名字。
+ * @param {char*} out 驼峰名字(保存结果)。
+ * @param {uint32_t} max_out_size 结果最大长度。 
+ *
+ * @return {const char* } 返回T驼峰名字。
+ */
 const char* tk_under_score_to_camel(const char* name, char* out, uint32_t max_out_size);
 
+/**
+ * @method tk_pointer_to_int
+ *
+ * 将指针转换成int。
+ * 
+ *>与tk_pointer_from_int配套使用，也就是pointer本身必须就是整数，而不是指针，否则pointer会被截断。
+ * 
+ * 
+ * @param {const void*} p 指针。
+ * 
+ * @return {int32_t} 返回对应的int数据。
+ */
 int32_t tk_pointer_to_int(const void* p);
+
+/**
+ * @method tk_pointer_from_int
+ *
+ * 将int转换成指针。
+ * 
+ * > 常用于将int类型的数据作为回调函数的ctx。
+ * 
+ * @param {int32_t} v 整数。
+ * 
+ * @return {void*} 返回对应的指针。
+ */
 void* tk_pointer_from_int(int32_t v);
 
 /**
@@ -494,7 +658,47 @@ wchar_t* tk_wstr_dup_utf8(const char* str);
  */
 uint32_t tk_wstr_count_c(const wchar_t* str, wchar_t c);
 
+/**
+ * @method image_region_parse
+ *
+ * 解析子图的区域信息。
+ *
+ * @param {uint32_t} img_w 图片宽度。
+ * @param {uint32_t} img_h 图片宽度。
+ * @param {const char*} region region。
+ * @param {rect_t*} r 返回具体位置。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t image_region_parse(uint32_t img_w, uint32_t img_h, const char* region, rect_t* r);
+
+/**
+ * @method object_to_json
+ * 将对象转换成json字符串。
+ *
+ * @param {object_t*} obj object对象。
+ * @param {str_t*} str 用于返回结果。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t object_to_json(object_t* obj, str_t* str);
+
+/**
+ * @method data_url_copy
+ * 
+ * 将数据从源URL拷贝到目标URL。
+ *
+ * @param {const char*} dst_url 目标URL。
+ * @param {const char*} src_url 源URL。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t data_url_copy(const char* dst_url, const char* src_url);
+
 const char* tk_normalize_key_name(const char* name, char fixed_name[TK_NAME_LEN + 1]);
+
+/*public for test*/
+ret_t xml_file_expand(const char* filename, str_t* s, const char* data);
 
 END_C_DECLS
 

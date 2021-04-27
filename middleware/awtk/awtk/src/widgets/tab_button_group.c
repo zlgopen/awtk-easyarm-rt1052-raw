@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  tab_button_group
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -151,7 +151,9 @@ static ret_t tab_button_group_ensure_active(widget_t* widget) {
   }
   WIDGET_FOR_EACH_CHILD_END();
 
-  widget_set_value(first, TRUE);
+  if (first != NULL) {
+    widget_set_value(first, TRUE);
+  }
 
   return RET_OK;
 }

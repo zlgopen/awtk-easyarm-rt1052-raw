@@ -6,7 +6,6 @@ import copy
 import glob
 import shutil
 import platform
-from PIL import Image
 
 ###########################
 DPI = 'x1'
@@ -39,6 +38,9 @@ OS_NAME = platform.system()
 def get_action():
     return ACTION
 
+def set_action(action):
+    global ACTION
+    ACTION = action
 
 def on_generate_res_before(handler):
     global ON_GENERATE_RES_BEFORE
@@ -57,7 +59,8 @@ def emit_generate_res_before(type):
             'theme': THEME,
             'imagegen_options': IMAGEGEN_OPTIONS,
             'input': INPUT_DIR,
-            'output': OUTPUT_DIR
+            'output': OUTPUT_DIR,
+            'awtk_root': AWTK_ROOT
         }
         ON_GENERATE_RES_BEFORE(ctx)
 
@@ -69,7 +72,8 @@ def emit_generate_res_after(type):
             'theme': THEME,
             'imagegen_options': IMAGEGEN_OPTIONS,
             'input': INPUT_DIR,
-            'output': OUTPUT_DIR
+            'output': OUTPUT_DIR,
+            'awtk_root': AWTK_ROOT
         }
         ON_GENERATE_RES_AFTER(ctx)
 
@@ -185,14 +189,14 @@ def is_packaged_of_default_theme():
 
 
 def getcwd():
-    if sys.version_info > (3, 0):
+    if sys.version_info >= (3, 0):
         return os.getcwd()
     else:
         return os.getcwdu()
 
 
 def to_file_system_coding(s):
-    if sys.version_info > (3, 0): return s
+    if sys.version_info >= (3, 0): return s
     coding = sys.getfilesystemencoding()
     return s.encode(coding)
 
@@ -262,7 +266,7 @@ def glob_asset_files(path):
 
 def read_file(filename):
     content = ''
-    if sys.version_info > (3, 0):
+    if sys.version_info >= (3, 0):
         with open(filename, 'r', encoding='utf8') as f:
             content = f.read()
     else:
@@ -272,7 +276,7 @@ def read_file(filename):
 
 
 def write_file(filename, s):
-    if sys.version_info > (3, 0):
+    if sys.version_info >= (3, 0):
         with open(filename, 'w', encoding='utf8') as f:
             f.write(s)
     else:
@@ -497,6 +501,30 @@ def gen_res_all_data():
 
     emit_generate_res_after('data')
 
+def gen_res_all_flows():
+    if not THEME_PACKAGED and THEME != 'default':
+        return
+
+    raw = join_path(INPUT_DIR, 'flows')
+    if not os.path.exists(raw):
+        return
+
+    emit_generate_res_before('flows')
+
+    if IS_GENERATE_RAW:
+        if INPUT_DIR != join_path(OUTPUT_DIR, 'raw'):
+            dst = join_path(OUTPUT_DIR, 'raw/flows')
+            if os.path.exists(dst):
+                remove_dir(dst)
+            copy_dir(raw, dst)
+
+    if IS_GENERATE_INC_RES or IS_GENERATE_INC_BITMAP:
+        inc = join_path(OUTPUT_DIR, 'inc/flows')
+        make_dirs(inc)
+        resgen(raw, inc, THEME, '.flows')
+
+    emit_generate_res_after('flows')
+
 
 def gen_res_all_xml():
     if not THEME_PACKAGED and THEME != 'default':
@@ -575,7 +603,10 @@ def gen_res_all_font():
                     gen_res_bitmap_font(input_dir, font_options, THEME)
 
             # 对default_full的特殊处理，兼容awtk的demos
-            IS_AWTK_DEMO = INPUT_DIR == join_path(AWTK_ROOT, 'demos/assets/default/raw')
+            IS_AWTK_DEMO = False
+            if os.path.exists('scripts/update_res_common.py'):
+                IS_AWTK_DEMO = True
+
             raw = join_path(INPUT_DIR, 'fonts/default_full.ttf')
             if IS_AWTK_DEMO and os.path.exists(raw):
                 text = join_path(INPUT_DIR, 'fonts/text.txt')
@@ -668,6 +699,7 @@ def gen_res_all():
     gen_res_all_ui()
     gen_res_all_style()
     gen_res_all_data()
+    gen_res_all_flows()
     gen_res_all_xml()
     emit_generate_res_after('all')
     print('=========================================================')
@@ -800,8 +832,9 @@ def gen_assets_c_of_one_theme(with_multi_theme = True):
     result += '\n'
 
     result += 'ret_t ' + func_name + '(void) {\n'
-    result += '  assets_manager_t* am = assets_manager();\n\n'
-    result += ''
+    result += '  assets_manager_t* am = assets_manager();\n'
+    result += '  assets_manager_set_theme(am, "' + THEME + '");\n'
+    result += '\n'
 
     result += '#ifdef WITH_FS_RES\n'
     result += '  assets_manager_preload(am, ASSET_TYPE_FONT, "default");\n'
@@ -880,8 +913,8 @@ def gen_asset_c_entry_with_multi_theme():
     result += 'ret_t assets_init(void) {\n'
     result += '  return assets_init_internal(APP_THEME);\n}\n\n'
 
-    result += 'static ret_t widget_set_theme_without_file_system(widget_t* widget, const char* name) {\n'
     result += '#ifndef WITH_FS_RES\n'
+    result += 'static ret_t widget_set_theme_without_file_system(widget_t* widget, const char* name) {\n'
     result += '  const asset_info_t* info = NULL;\n'
     result += '  event_t e = event_init(EVT_THEME_CHANGED, NULL);\n'
     result += '  widget_t* wm = widget_get_window_manager(widget);\n'
@@ -898,16 +931,14 @@ def gen_asset_c_entry_with_multi_theme():
     result += '  assets_init_internal(name);\n'
     result += '  locale_info_reload(locale_info);\n\n'
     result += '  info = assets_manager_ref(am, ASSET_TYPE_STYLE, "default");\n'
-    result += '  theme_init(theme(), info->data);\n'
+    result += '  theme_set_theme_data(theme(), info->data);\n'
     result += '  assets_manager_unref(assets_manager(), info);\n\n'
     result += '  widget_dispatch(wm, &e);\n'
     result += '  widget_invalidate_force(wm, NULL);\n\n'
     result += '  log_debug("theme changed: %s\\n", name);\n\n'
     result += '  return RET_OK;\n'
-    result += '#else /*WITH_FS_RES*/\n'
-    result += '  return RET_NOT_IMPL;\n'
-    result += '#endif /*WITH_FS_RES*/\n'
-    result += '}\n\n'
+    result += '}\n'
+    result += '#endif /*WITH_FS_RES*/\n\n'
 
     result += 'ret_t assets_set_global_theme(const char* name) {\n'
     result += '#ifdef WITH_FS_RES\n'
@@ -932,10 +963,6 @@ def gen_res_web_c():
     result += '#include "base/assets_manager.h"\n'
 
     result += gen_assets_includes(join_path(OUTPUT_DIR, 'inc/images/*.bsvg'), None, False)
-    if IS_GENERATE_INC_RES:
-        result += gen_assets_includes(join_path(OUTPUT_DIR, 'inc/images/*.res'), None, False)
-    else:
-        result += gen_assets_includes(join_path(OUTPUT_DIR, 'inc/images/*.data'), None, False)
     result += gen_assets_includes(join_path(OUTPUT_DIR, 'inc/strings/*.data'), None, False)
     result += gen_assets_includes(join_path(OUTPUT_DIR, 'inc/styles/*.data'), None, False)
     result += gen_assets_includes(join_path(OUTPUT_DIR, 'inc/ui/*.data'), None, False)
@@ -948,10 +975,6 @@ def gen_res_web_c():
     result += ''
 
     result += gen_assets_adds(join_path(OUTPUT_DIR, 'inc/images/*.bsvg'))
-    if IS_GENERATE_INC_RES:
-        result += gen_assets_adds(join_path(OUTPUT_DIR, 'inc/images/*.res'))
-    else:
-        result += gen_assets_adds(join_path(OUTPUT_DIR, 'inc/images/*.data'))
     result += gen_assets_adds(join_path(OUTPUT_DIR, 'inc/strings/*.data'))
     result += gen_assets_adds(join_path(OUTPUT_DIR, 'inc/styles/*.data'))
     result += gen_assets_adds(join_path(OUTPUT_DIR, 'inc/ui/*.data'))
@@ -980,6 +1003,7 @@ def gen_res_web_c():
 
 
 def gen_res_json_one(res_type, files):
+    from PIL import Image
     result = "\n  " + res_type + ': [\n'
     for f in files:
         uri = f.replace(os.getcwd(), "")[1:]
@@ -1083,6 +1107,9 @@ def update_res():
     elif ACTION == 'data':
         theme_foreach(gen_res_all_data)
         gen_res_c()
+    elif ACTION == 'flows':
+        theme_foreach(gen_res_all_flows)
+        gen_res_c()
     elif ACTION == 'xml':
         theme_foreach(gen_res_all_xml)
         gen_res_c()
@@ -1125,30 +1152,33 @@ def clean_res():
         remove_dir(ASSET_C)
     print('=========================================================')
 
+def get_args(args) :
+    list_args = []
+    for arg in args:
+        if arg.startswith('--') :
+            continue
+        list_args.append(arg)
+    return list_args
+
+def show_usage_imlp():
+    args = ' action[clean|web|json|all|font|image|ui|style|string|script|data|xml|assets.c] dpi[x1|x2] image_options[rgba|bgra+bgr565|mono] awtk_root[--awtk_root=XXXXX]'
+    print('=========================================================')
+    print('Usage: python '+sys.argv[0] + args)
+    print('Example:')
+    print('python ' + sys.argv[0] + ' all')
+    print('python ' + sys.argv[0] + ' clean')
+    print('python ' + sys.argv[0] + ' style --awtk_root=XXXXX ')
+    print('python ' + sys.argv[0] + ' all x1 bgra+bgr565')
+    print('python ' + sys.argv[0] + ' all x1 bgra+bgr565 --awtk_root=XXXXX')
+    print('=========================================================')
+    sys.exit(0)
 
 def show_usage():
-    global DPI
-    global ACTION
-    global IMAGEGEN_OPTIONS
-    args = ' action[clean|web|json|all|font|image|ui|style|string|script|data|xml|assets.c] dpi[x1|x2] image_options[rgba|bgra+bgr565|mono]'
     if len(sys.argv) == 1:
-        print('=========================================================')
-        print('Usage: python '+sys.argv[0] + args)
-        print('Example:')
-        print('python ' + sys.argv[0] + ' all')
-        print('python ' + sys.argv[0] + ' clean')
-        print('python ' + sys.argv[0] + ' style')
-        print('python ' + sys.argv[0] + ' all x1 bgra+bgr565')
-        print('=========================================================')
-        sys.exit(0)
+        show_usage_imlp();
     else:
-        ACTION = sys.argv[1]
-
-        if len(sys.argv) > 2:
-            DPI = sys.argv[2]
-
-        if len(sys.argv) > 3:
-            IMAGEGEN_OPTIONS = sys.argv[3]
-
+        sys_args = get_args(sys.argv[1:])
+        if len(sys_args) == 0 :
+            show_usage_imlp()
 
 show_usage()

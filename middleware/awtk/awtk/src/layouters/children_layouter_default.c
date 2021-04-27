@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  children layouter default
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,7 +31,7 @@ static const char* children_layouter_default_to_string(children_layouter_t* layo
   char temp[32];
   str_t* str = &(layouter->params);
   children_layouter_default_t* layout = (children_layouter_default_t*)layouter;
-
+  return_value_if_fail(layout != NULL, NULL);
   str_set(str, "default(");
   if (layout->cols_is_width) {
     tk_snprintf(temp, sizeof(temp) - 1, "w=%d,", (int)(layout->cols));
@@ -86,7 +86,7 @@ static ret_t children_layouter_default_set_param(children_layouter_t* layouter, 
                                                  const value_t* v) {
   int val = value_int(v);
   children_layouter_default_t* l = (children_layouter_default_t*)layouter;
-
+  return_value_if_fail(l != NULL, RET_BAD_PARAMS);
   switch (*name) {
     case 'w': {
       l->cols = val;
@@ -155,7 +155,7 @@ static ret_t children_layouter_default_set_param(children_layouter_t* layouter, 
 static ret_t children_layouter_default_get_param(children_layouter_t* layouter, const char* name,
                                                  value_t* v) {
   children_layouter_default_t* l = (children_layouter_default_t*)layouter;
-
+  return_value_if_fail(l != NULL, RET_BAD_PARAMS);
   switch (*name) {
     case 'w': {
       if (l->cols_is_width) {
@@ -247,7 +247,7 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
   widget_t** children = NULL;
   darray_t children_for_layout;
   children_layouter_default_t* layout = (children_layouter_default_t*)layouter;
-
+  return_value_if_fail(layout != NULL, RET_BAD_PARAMS);
   if (widget->children == NULL) {
     return RET_OK;
   }
@@ -288,12 +288,12 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
   }
 
   if (rows == 1 && cols == 0) { /*hbox*/
-    uint32_t xoffset = x;
-    uint32_t children_w = 0;
+    int32_t xoffset = x;
+    int32_t children_w = 0;
     h = layout_h - 2 * y_margin;
     w = layout_w - 2 * x_margin - (n - 1) * spacing;
 
-    return_value_if_fail(h > 0 && w > 0, RET_BAD_PARAMS);
+    goto_error_if_fail(h > 0 && w > 0);
 
     area = rect_init(0, 0, w, h);
     for (i = 0; i < n; i++) {
@@ -335,7 +335,7 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
   } else if (cols == 1 && rows == 0) { /*vbox*/
     w = layout_w - 2 * x_margin;
     h = layout_h - 2 * y_margin - (n - 1) * spacing;
-    return_value_if_fail(w > 0 && h > 0, RET_BAD_PARAMS);
+    goto_error_if_fail(w > 0 && h > 0);
 
     area = rect_init(0, 0, w, h);
     for (i = 0; i < n; i++) {
@@ -363,7 +363,7 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
     h = layout_h - 2 * y_margin - (rows - 1) * spacing;
     item_w = w / cols;
     item_h = h / rows;
-    return_value_if_fail(item_w > 0 && item_h > 0, RET_BAD_PARAMS);
+    goto_error_if_fail(item_w > 0 && item_h > 0);
 
     w = (cols - 1) * spacing + cols * item_w;
     h = (rows - 1) * spacing + rows * item_h;
@@ -409,6 +409,7 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
     log_debug("not supported(rows=%d, cols=%d)\n", rows, cols);
   }
 
+error:
   darray_deinit(&(children_for_layout));
 
   return RET_OK;
@@ -416,12 +417,13 @@ static ret_t children_layouter_default_layout(children_layouter_t* layouter, wid
 
 static bool_t children_layouter_default_is_valid(children_layouter_t* layouter) {
   children_layouter_default_t* l = (children_layouter_default_t*)layouter;
-
+  return_value_if_fail(l != NULL, FALSE);
   return (l->rows == 0 && l->cols == 0) ? FALSE : TRUE;
 }
 
 static ret_t children_layouter_default_destroy(children_layouter_t* layouter) {
   children_layouter_default_t* l = (children_layouter_default_t*)layouter;
+  return_value_if_fail(layouter != NULL, RET_BAD_PARAMS);
   str_reset(&(layouter->params));
   TKMEM_FREE(l);
 
@@ -430,7 +432,7 @@ static ret_t children_layouter_default_destroy(children_layouter_t* layouter) {
 
 static children_layouter_t* children_layouter_default_clone(children_layouter_t* layouter) {
   children_layouter_default_t* l = TKMEM_ZALLOC(children_layouter_default_t);
-
+  return_value_if_fail(l != NULL, NULL);
   memcpy(l, layouter, sizeof(*l));
   str_init(&(l->layouter.params), 0);
   str_set(&(l->layouter.params), layouter->params.str);

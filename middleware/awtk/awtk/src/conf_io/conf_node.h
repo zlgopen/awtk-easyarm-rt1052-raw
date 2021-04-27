@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  conf node
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -177,6 +177,58 @@ ret_t conf_doc_remove_children(conf_doc_t* doc, conf_node_t* node);
 ret_t conf_doc_set(conf_doc_t* doc, const char* path, const value_t* v);
 
 /**
+ * @method conf_doc_set_int
+ *
+ * 设置指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {int32_t} v 值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t conf_doc_set_int(conf_doc_t* doc, const char* path, int32_t v);
+
+/**
+ * @method conf_doc_set_bool
+ *
+ * 设置指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {bool_t} v 值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t conf_doc_set_bool(conf_doc_t* doc, const char* path, bool_t v);
+
+/**
+ * @method conf_doc_set_float
+ *
+ * 设置指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {float} v 值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t conf_doc_set_float(conf_doc_t* doc, const char* path, float v);
+
+/**
+ * @method conf_doc_set_str
+ *
+ * 设置指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {const char*} v 值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t conf_doc_set_str(conf_doc_t* doc, const char* path, const char* v);
+
+/**
  * @method conf_doc_get
  *
  * 获取指定路径节点的值。
@@ -188,6 +240,58 @@ ret_t conf_doc_set(conf_doc_t* doc, const char* path, const value_t* v);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t conf_doc_get(conf_doc_t* doc, const char* path, value_t* v);
+
+/**
+ * @method conf_doc_get_int
+ *
+ * 获取指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {int32_t} defval 缺省值。
+ *
+ * @return {int32_t} 返回值。
+ */
+int32_t conf_doc_get_int(conf_doc_t* doc, const char* path, int32_t defval);
+
+/**
+ * @method conf_doc_get_bool
+ *
+ * 获取指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {bool_t} defval 缺省值。
+ *
+ * @return {bool_t} 返回值。
+ */
+bool_t conf_doc_get_bool(conf_doc_t* doc, const char* path, bool_t defval);
+
+/**
+ * @method conf_doc_get_float
+ *
+ * 获取指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {float} defval 缺省值。
+ *
+ * @return {float} 返回值。
+ */
+float conf_doc_get_float(conf_doc_t* doc, const char* path, float defval);
+
+/**
+ * @method conf_doc_get_str
+ *
+ * 获取指定路径节点的值。
+ *
+ * @param {conf_doc_t*} doc 文档对象。
+ * @param {const char*} path 节点的路径。
+ * @param {const char*} defval 缺省值。
+ *
+ * @return {const char*} 返回值。
+ */
+const char* conf_doc_get_str(conf_doc_t* doc, const char* path, const char* defval);
 
 /**
  * @method conf_doc_remove

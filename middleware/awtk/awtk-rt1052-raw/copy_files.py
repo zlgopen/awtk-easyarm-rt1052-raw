@@ -101,6 +101,7 @@ else:
     assert 0, " VGCANVAS != {NANOVG, CAIRO} and NANOVG_BACKEND != {AGG, AGGE}"
 
 
+copyAwtkFiles('docs', 'awtk/docs')
 copyAwtkFiles('src/xml', 'awtk/src/xml')
 copyAwtkFiles('src/svg', 'awtk/src/svg')
 copyAwtkFiles('src/tkc', 'awtk/src/tkc')
@@ -125,6 +126,7 @@ copyAwtkFile('src/awtk_global.c', 'awtk/src/awtk_global.c')
 copyAwtkFile('src/awtk_global.h', 'awtk/src/awtk_global.h')
 copyAwtkFile('src/awtk_widgets.h', 'awtk/src/awtk_widgets.h')
 copyAwtkFile('src/awtk_ext_widgets.h', 'awtk/src/awtk_ext_widgets.h')
+copyAwtkFile('src/fscript_ext/fscript_ext.h', 'awtk/src/fscript_ext/fscript_ext.h')
 copyAwtkFile('src/native_window/native_window_raw.c', 'awtk/src/native_window/native_window_raw.c')
 copyAwtkFile('src/native_window/native_window_raw.h', 'awtk/src/native_window/native_window_raw.h')
 copyAwtkFile('src/window_manager/window_manager_default.c', 'awtk/src/window_manager/window_manager_default.c')
@@ -156,6 +158,8 @@ for f in LCD_FILES:
     copyAwtkFile(sfilename, dfilename)
 
 INPUT_METHODS_FILES=['input_engines/input_engine_pinyin.cpp',
+    'input_engines/ime_utils.c',
+    'input_engines/ime_utils.h',
     'input_methods/input_method_creator.c',
     'input_methods/input_method_default.inc',
     'input_methods/input_method_null.inc',
@@ -174,20 +178,4 @@ for f in MAIN_LOOP_FILES:
     copyAwtkFile(sfilename, dfilename)
 
 
-copyAwtkFiles('demos/assets', 'awtk-demos/assets')
-
-DEMO_FILES=['assets.h',
-    'assets.c',
-    'demo_main.c',
-    'demo_ui_app.c',
-    'common.inc',
-    'vg_common.inc']
-for f in DEMO_FILES:
-    sfilename=os.path.join('demos', f);
-    dfilename=os.path.join('awtk-demos/', f);
-    copyAwtkFile(sfilename, dfilename)
-
-
 copyPortFiles('awtk-port', 'awtk-port')
-# copyPortFiles('pxp', 'pxp')
-# copyPortFile('user_code/main.c', 'awtk-demos/main.c')	

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  named value
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -66,8 +66,12 @@ ret_t named_value_set_value(named_value_t* nv, const value_t* value) {
     return RET_OK;
   }
 
-  value_reset(&(nv->value));
-  return value_deep_copy(&(nv->value), value);
+  if (!value_equal(value, &(nv->value))) {
+    value_reset(&(nv->value));
+    return value_deep_copy(&(nv->value), value);
+  }
+
+  return RET_OK;
 }
 
 ret_t named_value_deinit(named_value_t* nv) {

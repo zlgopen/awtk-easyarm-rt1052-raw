@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget property names
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -64,6 +64,54 @@ BEGIN_C_DECLS
  * 高度。
  */
 #define WIDGET_PROP_H "h"
+
+/**
+ * @const WIDGET_PROP_DESIGN_W
+ * 窗口设计时宽度。
+ */
+#define WIDGET_PROP_DESIGN_W "design_w"
+
+/**
+ * @const WIDGET_PROP_DESIGN_H
+ * 窗口设计时宽度。
+ */
+#define WIDGET_PROP_DESIGN_H "design_h"
+
+/**
+ * @const WIDGET_PROP_AUTO_SCALE_CHILDREN_X
+ * 窗口大小与设计时大小不同时，是否自动调整子控件的x坐标。
+ */
+#define WIDGET_PROP_AUTO_SCALE_CHILDREN_X "auto_scale_children_x"
+
+/**
+ * @const WIDGET_PROP_AUTO_SCALE_CHILDREN_Y
+ * 窗口大小与设计时大小不同时，是否自动调整子控件的y坐标。
+ */
+#define WIDGET_PROP_AUTO_SCALE_CHILDREN_Y "auto_scale_children_y"
+
+/**
+ * @const WIDGET_PROP_AUTO_SCALE_CHILDREN_W
+ * 窗口大小与设计时大小不同时，是否自动调整子控件的宽度。
+ */
+#define WIDGET_PROP_AUTO_SCALE_CHILDREN_W "auto_scale_children_w"
+
+/**
+ * @const WIDGET_PROP_AUTO_SCALE_CHILDREN_H
+ * 窗口大小与设计时大小不同时，是否自动调整子控件的高度。
+ */
+#define WIDGET_PROP_AUTO_SCALE_CHILDREN_H "auto_scale_children_h"
+
+/**
+ * @const WIDGET_PROP_INPUTING
+ * inputing。
+ */
+#define WIDGET_PROP_INPUTING "inputing"
+
+/**
+ * @const WIDGET_PROP_ALWAYS_ON_TOP
+ * always on top。
+ */
+#define WIDGET_PROP_ALWAYS_ON_TOP "always_on_top"
 
 /**
  * @const WIDGET_PROP_CARET_X
@@ -138,6 +186,18 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_MAX_W "max_w"
 
 /**
+ * @const WIDGET_PROP_AUTO_ADJUST_SIZE
+ * 根据子控件和文本自动调整大小。
+ */
+#define WIDGET_PROP_AUTO_ADJUST_SIZE "auto_adjust_size"
+
+/**
+ * @const WIDGET_PROP_SINGLE_INSTANCE
+ * 窗口是否保持单例。
+ */
+#define WIDGET_PROP_SINGLE_INSTANCE "single_instance"
+
+/**
  * @const WIDGET_PROP_CHILDREN_LAYOUT
  * 子控件布局参数。
  */
@@ -210,10 +270,28 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_VALUE "value"
 
 /**
+ * @const WIDGET_PROP_REVERSE
+ * 进度条反向显示。
+ */
+#define WIDGET_PROP_REVERSE "reverse"
+
+/**
  * @const WIDGET_PROP_LENGTH
  * 长度。
  */
 #define WIDGET_PROP_LENGTH "length"
+
+/**
+ * @const WIDGET_PROP_LINE_WRAP
+ * 自动换行。
+ */
+#define WIDGET_PROP_LINE_WRAP "line_wrap"
+
+/**
+ * @const WIDGET_PROP_WORD_WRAP
+ * 是否允许单词中换行。
+ */
+#define WIDGET_PROP_WORD_WRAP "word_wrap"
 
 /**
  * @const WIDGET_PROP_TEXT
@@ -390,6 +468,12 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_READONLY "readonly"
 
 /**
+ * @const WIDGET_PROP_CANCELABLE
+ * 是否可取消。
+ */
+#define WIDGET_PROP_CANCELABLE "cancelable"
+
+/**
  * @const WIDGET_PROP_PASSWORD_VISIBLE
  * 密码是否可见。
  */
@@ -400,6 +484,18 @@ BEGIN_C_DECLS
  * 是否处于active状态。
  */
 #define WIDGET_PROP_ACTIVE "active"
+
+/**
+ * @const WIDGET_PROP_CURR_PAGE
+ * 当前页。
+ */
+#define WIDGET_PROP_CURR_PAGE "curr_page"
+
+/**
+ * @const WIDGET_PROP_PAGE_MAX_NUMBER
+ * 页面最大个数。
+ */
+#define WIDGET_PROP_PAGE_MAX_NUMBER "page_max_number"
 
 /**
  * @const WIDGET_PROP_VERTICAL
@@ -466,6 +562,12 @@ BEGIN_C_DECLS
  * 编辑器在获得焦点时是否打开输入法。
  */
 #define WIDGET_PROP_OPEN_IM_WHEN_FOCUSED "open_im_when_focused"
+
+/**
+ * @const WIDGET_PROP_CLOSE_IM_WHEN_BLURED
+ * 编辑器在失去焦点时是否关闭输入法。
+ */
+#define WIDGET_PROP_CLOSE_IM_WHEN_BLURED "close_im_when_blured"
 
 /**
  * @const WIDGET_PROP_X_MIN
@@ -600,10 +702,22 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_REPEAT "repeat"
 
 /**
+ * @const WIDGET_PROP_LONG_PRESS_TIME
+ * 触发长按事件的时间(ms)。
+ */
+#define WIDGET_PROP_LONG_PRESS_TIME "long_press_time"
+
+/**
  * @const WIDGET_PROP_ENABLE_LONG_PRESS
  * 是否启用长按。
  */
 #define WIDGET_PROP_ENABLE_LONG_PRESS "enable_long_press"
+
+/**
+ * @const WIDGET_PROP_CLICK_THROUGH
+ * 是否启用点击穿透。
+ */
+#define WIDGET_PROP_CLICK_THROUGH "click_through"
 
 /**
  * @const WIDGET_PROP_ANIMATABLE
@@ -750,6 +864,12 @@ BEGIN_C_DECLS
 #define WIDGET_PROP_CLOSE_WHEN_CLICK_OUTSIDE "close_when_click_outside"
 
 /**
+ * @const WIDGET_PROP_CLOSE_WHEN_TIMEOUT
+ * 超时后关闭窗口。
+ */
+#define WIDGET_PROP_CLOSE_WHEN_TIMEOUT "close_when_timeout"
+
+/**
  * @const WIDGET_PROP_LINE_GAP
  * 行间距。
  */
@@ -799,7 +919,7 @@ BEGIN_C_DECLS
 
 /**
  * @const WIDGET_PROP_WITH_FOCUS_STATE
- * 是否支持焦点状态(如果希望style支持焦点状态，但有不希望焦点停留，可用本属性)。
+ * 是否支持焦点状态(如果希望style支持焦点状态，但又不希望焦点停留，可用本属性)。
  */
 #define WIDGET_PROP_WITH_FOCUS_STATE "with_focus_state"
 
@@ -1237,7 +1357,7 @@ typedef enum _window_closable_t {
 /**
  * @enum widget_state_t
  * @annotation ["scriptable", "string"]
- * @prefix WIDGET_
+ * @prefix WIDGET_STATE_
  * 控件状态常量定义。
  *
  * 这里指定常用的状态值，扩展控件可以在自己的头文件中定义私有的状态。
@@ -1253,6 +1373,12 @@ typedef enum _window_closable_t {
  * 正常状态。
  */
 #define WIDGET_STATE_NORMAL "normal"
+
+/**
+ * @const WIDGET_STATE_CHANGED
+ * 内容被修改的状态。
+ */
+#define WIDGET_STATE_CHANGED "changed"
 
 /**
  * @const WIDGET_STATE_PRESSED
@@ -1438,6 +1564,13 @@ typedef enum _window_closable_t {
  * Four pointed arrow pointing north, south, east, and west。
  */
 #define WIDGET_CURSOR_SIZEALL "cursor_size_all"
+
+/*for fscript*/
+#define STR_PROP_SELF "self"
+#define STR_PROP_PARENT "parent"
+#define STR_PROP_WINDOW "window"
+#define STR_PROP_WINDOW_MANAGER "window_manager"
+#define STR_PROP_MODEL "__model__"
 
 END_C_DECLS
 

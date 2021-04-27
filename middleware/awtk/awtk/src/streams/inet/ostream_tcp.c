@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input stream base on socket
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -74,4 +74,10 @@ tk_ostream_t* tk_ostream_tcp_create(int sock) {
   TK_OSTREAM(obj)->write = tk_ostream_tcp_write;
 
   return TK_OSTREAM(obj);
+}
+
+tk_ostream_tcp_t* tk_ostream_tcp_cast(tk_ostream_t* s) {
+  return_value_if_fail(s != NULL && OBJECT(s)->vt == &s_tk_ostream_tcp_vtable, NULL);
+
+  return (tk_ostream_tcp_t*)s;
 }

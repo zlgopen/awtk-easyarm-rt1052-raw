@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  timer manager
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,12 +33,39 @@ uint32_t timer_add(timer_func_t on_timer, void* ctx, uint32_t duration) {
   return timer_manager_add(timer_manager(), on_timer, ctx, duration);
 }
 
+uint32_t timer_add_with_type(timer_func_t on_timer, void* ctx, uint32_t duration, uint16_t type) {
+  return timer_manager_add_with_type(timer_manager(), on_timer, ctx, duration, type);
+}
+
 ret_t timer_remove(uint32_t timer_id) {
   return timer_manager_remove(timer_manager(), timer_id);
 }
 
+ret_t timer_remove_all_by_ctx_and_type(uint16_t type, void* ctx) {
+  return timer_manager_all_remove_by_ctx_and_type(timer_manager(), type, ctx);
+}
+
+ret_t timer_remove_all_by_ctx(void* ctx) {
+  return timer_manager_all_remove_by_ctx(timer_manager(), ctx);
+}
+
 ret_t timer_reset(uint32_t timer_id) {
   return timer_manager_reset(timer_manager(), timer_id);
+}
+
+ret_t timer_suspend(uint32_t timer_id) {
+  timer_info_t* timer = (timer_info_t*)timer_find(timer_id);
+  return_value_if_fail(timer != NULL, RET_BAD_PARAMS);
+  timer->suspend = TRUE;
+  return RET_OK;
+}
+
+ret_t timer_resume(uint32_t timer_id) {
+  timer_info_t* timer = (timer_info_t*)timer_find(timer_id);
+  return_value_if_fail(timer != NULL, RET_BAD_PARAMS);
+  timer->suspend = FALSE;
+
+  return timer_reset(timer_id);
 }
 
 const timer_info_t* timer_find(uint32_t timer_id) {

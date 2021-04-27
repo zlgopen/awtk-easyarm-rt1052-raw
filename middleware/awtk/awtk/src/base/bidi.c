@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  Unicode Bidirectional Algorithm.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,24 +47,24 @@ static bidi_type_t bidi_type_from(int fribidi_type) {
 static FriBidiParType bidi_type_to(bidi_type_t type) {
   switch (type) {
     case BIDI_TYPE_RTL:
-      return FRIBIDI_PAR_RTL;
+      return (FriBidiParType)FRIBIDI_PAR_RTL;
     case BIDI_TYPE_LTR:
-      return FRIBIDI_PAR_LTR;
+      return (FriBidiParType)FRIBIDI_PAR_LTR;
     case BIDI_TYPE_RLO:
-      return FRIBIDI_TYPE_RLO;
+      return (FriBidiParType)FRIBIDI_TYPE_RLO;
     case BIDI_TYPE_LRO:
-      return FRIBIDI_TYPE_LRO;
+      return (FriBidiParType)FRIBIDI_TYPE_LRO;
     case BIDI_TYPE_WRTL:
-      return FRIBIDI_PAR_WRTL;
+      return (FriBidiParType)FRIBIDI_PAR_WRTL;
     case BIDI_TYPE_WLTR:
-      return FRIBIDI_PAR_WLTR;
+      return (FriBidiParType)FRIBIDI_PAR_WLTR;
     default:
-      return FRIBIDI_PAR_ON;
+      return (FriBidiParType)FRIBIDI_PAR_ON;
   }
 }
 
 bidi_type_t bidi_type_from_name(const char* name) {
-  if(name == NULL || *name == '\0') {
+  if (name == NULL || *name == '\0') {
     return BIDI_TYPE_AUTO;
   }
 

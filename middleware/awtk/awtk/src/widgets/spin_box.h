@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  spin_box
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,7 +46,7 @@ BEGIN_C_DECLS
  * ```
  *
  * >
- * 更多用法请参考：[spin_box.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/spinbox.xml)
+ * 更多用法请参考：[spin_box.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/spinbox.xml)
  *
  * 在c代码中使用函数spin_box\_create创建spinbox控件。如：
  *
@@ -77,7 +77,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L128)
+ * default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L128)
  *
  */
 typedef edit_t spin_box_t;

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  pthread implemented thread related functions.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -282,7 +282,7 @@ struct _tk_thread_t {
   tk_thread_entry_t entry;
   char name[TK_NAME_LEN + 1];
   uint32_t stack_size;
-  uint32_t priority;
+  int32_t priority;
 };
 
 ret_t tk_thread_set_name(tk_thread_t* thread, const char* name) {
@@ -301,10 +301,14 @@ ret_t tk_thread_set_stack_size(tk_thread_t* thread, uint32_t stack_size) {
   return RET_OK;
 }
 
-ret_t tk_thread_set_priority(tk_thread_t* thread, uint32_t priority) {
+int32_t tk_thread_get_priority_from_platform(tk_thread_priority_t priority) {
+  return 0;
+}
+
+ret_t tk_thread_set_priority(tk_thread_t* thread, tk_thread_priority_t priority) {
   return_value_if_fail(thread != NULL, RET_BAD_PARAMS);
 
-  thread->priority = priority;
+  thread->priority = tk_thread_get_priority_from_platform(priority);
 
   return RET_OK;
 }

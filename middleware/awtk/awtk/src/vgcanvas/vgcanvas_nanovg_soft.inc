@@ -1,4 +1,6 @@
 #include "tkc/utils.h"
+#include "base/types_def.h"
+#include "vgcanvas_nanovg.inc" 
 
 static enum NVGtexture bitmap_format_to_nanovg(bitmap_format_t format) {
   enum NVGtexture f = NVG_TEXTURE_BGRA;
@@ -37,7 +39,7 @@ static enum NVGtexture bitmap_format_to_nanovg(bitmap_format_t format) {
   return f;
 }
 
-static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h, framebuffer_object_t* fbo) {
+static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h, bool_t custom_draw_model, framebuffer_object_t* fbo) {
   return RET_NOT_IMPL;
 }
 
@@ -50,7 +52,7 @@ static ret_t vgcanvas_nanovg_bind_fbo(vgcanvas_t* vgcanvas, framebuffer_object_t
 }
 
 static ret_t vgcanvas_nanovg_fbo_to_imageData(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo,
-                                              bitmap_t* img, rect_t* r) {
+                                              bitmap_t* img, const rect_t* r) {
   return RET_NOT_IMPL;
 }
 
@@ -59,7 +61,7 @@ static ret_t vgcanvas_nanovg_unbind_fbo(vgcanvas_t* vgcanvas, framebuffer_object
 }
 
 static ret_t vgcanvas_nanovg_fbo_to_bitmap(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo,
-                                           bitmap_t* img, rect_t* r) {
+                                           bitmap_t* img, const rect_t* r) {
   return RET_NOT_IMPL;
 }
 
@@ -78,7 +80,7 @@ static ret_t vgcanvas_nanovg_reinit(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h
   return RET_OK;
 }
 
-static ret_t vgcanvas_nanovg_begin_frame(vgcanvas_t* vgcanvas, rect_t* dirty_rect) {
+static ret_t vgcanvas_nanovg_begin_frame(vgcanvas_t* vgcanvas, const rect_t* dirty_rect) {
   vgcanvas_nanovg_t* canvas = (vgcanvas_nanovg_t*)vgcanvas;
   NVGcontext* vg = canvas->vg;
 
@@ -130,7 +132,6 @@ static int vgcanvas_nanovg_ensure_image(vgcanvas_nanovg_t* canvas, bitmap_t* img
   int32_t i = 0;
   int32_t f = 0;
   uint8_t* img_data = NULL;
-  uint32_t bpp = bitmap_get_bpp(img);
   vgcanvas_nanovg_soft_texture_t* texture = NULL;
 
   if (img->flags & BITMAP_FLAG_TEXTURE) {
@@ -143,7 +144,7 @@ static int vgcanvas_nanovg_ensure_image(vgcanvas_nanovg_t* canvas, bitmap_t* img
     }
   }
 
-  flag = (int)vgcanvas_nanovg_bitmap_flag_to_NVGimageFlags(img->flags);
+  flag = (int)vgcanvas_nanovg_bitmap_flag_to_NVGimageFlags((bitmap_flag_t)(img->flags));
 
   switch (img->format) {
     case BITMAP_FMT_RGBA8888: {
@@ -190,6 +191,7 @@ static int vgcanvas_nanovg_ensure_image(vgcanvas_nanovg_t* canvas, bitmap_t* img
 static ret_t vgcanvas_nanovg_destroy(vgcanvas_t* vgcanvas) {
   vgcanvas_nanovg_t* canvas = (vgcanvas_nanovg_t*)vgcanvas;
 
+  vgcanvas_nanovg_deinit(vgcanvas);
   nvgDeleteInternal(canvas->vg);
   TKMEM_FREE(vgcanvas);
 

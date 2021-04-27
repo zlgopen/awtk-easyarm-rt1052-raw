@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window_base
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -59,6 +59,43 @@ typedef struct _window_base_t {
    * 请参考[主题](https://github.com/zlgopen/awtk/blob/master/docs/theme.md)
    */
   char* theme;
+
+  /**
+   * @property {uint16_t} design_w
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 设计时宽度。
+   */
+  uint16_t design_w;
+  /**
+   * @property {uint16_t} design_h
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 设计时高度。
+   */
+  uint16_t design_h;
+  /**
+   * @property {bool_t} auto_scale_children_x
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 窗口大小与设计时大小不同时，是否自动调整子控件的x坐标。
+   */
+  uint16_t auto_scale_children_x : 1;
+  /**
+   * @property {bool_t} auto_scale_children_y
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 窗口大小与设计时大小不同时，是否自动调整子控件的y坐标。
+   */
+  uint16_t auto_scale_children_y : 1;
+  /**
+   * @property {bool_t} auto_scale_children_w
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 窗口大小与设计时大小不同时，是否自动调整子控件的宽度。
+   */
+  uint16_t auto_scale_children_w : 1;
+  /**
+   * @property {bool_t} auto_scale_children_h
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 窗口大小与设计时大小不同时，是否自动调整子控件的高度。
+   */
+  uint16_t auto_scale_children_h : 1;
 
   /**
    * @property {bool_t} disable_anim
@@ -196,6 +233,13 @@ typedef struct _window_base_t {
    */
   char* move_focus_right_key;
 
+  /**
+   * @property {bool_t} single_instance
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 单例。如果窗口存在，先关闭再打开。
+   */
+  bool_t single_instance;
+
   /*private*/
   const asset_info_t* res_theme;
   font_manager_t* font_manager;
@@ -203,6 +247,31 @@ typedef struct _window_base_t {
   widget_t* save_focus_widget;
   uint32_t grab_count_when_to_foreground;
 } window_base_t;
+
+/**
+ * @event {event_t} EVT_WINDOW_WILL_OPEN
+ * 窗口即将打开事件。 如果有窗口动画，在窗口动画开始前触发。如果没有窗口动画，在窗口被加载后的下一次循环中触发。
+ */
+
+/**
+ * @event {event_t} EVT_WINDOW_OPEN
+ * 窗口打开事件。 如果有窗口动画，在窗口动画完成时触发。如果没有窗口动画，在窗口被加载后的下一次循环中触发。
+ */
+
+/**
+ * @event {event_t} EVT_WINDOW_TO_BACKGROUND
+ * 窗口被切换到后台事件。 打开新窗口时，当前窗口被切换到后台时，对当前窗口触发本事件。
+ */
+
+/**
+ * @event {event_t} EVT_WINDOW_TO_FOREGROUND
+ * 窗口被切换到前台事件。 关闭当前窗口时，前一个窗口被切换到前台时，对前一个窗口触发本事件。
+ */
+
+/**
+ * @event {event_t} EVT_WINDOW_CLOSE
+ * 窗口关闭事件。
+ */
 
 /*for sub class*/
 
@@ -223,7 +292,16 @@ ret_t window_base_on_destroy(widget_t* widget);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t window_base_on_event(widget_t* widget, event_t* e);
-ret_t window_base_invalidate(widget_t* widget, rect_t* r);
+
+/**
+ * @method window_base_invalidate
+ * 窗口on_invalidate函数的缺省实现。
+ * @param {widget_t*} widget window_base对象。
+ * @param {const rect_t*} rect rect对象。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t window_base_invalidate(widget_t* widget, const rect_t* rect);
 
 /**
  * @method window_base_on_paint_begin

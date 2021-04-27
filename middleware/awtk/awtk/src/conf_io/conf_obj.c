@@ -4,7 +4,7 @@
  * Author: AWTK Develop Team
  * Brief:  conf obj
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,10 +32,12 @@ typedef struct _conf_obj_t {
 
   /*private*/
   char* url;
+  char* default_url;
   conf_doc_t* doc;
   conf_doc_save_t save;
   conf_doc_load_t load;
   bool_t readonly;
+  bool_t modified;
 } conf_obj_t;
 
 static conf_obj_t* conf_obj_cast(object_t* obj);
@@ -45,6 +47,7 @@ static ret_t conf_obj_move_up(object_t* obj, const char* name) {
   conf_obj_t* o = CONF_OBJ(obj);
   return_value_if_fail(o != NULL, RET_BAD_PARAMS);
 
+  o->modified = TRUE;
   return conf_doc_move_up(o->doc, name);
 }
 
@@ -52,6 +55,7 @@ static ret_t conf_obj_move_down(object_t* obj, const char* name) {
   conf_obj_t* o = CONF_OBJ(obj);
   return_value_if_fail(o != NULL, RET_BAD_PARAMS);
 
+  o->modified = TRUE;
   return conf_doc_move_down(o->doc, name);
 }
 
@@ -63,6 +67,7 @@ static ret_t conf_obj_remove_prop(object_t* obj, const char* name) {
     return RET_NOT_IMPL;
   }
 
+  o->modified = TRUE;
   return conf_doc_remove(o->doc, name);
 }
 
@@ -74,6 +79,7 @@ static ret_t conf_obj_clear(object_t* obj, const char* name) {
     return RET_NOT_IMPL;
   }
 
+  o->modified = TRUE;
   return conf_doc_clear(o->doc, name);
 }
 
@@ -85,12 +91,26 @@ static ret_t conf_obj_set_prop(object_t* obj, const char* name, const value_t* v
     return RET_NOT_IMPL;
   }
 
+  if (tk_str_eq(name, CONF_OBJ_PROP_DEFAULT_URL)) {
+    o->default_url = tk_str_copy(o->default_url, value_str(v));
+    return RET_OK;
+  }
+
+  o->modified = TRUE;
   return conf_doc_set(o->doc, name, v);
 }
 
 static ret_t conf_obj_get_prop(object_t* obj, const char* name, value_t* v) {
   conf_obj_t* o = CONF_OBJ(obj);
   return_value_if_fail(o != NULL, RET_BAD_PARAMS);
+
+  if (tk_str_eq(name, CONF_OBJ_PROP_URL)) {
+    value_set_str(v, o->url);
+    return RET_OK;
+  } else if (tk_str_eq(name, CONF_OBJ_PROP_DEFAULT_URL)) {
+    value_set_str(v, o->default_url);
+    return RET_OK;
+  }
 
   return conf_doc_get(o->doc, name, v);
 }
@@ -106,6 +126,10 @@ ret_t conf_obj_save(object_t* obj) {
 
   ret = o->save(o->doc, writer);
   data_writer_destroy(writer);
+
+  if (ret == RET_OK) {
+    o->modified = FALSE;
+  }
 
   return ret;
 }
@@ -128,12 +152,15 @@ static ret_t conf_obj_load(object_t* obj) {
   return RET_OK;
 }
 
-static ret_t conf_obj_load_or_create(object_t* obj) {
+static ret_t conf_obj_load_or_create(object_t* obj, bool_t create_if_not_exist) {
   conf_obj_t* o = CONF_OBJ(obj);
+  return_value_if_fail(o != NULL, RET_FAIL);
 
-  conf_obj_load(obj);
+  if (o->url != NULL) {
+    conf_obj_load(obj);
+  }
 
-  if (o->doc == NULL) {
+  if (o->doc == NULL && create_if_not_exist) {
     o->doc = conf_doc_create(20);
   }
 
@@ -153,7 +180,7 @@ static ret_t conf_obj_reload(object_t* obj) {
   conf_doc_destroy(o->doc);
   o->doc = NULL;
 
-  return conf_obj_load_or_create(obj);
+  return conf_obj_load_or_create(obj, FALSE);
 }
 
 static bool_t conf_obj_can_exec(object_t* obj, const char* name, const char* args) {
@@ -193,7 +220,13 @@ static ret_t conf_obj_exec(object_t* obj, const char* name, const char* args) {
   }
 
   if (tk_str_ieq(name, OBJECT_CMD_SAVE)) {
-    ret = conf_obj_save(obj);
+    if (tk_str_eq(args, "force")) {
+      ret = conf_obj_save(obj);
+    } else if (o->modified) {
+      ret = conf_obj_save(obj);
+    } else {
+      ret = RET_NOT_MODIFIED;
+    }
   } else if (tk_str_ieq(name, OBJECT_CMD_RELOAD)) {
     conf_obj_reload(obj);
     ret = RET_ITEMS_CHANGED;
@@ -245,6 +278,7 @@ static ret_t conf_obj_destroy(object_t* obj) {
 
   conf_doc_destroy(o->doc);
   TKMEM_FREE(o->url);
+  TKMEM_FREE(o->default_url);
   o->doc = NULL;
 
   return RET_OK;
@@ -280,7 +314,8 @@ object_t* conf_obj_create(conf_doc_save_t save, conf_doc_load_t load, const char
                           bool_t create_if_not_exist) {
   conf_obj_t* o = NULL;
   object_t* obj = NULL;
-  return_value_if_fail(save != NULL && load != NULL && url != NULL && *url, NULL);
+  return_value_if_fail(save != NULL && load != NULL, NULL);
+  return_value_if_fail((url != NULL && *url) || create_if_not_exist, NULL);
 
   obj = object_create(&s_conf_obj_vtable);
   o = CONF_OBJ(obj);
@@ -289,12 +324,12 @@ object_t* conf_obj_create(conf_doc_save_t save, conf_doc_load_t load, const char
   o->save = save;
   o->load = load;
   o->url = tk_strdup(url);
-  if (o->url == NULL) {
+  if (o->url == NULL && url != NULL) {
     OBJECT_UNREF(o);
   }
   return_value_if_fail(o != NULL, NULL);
 
-  conf_obj_load_or_create(obj);
+  conf_obj_load_or_create(obj, create_if_not_exist);
 
   if (o->doc == NULL || o->doc->root == NULL) {
     TKMEM_FREE(o->url);

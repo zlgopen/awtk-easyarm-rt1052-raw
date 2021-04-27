@@ -9,7 +9,7 @@
 如果不需要滚动，可以用view控件配置适当的layout参数作为列表控件。
 
 列表视图中的列表项可以固定高度，也可以使用不同高度。请参考[变高列表项](
-https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/list_view_vh.xml)
+https://github.com/zlgopen/awtk/blob/master/design/default/ui/list_view_vh.xml)
 
 列表视图控件的中可以有滚动条，也可以没有滚动条。
 可以使用移动设备风格的滚动条，也可以使用桌面风格的滚动条。
@@ -36,7 +36,7 @@ list\_view\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数均�
 
 
 > 更多用法请参考：[list\_view\_m.xml](
-https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/list_view_m.xml)
+https://github.com/zlgopen/awtk/blob/master/design/default/ui/list_view_m.xml)
 
 在c代码中使用函数list\_view\_create创建列表视图控件。如：
 
@@ -48,6 +48,14 @@ widget_t* list_view = list_view_create(win, 0, 0, 0, 0);
 如果需要动态修改，可以使用widget\_clone来增加列表项，使用widget\_remove\_child来移出列表项。
 
 可用通过style来设置控件的显示风格，如背景颜色和边框颜色等(一般情况不需要)。
+
+备注：list_view 下的 scroll_view 控件不支持遍历所有子控件的效果。
+
+下面是针对 scroll_bar_d （桌面版）有效果，scroll_bar_m（移动版）没有效果。
+如果 floating_scroll_bar 属性为 TRUE 和 auto_hide_scroll_bar 属性为 TRUE，scroll_view 宽默认为 list_view 的 100% 宽，鼠标在 list_view 上滚动条才显示，不在的就自动隐藏，如果 scroll_view 的高比虚拟高要大的话，滚动条变成不可见，scroll_view 宽不会变。
+如果 floating_scroll_bar 属性为 TRUE 和 auto_hide_scroll_bar 属性为 FALSE ，scroll_view 宽默认为 list_view 的 100% 宽，滚动条不隐藏，如果 scroll_view 的高比虚拟高要大的话，滚动条变成不可见，scroll_view 宽不会变。
+如果 floating_scroll_bar 属性为 FALSE 和 auto_hide_scroll_bar 属性为 FALSE，如果 scroll_view 的高比虚拟高要大的话，滚动条变成不可用，scroll_view 宽不会变。
+如果 floating_scroll_bar 属性为 FALSE 和 auto_hide_scroll_bar 属性为 TRUE，如果 scroll_view 的高比虚拟高要大的话，滚动条变成不可见，scroll_view 宽会合并原来滚动条的宽。
 ----------------------------------
 ### 函数
 <p id="list_view_t_methods">
@@ -59,6 +67,7 @@ widget_t* list_view = list_view_create(win, 0, 0, 0, 0);
 | <a href="#list_view_t_list_view_reinit">list\_view\_reinit</a> | list_view重新初始化。 |
 | <a href="#list_view_t_list_view_set_auto_hide_scroll_bar">list\_view\_set\_auto\_hide\_scroll\_bar</a> | 设置是否自动隐藏滚动条。 |
 | <a href="#list_view_t_list_view_set_default_item_height">list\_view\_set\_default\_item\_height</a> | 设置列表项的缺省高度。 |
+| <a href="#list_view_t_list_view_set_floating_scroll_bar">list\_view\_set\_floating\_scroll\_bar</a> | 设置滚动条是否悬浮在 scroll_view 上面。 |
 | <a href="#list_view_t_list_view_set_item_height">list\_view\_set\_item\_height</a> | 设置列表项的高度。 |
 ### 属性
 <p id="list_view_t_properties">
@@ -67,6 +76,7 @@ widget_t* list_view = list_view_create(win, 0, 0, 0, 0);
 | -------- | ----- | ------------ | 
 | <a href="#list_view_t_auto_hide_scroll_bar">auto\_hide\_scroll\_bar</a> | bool\_t | 如果不需要滚动条时，自动隐藏滚动条。 |
 | <a href="#list_view_t_default_item_height">default\_item\_height</a> | int32\_t | 列表项的缺省高度。如果item_height <= 0 而且列表项自身的高度 <= 0，则使用缺省高度。 |
+| <a href="#list_view_t_floating_scroll_bar">floating\_scroll\_bar</a> | bool\_t | 滚动条是否悬浮在 scroll_view 上面 |
 | <a href="#list_view_t_item_height">item\_height</a> | int32\_t | 列表项的高度。如果 item_height > 0，所有列表项使用固定高度，否则使用列表项自身的高度。 |
 #### list\_view\_cast 函数
 -----------------------
@@ -169,6 +179,26 @@ ret_t list_view_set_default_item_height (widget_t* widget, int32_t default_item_
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | default\_item\_height | int32\_t | 列表项的高度。 |
+#### list\_view\_set\_floating\_scroll\_bar 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="list_view_t_list_view_set_floating_scroll_bar">设置滚动条是否悬浮在 scroll_view 上面。
+
+* 函数原型：
+
+```
+ret_t list_view_set_floating_scroll_bar (widget_t* widget, bool_t floating_scroll_bar);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| floating\_scroll\_bar | bool\_t | 滚动条是否悬浮在 scroll\_view 上面。 |
 #### list\_view\_set\_item\_height 函数
 -----------------------
 
@@ -210,6 +240,22 @@ ret_t list_view_set_item_height (widget_t* widget, int32_t item_height);
 > <p id="list_view_t_default_item_height">列表项的缺省高度。如果item_height <= 0 而且列表项自身的高度 <= 0，则使用缺省高度。
 
 * 类型：int32\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
+#### floating\_scroll\_bar 属性
+-----------------------
+> <p id="list_view_t_floating_scroll_bar">滚动条是否悬浮在 scroll_view 上面
+
+* 类型：bool\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |

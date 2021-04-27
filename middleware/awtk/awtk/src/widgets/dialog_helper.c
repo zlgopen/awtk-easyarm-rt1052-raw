@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dialogi helper
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +22,7 @@
 #include "widgets/label.h"
 #include "base/dialog.h"
 #include "widgets/button.h"
+#include "base/style_factory.h"
 #include "widgets/dialog_title.h"
 #include "widgets/dialog_client.h"
 
@@ -44,6 +45,7 @@ widget_t* dialog_create_simple(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h)
 }
 
 #include "base/window_manager.h"
+#include "dialog_toast.inc"
 
 #define OK_STYLE_NAME "default"
 #define CANCEL_STYLE_NAME "default"
@@ -58,14 +60,6 @@ static ret_t on_ok_to_quit(void* ctx, event_t* e) {
 static ret_t on_cancel_to_quit(void* ctx, event_t* e) {
   widget_t* dlg = WIDGET(ctx);
   dialog_quit(dlg, RET_FAIL);
-
-  return RET_REMOVE;
-}
-
-static ret_t on_timer_to_quit(const timer_info_t* info) {
-  widget_t* dlg = WIDGET(info->ctx);
-
-  dialog_quit(dlg, 0);
 
   return RET_REMOVE;
 }
@@ -90,7 +84,31 @@ static ret_t dialog_get_size_limits(rect_t* r) {
   return RET_OK;
 }
 
-static widget_t* dialog_create_label(const char* text) {
+static ret_t dialog_create_label_load_style(widget_t* widget, const char* theme_name) {
+  assets_manager_t* am = assets_manager();
+  const asset_info_t* res_theme = assets_manager_ref(am, ASSET_TYPE_STYLE, theme_name);
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+
+  if (res_theme != NULL) {
+    theme_t* theme = theme_default_create(res_theme->data);
+    widget->astyle = style_factory_create_style(style_factory(), theme_get_style_type(theme));
+    style_update_state(widget->astyle, theme, widget->vt->type, NULL, WIDGET_STATE_NORMAL);
+    assets_manager_unref(am, res_theme);
+    theme_destroy(theme);
+  }
+
+  return RET_OK;
+}
+
+static ret_t dialog_create_label_unload_style(widget_t* widget) {
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+  style_destroy(widget->astyle);
+  widget->astyle = NULL;
+
+  return RET_OK;
+}
+
+static widget_t* dialog_create_label(const char* text, const char* theme_name) {
   rect_t r;
   widget_t* label = NULL;
 
@@ -98,44 +116,23 @@ static widget_t* dialog_create_label(const char* text) {
 
   label = label_create(NULL, 0, 0, 0, 0);
   return_value_if_fail(label != NULL, NULL);
-
+  dialog_create_label_load_style(label, theme_name);
   if (text != NULL) {
     widget_set_tr_text(label, text);
+    label_set_line_wrap(label, TRUE);
+    label_set_word_wrap(label, TRUE);
   }
   label_resize_to_content(label, r.x, r.w, r.y, r.h);
-
+  dialog_create_label_unload_style(label);
   return label;
 }
 
 ret_t dialog_toast(const char* text, uint32_t duration) {
-  char params[128];
-  int32_t margin = 10;
-  widget_t* label = NULL;
-  widget_t* dialog = NULL;
-  return_value_if_fail(text != NULL && duration >= 1000, RET_BAD_PARAMS);
+  dialog_toast_t* dialog_toast = dialog_toast_manager();
+  return_value_if_fail(dialog_toast != NULL, RET_OOM);
 
-  label = dialog_create_label(text);
-  return_value_if_fail(label != NULL, RET_OOM);
-
-  dialog = dialog_create(NULL, 0, 0, label->w + 2 * margin, label->h + 2 * margin);
-  goto_error_if_fail(dialog != NULL);
-
-  widget_set_prop_str(dialog, WIDGET_PROP_ANIM_HINT, "fade(duration=500)");
-  widget_set_prop_str(dialog, WIDGET_PROP_THEME, "dialog_toast");
-  widget_add_child(dialog, label);
-
-  tk_snprintf(params, sizeof(params) - 1, "default(x=%d, y=%d, w=%d, h=%d)", margin, margin,
-              label->w, label->h);
-  widget_set_self_layout(label, params);
-
-  widget_on(dialog, EVT_POINTER_UP, on_ok_to_quit, dialog);
-  widget_add_timer(dialog, on_timer_to_quit, duration);
-
-  return (ret_t)dialog_modal(dialog);
-error:
-  widget_destroy(label);
-
-  return RET_FAIL;
+  ENSURE(dialog_toast_push_message(dialog_toast, text, duration) != NULL);
+  return dialog_toast_model(dialog_toast);
 }
 
 ret_t dialog_info_ex(const char* text, const char* title_text, const char* theme) {
@@ -149,7 +146,7 @@ ret_t dialog_info_ex(const char* text, const char* title_text, const char* theme
   widget_t* client = NULL;
   return_value_if_fail(text != NULL, RET_BAD_PARAMS);
 
-  label = dialog_create_label(text);
+  label = dialog_create_label(text, theme);
   return_value_if_fail(label != NULL, RET_OOM);
 
   tk_snprintf(params, sizeof(params) - 1, "default(x=10, y=10, w=%d, h=%d)", label->w, label->h);
@@ -195,6 +192,7 @@ ret_t dialog_warn(const char* title, const char* text) {
   return dialog_info_ex(text, title, "dialog_warn");
 }
 
+#define DIALOG_CONFIRM_NAME "dialog_confirm"
 ret_t dialog_confirm(const char* stitle, const char* text) {
   uint32_t w = 0;
   uint32_t h = 0;
@@ -208,7 +206,7 @@ ret_t dialog_confirm(const char* stitle, const char* text) {
   return_value_if_fail(text != NULL, RET_BAD_PARAMS);
 
   stitle = stitle != NULL ? stitle : "Confirm";
-  label = dialog_create_label(text);
+  label = dialog_create_label(text, DIALOG_CONFIRM_NAME);
   return_value_if_fail(label != NULL, RET_OOM);
 
   tk_snprintf(params, sizeof(params) - 1, "default(x=10, y=10, w=%d, h=%d)", label->w, label->h);
@@ -217,7 +215,7 @@ ret_t dialog_confirm(const char* stitle, const char* text) {
   h = label->h + 90;
   w = tk_max(label->w, 128) + 40;
   dialog = dialog_create_simple(NULL, 0, 0, w, h);
-  widget_set_prop_str(dialog, WIDGET_PROP_THEME, "dialog_confirm");
+  widget_set_prop_str(dialog, WIDGET_PROP_THEME, DIALOG_CONFIRM_NAME);
   widget_set_prop_str(dialog, WIDGET_PROP_HIGHLIGHT, "default(alpha=40)");
 
   client = dialog_get_client(dialog);

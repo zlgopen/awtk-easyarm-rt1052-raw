@@ -170,6 +170,12 @@ TEST(value, double) {
   ASSERT_EQ(value_double(&v), 10);
 }
 
+TEST(value, bool_to_double) {
+  value_t v;
+  ASSERT_EQ(&v, value_set_bool(&v, true));
+  ASSERT_EQ(value_double(&v), 1);
+}
+
 TEST(value, strdouble) {
   value_t v;
   ASSERT_EQ(&v, value_set_str(&v, "10"));
@@ -265,6 +271,27 @@ TEST(ValueTest, deepcopy) {
 
   ASSERT_EQ(strcmp(value_str(&v), "str"), 0);
   ASSERT_NE(v.value.str, other.value.str);
+
+  value_reset(&v);
+  value_reset(&other);
+}
+
+TEST(ValueTest, deepcopy_binary) {
+  value_t v;
+  value_t other;
+  const char* str = "str";
+  binary_data_t* bin1 = NULL;
+  binary_data_t* bin2 = NULL;
+
+  ASSERT_EQ(&other, value_set_binary_data(&other, (void*)str, 4));
+  ASSERT_EQ(value_deep_copy(&v, &other), RET_OK);
+
+  bin1 = value_binary_data(&v);
+  bin2 = value_binary_data(&other);
+
+  ASSERT_STREQ((const char*)(bin1->data), str);
+  ASSERT_STREQ((const char*)(bin2->data), str);
+  ASSERT_EQ(bin1->data != bin2->data, true);
 
   value_reset(&v);
   value_reset(&other);

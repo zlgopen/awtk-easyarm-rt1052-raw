@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dialog
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,13 +43,7 @@ static ret_t dialog_on_add_child(widget_t* widget, widget_t* child) {
   return RET_CONTINUE;
 }
 
-static const char* const s_dialog_properties[] = {WIDGET_PROP_ANIM_HINT,
-                                                  WIDGET_PROP_OPEN_ANIM_HINT,
-                                                  WIDGET_PROP_MOVE_FOCUS_PREV_KEY,
-                                                  WIDGET_PROP_MOVE_FOCUS_NEXT_KEY,
-                                                  WIDGET_PROP_CLOSE_ANIM_HINT,
-                                                  WIDGET_PROP_THEME,
-                                                  NULL};
+static const char* const s_dialog_properties[] = {NULL};
 
 static ret_t dialog_set_prop(widget_t* widget, const char* name, const value_t* v) {
   dialog_t* dialog = DIALOG(widget);

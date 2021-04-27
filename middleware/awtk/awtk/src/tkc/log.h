@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  log functions
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -175,14 +175,18 @@ void awtk_ios_log(const char* message, ...);
   if (log_get_log_level() <= LOG_LEVEL_ERROR) printf(format, ##args)
 #else
 /*MSVC*/
-#define log_debug(format, ...) \
-  if (log_get_log_level() <= LOG_LEVEL_DEBUG) printf(format, __VA_ARGS__)
-#define log_info(format, ...) \
-  if (log_get_log_level() <= LOG_LEVEL_INFO) printf(format, __VA_ARGS__)
-#define log_warn(format, ...) \
-  if (log_get_log_level() <= LOG_LEVEL_WARN) printf(format, __VA_ARGS__)
-#define log_error(format, ...) \
-  if (log_get_log_level() <= LOG_LEVEL_ERROR) printf(format, __VA_ARGS__)
+#define log_debug(format, ...)                                             \
+  if (log_get_log_level() <= LOG_LEVEL_DEBUG) printf(format, __VA_ARGS__); \
+  fflush(stdout)
+#define log_info(format, ...)                                             \
+  if (log_get_log_level() <= LOG_LEVEL_INFO) printf(format, __VA_ARGS__); \
+  fflush(stdout)
+#define log_warn(format, ...)                                             \
+  if (log_get_log_level() <= LOG_LEVEL_WARN) printf(format, __VA_ARGS__); \
+  fflush(stdout)
+#define log_error(format, ...)                                             \
+  if (log_get_log_level() <= LOG_LEVEL_ERROR) printf(format, __VA_ARGS__); \
+  fflush(stdout)
 #endif
 #elif defined(HAS_STDIO) || defined(AWTK_WEB)
 #include <stdio.h>

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  key code constants
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -533,7 +533,7 @@ typedef enum _key_code_t {
    * TK_KEY_RIGHTBRACE
    */
   TK_KEY_RIGHTBRACE = ')',
-#ifdef SDL2
+#ifdef WITH_SDL
   TK_KEY_CAPSLOCK = SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_CAPSLOCK),
 
   TK_KEY_F1 = SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_F1),
@@ -879,6 +879,11 @@ typedef enum _key_code_t {
    */
   TK_KEY_CANCEL = 0x20 + 167,
 #endif
+  /**
+   * @const TK_KEY_WHEEL
+   * TK_KEY_WHEEL
+   */
+  TK_KEY_WHEEL = 0x20 + 168,
 } key_code_t;
 
 #ifndef TK_KEY_CLOSE_INPUT_METHOD
@@ -894,11 +899,11 @@ typedef enum _key_code_t {
 #endif /*TK_KEY_TOGGLE_INPUT_METHOD*/
 
 static inline bool_t key_code_is_enter(int key) {
-#ifdef SDL2
+#ifdef WITH_SDL
   return (key == TK_KEY_RETURN || key == TK_KEY_KP_ENTER);
 #else
   return key == TK_KEY_RETURN;
-#endif /*SDL2*/
+#endif /*WITH_SDL*/
 }
 
 END_C_DECLS

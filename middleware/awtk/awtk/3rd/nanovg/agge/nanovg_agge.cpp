@@ -110,6 +110,22 @@ static void aggenvg__setLineCap(void* uptr, int lineCap)
       agge->line_style.set_cap(agge::caps::square());
 }
 
+static void aggenvg__clearCacheTexture(AGGENVGcontext* agge) {
+  AGGENVGtexture* textures = NULL;
+  int ntextures = agge->ntextures;
+  int size = sizeof(AGGENVGtexture) * ntextures;
+
+  if (agge->textures != NULL && ntextures > 0) {
+    textures = (AGGENVGtexture*)malloc(size);
+    memcpy(textures, agge->textures, size);
+
+    free(agge->textures);
+    agge->textures = textures;
+    agge->ntextures = ntextures;
+    agge->ctextures = ntextures;
+  }
+}
+
 static AGGENVGtexture* aggenvg__allocTexture(AGGENVGcontext* agge) {
   int i;
   AGGENVGtexture* tex = NULL;
@@ -272,6 +288,15 @@ static agge::pixel32_rgba to_pixel32_rgba(NVGcolor rgba) {
   return agge::pixel32_rgba(rgba.r * 255, rgba.g * 255, rgba.b * 255, rgba.a * 255);
 }
 
+static int clip_rect_is_zero(NVGscissor* scissor) {
+  int w = (int)(scissor->extent[0] + 0.5f);
+  int h = (int)(scissor->extent[1] + 0.5f);
+  if (w <= 0 || h <= 0) {
+    return 0;
+  }
+  return 1;
+}
+
 template <typename PixelT>
 void renderPaint(AGGENVGcontext* agge, NVGpaint* paint) {
   agge::renderer& ren = agge->ren;
@@ -355,6 +380,7 @@ template <typename PixelT>
 void renderFill(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation,
                 NVGscissor* scissor, float fringe, const float* bounds, const NVGpath* paths,
                 int npaths) {
+  if(clip_rect_is_zero(scissor) == 0) return; 
   AGGENVGcontext* agge = (AGGENVGcontext*)uptr;
   agge::rasterizer<agge::clipper<int> >& ras = agge->ras;
 
@@ -381,7 +407,7 @@ template <typename PixelT>
 void renderStroke(void* uptr, NVGpaint* paint, NVGcompositeOperationState compositeOperation,
                   NVGscissor* scissor, float fringe, float strokeWidth, const NVGpath* paths,
                   int npaths) {
-  if(paths->count <= 0) return; 
+  if(paths->count <= 0 || clip_rect_is_zero(scissor) == 0) return; 
   AGGENVGcontext* agge = (AGGENVGcontext*)uptr;
   agge::stroke& line_style = agge->line_style;
   agge::rasterizer<agge::clipper<int> >& ras = agge->ras;
@@ -412,6 +438,15 @@ static void aggenvg__renderDelete(void* uptr) {
   if (agge == NULL) return;
 
   delete agge;
+}
+
+static int aggenvg__clearCache(void* uptr) {
+  AGGENVGcontext* agge = (AGGENVGcontext*)uptr;
+  if (agge == NULL) return -1;
+  agge::rasterizer<agge::clipper<int> >& ras = agge->ras;
+  ras.clear_cache();
+  aggenvg__clearCacheTexture(agge);
+  return 0;
 }
 
 static void nvgInitAGGE(AGGENVGcontext* agge, NVGparams* params, uint32_t w, uint32_t h, uint32_t stride,
@@ -489,6 +524,7 @@ NVGcontext* nvgCreateAGGE(uint32_t w, uint32_t h, uint32_t stride, enum NVGtextu
   params.renderCancel = aggenvg__renderCancel;
   params.renderFlush = aggenvg__renderFlush;
   params.renderDelete = aggenvg__renderDelete;
+  params.clearCache = aggenvg__clearCache;
   params.userPtr = agge;
   params.edgeAntiAlias = 1;
 

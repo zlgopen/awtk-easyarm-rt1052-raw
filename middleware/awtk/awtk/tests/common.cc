@@ -142,3 +142,12 @@ ret_t widget_log_events(void* ctx, event_t* e) {
   }
   return RET_OK;
 }
+
+ret_t widget_dispatch_click(widget_t* widget) {
+  pointer_event_t evt;
+
+  widget_dispatch(widget, pointer_event_init(&evt, EVT_POINTER_DOWN, widget, 1, 1));
+  widget_dispatch(widget, pointer_event_init(&evt, EVT_POINTER_UP, widget, 1, 1));
+
+  return RET_OK;
+}

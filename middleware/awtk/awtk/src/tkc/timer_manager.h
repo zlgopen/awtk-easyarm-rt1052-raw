@@ -1,9 +1,9 @@
 ﻿/**
- * File:   timer.h
+ * File:   timer_manager.h
  * Author: AWTK Develop Team
  * Brief:  timer manager
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -121,6 +121,16 @@ uint32_t timer_manager_add(timer_manager_t* timer_manager, timer_func_t on_timer
 ret_t timer_manager_remove(timer_manager_t* timer_manager, uint32_t timer_id);
 
 /**
+ * @method timer_manager_all_remove_by_ctx
+ * 根据上下文删除所有对应的定时器。
+ * @param {timer_manager_t*} timer_manager 定时器管理器对象。
+ * @param {void*} ctx timer回调函数的上下文。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t timer_manager_all_remove_by_ctx(timer_manager_t* timer_manager, void* ctx);
+
+/**
  * @method timer_manager_reset
  * 重置定时器。
  * @param {timer_manager_t*} timer_manager 定时器管理器对象。
@@ -176,6 +186,12 @@ uint64_t timer_manager_next_time(timer_manager_t* timer_manager);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t timer_manager_append(timer_manager_t* timer_manager, timer_info_t* timer);
+
+/*internal use*/
+ret_t timer_manager_all_remove_by_ctx_and_type(timer_manager_t* timer_manager, uint16_t type,
+                                               void* ctx);
+uint32_t timer_manager_add_with_type(timer_manager_t* timer_manager, timer_func_t on_timer,
+                                     void* ctx, uint32_t duration, uint16_t timer_info_type);
 
 END_C_DECLS
 

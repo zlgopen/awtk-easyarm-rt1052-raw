@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  events structs
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -122,6 +122,11 @@ typedef enum _event_type_t {
    */
   EVT_KEY_DOWN,
   /**
+   * @const EVT_KEY_LONG_PRESS
+   * 键长按事件名(key_event_t)。
+   */
+  EVT_KEY_LONG_PRESS,
+  /**
    * @const EVT_KEY_DOWN_BEFORE_CHILDREN
    * 键按下事件名，在子控件处理之前触发(key_event_t)。
    */
@@ -173,17 +178,17 @@ typedef enum _event_type_t {
   EVT_MOVE_RESIZE,
   /**
    * @const EVT_VALUE_WILL_CHANGE
-   * 控件的值即将改变的事件名(event_t)。
+   * 控件的值即将改变的事件名(value_change_event_t)。
    */
   EVT_VALUE_WILL_CHANGE,
   /**
    * @const EVT_VALUE_CHANGED
-   * 控件的值改变的事件名(event_t)。
+   * 控件的值改变的事件名(value_change_event_t)。
    */
   EVT_VALUE_CHANGED,
   /**
    * @const EVT_VALUE_CHANGING
-   * 控件的值持续改变(如编辑器正在编辑)的事件名(event_t)。
+   * 控件的值持续改变(如编辑器正在编辑)的事件名(value_change_event_t)。
    */
   EVT_VALUE_CHANGING,
   /**
@@ -286,10 +291,30 @@ typedef enum _event_type_t {
    */
   EVT_TOP_WINDOW_CHANGED,
   /**
+   * @const EVT_IM_START
+   * 输入法启动(event_t)。
+   */
+  EVT_IM_START,
+  /**
+   * @const EVT_IM_STOP
+   * 输入法停止(event_t)。
+   */
+  EVT_IM_STOP,
+  /**
    * @const EVT_IM_COMMIT
    * 输入法提交输入的文本事件(im_commit_event_t)。
    */
   EVT_IM_COMMIT,
+  /**
+   * @const EVT_IM_CLEAR
+   * 清除编辑器内容(event_t)。
+   */
+  EVT_IM_CLEAR,
+  /**
+   * @const EVT_IM_CANCEL
+   * 取消编辑，恢复之前的内容(event_t)。
+   */
+  EVT_IM_CANCEL,
   /**
    * @const EVT_IM_PREEDIT
    * 进入预编辑状态(event_t)。
@@ -349,6 +374,11 @@ typedef enum _event_type_t {
    * 结束拖动(event_t)。
    */
   EVT_DRAG_END,
+  /**
+   * @const EVT_RESET
+   * Reset(event_t)。
+   */
+  EVT_RESET,
   /**
    * @const EVT_SCREEN_SAVER
    * 在指定的时间内(WITH_SCREEN_SAVER_TIME)，没有用户输入事件，由窗口管理器触发。
@@ -415,6 +445,36 @@ typedef enum _event_type_t {
    * scroll view结束滚动(event_t)。
    */
   EVT_SCROLL_END,
+  /**
+   * @const EVT_MULTI_GESTURE
+   * 多点触摸手势(multi_gesture_event_t)。
+   */
+  EVT_MULTI_GESTURE,
+  /**
+   * @const EVT_PAGE_CHANGED
+   * 页面改变了(event_t)。
+   */
+  EVT_PAGE_CHANGED,
+  /**
+   * @const EVT_ASSET_MANAGER_LOAD_ASSET
+   * 资源管理加载某个资源(assets_event_t)。
+   */
+  EVT_ASSET_MANAGER_LOAD_ASSET,
+  /**
+   * @const EVT_ASSET_MANAGER_UNLOAD_ASSET
+   * 资源管理卸载某个资源(assets_event_t)。
+   */
+  EVT_ASSET_MANAGER_UNLOAD_ASSET,
+  /**
+   * @const EVT_ASSET_MANAGER_CLEAR_CACHE
+   * 资源管理移除同种资源缓存(assets_event_t)。
+   */
+  EVT_ASSET_MANAGER_CLEAR_CACHE,
+  /**
+   * @const EVT_TIMER
+   * 定时器(event_t)。
+   */
+  EVT_TIMER,
   /**
    * @const EVT_REQ_START
    * event queue其它请求编号起始值。
@@ -521,6 +581,50 @@ orientation_event_t* orientation_event_cast(event_t* event);
  */
 event_t* orientation_event_init(orientation_event_t* event, uint32_t type, void* target,
                                 lcd_orientation_t orientation);
+
+/**
+ * @class value_change_event_t
+ * @annotation ["scriptable"]
+ * @parent event_t
+ * 值变化事件。
+ */
+typedef struct _value_change_event_t {
+  event_t e;
+  /**
+   * @property {value_t} old_value
+   * @annotation ["readable"]
+   * 旧值。
+   */
+  value_t old_value;
+
+  /**
+   * @property {value_t} new_value
+   * @annotation ["readable"]
+   * 新值。
+   */
+  value_t new_value;
+} value_change_event_t;
+
+/**
+ * @method value_change_event_cast
+ * @annotation ["cast", "scriptable"]
+ * 把event对象转value_change_event_t对象，主要给脚本语言使用。
+ * @param {event_t*} event event对象。
+ *
+ * @return {value_change_event_t*} event对象。
+ */
+value_change_event_t* value_change_event_cast(event_t* event);
+
+/**
+ * @method value_change_event_init
+ * 初始化事件。
+ * @param {value_change_event_t*} event event对象。
+ * @param {void*} target 事件目标。
+ * @param {uint32_t} type 事件类型。
+ *
+ * @return {event_t*} event对象。
+ */
+event_t* value_change_event_init(value_change_event_t* event, uint32_t type, void* target);
 
 /**
  * @class pointer_event_t
@@ -808,6 +912,114 @@ event_t* window_event_init(window_event_t* event, uint32_t type, void* target, w
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t pointer_event_rotate(pointer_event_t* evt, system_info_t* info);
+
+/**
+ * @class multi_gesture_event_t
+ * @annotation ["scriptable"]
+ * @parent event_t
+ * 多点触摸手势事件。
+ */
+typedef struct _multi_gesture_event_t {
+  event_t e;
+  /**
+   * @property {xy_t} x
+   * @annotation ["readable", "scriptable"]
+   * 中心点x坐标。
+   */
+  xy_t x;
+  /**
+   * @property {xy_t} y
+   * @annotation ["readable", "scriptable"]
+   * 中心点y坐标。
+   */
+  xy_t y;
+  /**
+   * @property {float} rotation
+   * @annotation ["readable", "scriptable"]
+   * 旋转角度(幅度)增量。（单位弧度）
+   */
+  float_t rotation;
+  /**
+   * @property {float} distance
+   * @annotation ["readable", "scriptable"]
+   * 两点间的距离增量。(-1,0)表示缩小，(0-1)表示增加。
+   */
+  float_t distance;
+} multi_gesture_event_t;
+
+/**
+ * @method multi_gesture_event_cast
+ * @annotation ["cast", "scriptable"]
+ * 把event对象转multi_gesture_event_t对象，主要给脚本语言使用。
+ * @param {event_t*} event event对象。
+ *
+ * @return {multi_gesture_event_t*} event对象。
+ */
+multi_gesture_event_t* multi_gesture_event_cast(event_t* event);
+
+/**
+ * @method multi_gesture_event_init
+ * 初始化事件。
+ * @param {multi_gesture_event_t*} event event对象。
+ * @param {void*} target 事件目标。
+ * @param {int32_t} x x的值。
+ * @param {int32_t} y y的值。
+ * @param {float} rotation 旋转角度(幅度)增量。
+ * @param {float} distance 两点间的距离增量。(-1,0)表示缩小，(0-1)表示增加。
+ *
+ * @return {event_t*} event对象。
+ */
+event_t* multi_gesture_event_init(multi_gesture_event_t* event, void* target, int32_t x, int32_t y,
+                                  float rotation, float distance);
+
+/**
+ * @class assets_event_t
+ * @annotation ["scriptable"]
+ * @parent event_t
+ * 资源事件，由资源管理器触发。
+ */
+typedef struct _assets_event_t {
+  event_t e;
+  /**
+   * @property {asset_type_t} type 
+   * @annotation ["readable", "scriptable"]
+   * 触发事件的资源类型
+   */
+  asset_type_t type;
+  /**
+   * @property {asset_info_t*} asset_info 
+   * @annotation ["readable", "scriptable"]
+   * 触发事件的资源对象
+   */
+  asset_info_t* asset_info;
+} assets_event_t;
+
+/**
+ * @method window_event_init
+ * 初始化事件。
+ * @param {window_event_t*} event event对象。
+ * @param {assets_manager_t*} am 事件目标资源管理器。
+ * @param {uint32_t} type 事件类型。
+ * @param {asset_type_t} asset_type 资源类型。
+ * @param {asset_info_t*} asset_info 资源对象。
+ *
+ * @return {event_t*} event对象。
+ */
+event_t* assets_event_init(assets_event_t* event, assets_manager_t* am, uint32_t type,
+                           asset_type_t asset_type, asset_info_t* asset_info);
+
+/**
+ * @method event_from_name
+ * 将事件名转换成事件的值。
+ * @param {const char*} name 事件名。
+ *
+ * @return {int32_t} 返回事件的值。
+ */
+int32_t event_from_name(const char* name);
+
+#define STR_ON_EVENT_PREFIX "on:"
+#define STR_GLOBAL_EVENT_PREFIX "global"
+#define STR_VALUE_CHANGED_BY_UI "value_changed_by_ui"
 
 END_C_DECLS
 

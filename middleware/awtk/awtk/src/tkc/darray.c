@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dynamic darray.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -73,7 +73,7 @@ static bool_t darray_extend(darray_t* darray) {
   }
 }
 
-int darray_find_index(darray_t* darray, void* data) {
+int32_t darray_find_index(darray_t* darray, void* data) {
   int32_t i = 0;
   int32_t size = 0;
   void** elms = NULL;
@@ -224,7 +224,7 @@ ret_t darray_find_all(darray_t* darray, tk_compare_t cmp, void* ctx, darray_t* m
 }
 
 void* darray_find(darray_t* darray, void* data) {
-  int pos = darray_find_index(darray, data);
+  int32_t pos = darray_find_index(darray, data);
 
   return pos >= 0 ? darray->elms[pos] : NULL;
 }
@@ -251,13 +251,31 @@ void* darray_head(darray_t* darray) {
   return darray->elms[0];
 }
 
-ret_t darray_push(darray_t* darray, void* data) {
+ret_t darray_insert(darray_t* darray, uint32_t index, void* data) {
+  void** s = NULL;
+  void** d = NULL;
+  void** p = NULL;
   return_value_if_fail(darray != NULL, RET_BAD_PARAMS);
+  index = tk_min(index, darray->size);
   return_value_if_fail(darray_extend(darray), RET_OOM);
 
-  darray->elms[darray->size++] = data;
+  p = darray->elms + index;
+  d = darray->elms + darray->size;
+  s = d - 1;
+
+  while (s >= p) {
+    *d-- = *s--;
+  }
+  *p = data;
+  darray->size++;
 
   return RET_OK;
+}
+
+ret_t darray_push(darray_t* darray, void* data) {
+  return_value_if_fail(darray != NULL, RET_BAD_PARAMS);
+
+  return darray_insert(darray, darray->size, data);
 }
 
 int32_t darray_count(darray_t* darray, void* data) {
@@ -335,7 +353,7 @@ ret_t darray_deinit(darray_t* darray) {
 }
 
 ret_t darray_destroy(darray_t* darray) {
-  return_value_if_fail(darray != NULL && darray->elms != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(darray != NULL, RET_BAD_PARAMS);
 
   darray_deinit(darray);
   TKMEM_FREE(darray);
@@ -343,11 +361,11 @@ ret_t darray_destroy(darray_t* darray) {
   return RET_OK;
 }
 
-int darray_bsearch_index(darray_t* darray, tk_compare_t cmp, void* ctx) {
-  int low = 0;
-  int mid = 0;
-  int high = 0;
-  int result = 0;
+int32_t darray_bsearch_index(darray_t* darray, tk_compare_t cmp, void* ctx) {
+  int32_t low = 0;
+  int32_t mid = 0;
+  int32_t high = 0;
+  int32_t result = 0;
   void* iter = NULL;
   return_value_if_fail(darray != NULL && darray->size > 0, -1);
 
@@ -375,7 +393,7 @@ int darray_bsearch_index(darray_t* darray, tk_compare_t cmp, void* ctx) {
 }
 
 void* darray_bsearch(darray_t* darray, tk_compare_t cmp, void* ctx) {
-  int index = darray_bsearch_index(darray, cmp, ctx);
+  int32_t index = darray_bsearch_index(darray, cmp, ctx);
   if (index >= 0) {
     return darray->elms[index];
   } else {

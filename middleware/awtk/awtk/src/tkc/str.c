@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  string
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -162,7 +162,7 @@ ret_t str_decode_xml_entity_with_len(str_t* str, const char* text, uint32_t len)
       } else if (strncmp(s, "amp;", 4) == 0) {
         c = '&';
         s += 4;
-      } else if (strncmp(s, "quot;", 5) == 0) {
+      } else if (strncmp(s, "quot;", 5) == 0 || strncmp(s, "quota;", 6) == 0) {
         c = '\"';
         s += 5;
       } else if (strncmp(s, "nbsp;", 5) == 0) {
@@ -582,7 +582,9 @@ ret_t str_expand_vars(str_t* str, const char* src, const object_t* obj) {
     char c = *p;
 
     if (c == '$') {
-      if (p[1] && p[2]) {
+      if (strncmp(p, "${}", 3) == 0) {
+        p += 3;
+      } else if (p[1] && p[2]) {
         p = expand_var(str, p + 2, obj);
       } else {
         return RET_BAD_PARAMS;
@@ -668,6 +670,44 @@ ret_t str_append_json_bool_pair(str_t* str, const char* key, bool_t value) {
   return_value_if_fail(str_append_json_str(str, key) == RET_OK, RET_OOM);
   return_value_if_fail(str_append_char(str, ':') == RET_OK, RET_OOM);
   return_value_if_fail(str_append(str, value ? "true" : "false") == RET_OK, RET_OOM);
+
+  return RET_OK;
+}
+
+ret_t str_encode_hex(str_t* str, const uint8_t* data, uint32_t size, const char* format) {
+  char tstr[64];
+  uint32_t i = 0;
+  return_value_if_fail(str != NULL && data != NULL, RET_BAD_PARAMS);
+
+  if (format == NULL) {
+    format = "%02x";
+  }
+
+  for (i = 0; i < size; i++) {
+    tk_snprintf(tstr, sizeof(tstr) - 1, format, data[i]);
+    return_value_if_fail(str_append(str, tstr) == RET_OK, RET_OOM);
+  }
+
+  return RET_OK;
+}
+
+ret_t str_decode_hex(str_t* str, uint8_t* data, uint32_t size) {
+  uint8_t* dend = data + size;
+  char* p;
+  char v[3];
+  return_value_if_fail(str != NULL && data != NULL, RET_BAD_PARAMS);
+
+  for (p = str->str; p < str->str + str->size && data < dend; p += 2) {
+    while (p[0] == ' ') {
+      p++;
+    }
+    if (p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
+      p += 2;
+    }
+    tk_strncpy(v, p, 2);
+    *data = tk_strtol(v, 0, 16);
+    data++;
+  }
 
   return RET_OK;
 }

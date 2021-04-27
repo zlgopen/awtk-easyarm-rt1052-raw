@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  path
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -191,7 +191,9 @@ ret_t path_normalize(const char* path, char* result, int32_t size) {
         }
         break;
       }
-      default: { *d++ = *s++; }
+      default: {
+        *d++ = *s++;
+      }
     }
   }
 

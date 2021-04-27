@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  main_loop interface
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -109,6 +109,16 @@ ret_t main_loop_add_event_source(main_loop_t* l, event_source_t* source);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t main_loop_remove_event_source(main_loop_t* l, event_source_t* source);
+
+/**
+ * @method main_loop_remove_event_source_by_tag
+ * 删除event_source。
+ * @param {main_loop_t*} l main_loop对象。
+ * @param {void*} tag tag。
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t main_loop_remove_event_source_by_tag(main_loop_t* l, void* tag);
 
 END_C_DECLS
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  basic types definitions.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <inttypes.h>
 
 #if defined(HAS_AWTK_CONFIG)
 #include "awtk_config.h"
@@ -42,9 +43,10 @@
 #endif /*HAS_AWTK_CONFIG*/
 
 #if defined(WIN32) || defined(LINUX) || defined(MACOS) || defined(ANDROID) || defined(IOS)
-
 #define WITH_SOCKET 1
+#endif /*WIN32 || MACOS || LINUX || IOS || ANDROID*/
 
+#ifdef WITH_SOCKET
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN 1
 #include <windows.h>
@@ -62,9 +64,7 @@ typedef int socklen_t;
 #include <sys/time.h>
 #include <sys/types.h>
 #endif /*WIN32*/
-
-#endif /*WIN32 || MACOS || LINUX || IOS || ANDROID*/
-
+#endif /*WITH_SOCKET*/
 #ifdef __cplusplus
 #define BEGIN_C_DECLS extern "C" {
 #define END_C_DECLS }
@@ -229,7 +229,12 @@ typedef enum _ret_t {
    * @const RET_EOS
    * End of Stream
    */
-  RET_EOS
+  RET_EOS,
+  /**
+   * @const RET_NOT_MODIFIED
+   * 没有改变。
+   */
+  RET_NOT_MODIFIED,
 } ret_t;
 
 #include "tkc/log.h"
@@ -277,28 +282,28 @@ typedef enum _ret_t {
   }
 #else
 #define ENSURE(p) assert(p)
-#define goto_error_if_fail(p)                           \
-  if (!(p)) {                                           \
-    log_warn("%s:%d " #p "\n", __FUNCTION__, __LINE__); \
-    goto error;                                         \
+#define goto_error_if_fail(p)                                              \
+  if (!(p)) {                                                              \
+    log_warn("%s:%d condition(" #p ") failed!\n", __FUNCTION__, __LINE__); \
+    goto error;                                                            \
   }
 
-#define break_if_fail(p)                                \
-  if (!(p)) {                                           \
-    log_warn("%s:%d " #p "\n", __FUNCTION__, __LINE__); \
-    break;                                              \
+#define break_if_fail(p)                                                   \
+  if (!(p)) {                                                              \
+    log_warn("%s:%d condition(" #p ") failed!\n", __FUNCTION__, __LINE__); \
+    break;                                                                 \
   }
 
-#define return_if_fail(p)                               \
-  if (!(p)) {                                           \
-    log_warn("%s:%d " #p "\n", __FUNCTION__, __LINE__); \
-    return;                                             \
+#define return_if_fail(p)                                                  \
+  if (!(p)) {                                                              \
+    log_warn("%s:%d condition(" #p ") failed!\n", __FUNCTION__, __LINE__); \
+    return;                                                                \
   }
 
-#define return_value_if_fail(p, value)                  \
-  if (!(p)) {                                           \
-    log_warn("%s:%d " #p "\n", __FUNCTION__, __LINE__); \
-    return (value);                                     \
+#define return_value_if_fail(p, value)                                     \
+  if (!(p)) {                                                              \
+    log_warn("%s:%d condition(" #p ") failed!\n", __FUNCTION__, __LINE__); \
+    return (value);                                                        \
   }
 
 #endif
@@ -307,7 +312,8 @@ typedef enum _ret_t {
 #define tk_abs(a) ((a) < (0) ? (-(a)) : (a))
 #define tk_max(a, b) ((a) > (b) ? (a) : (b))
 #define tk_roundi(a) (int32_t)(((a) >= 0) ? ((a) + 0.5f) : ((a)-0.5f))
-#define tk_clampi(a, mn, mx) ((a) < (mn) ? (mn) : ((a) > (mx) ? (mx) : (a)))
+#define tk_clamp(a, mn, mx) ((a) < (mn) ? (mn) : ((a) > (mx) ? (mx) : (a)))
+#define tk_clampi(a, mn, mx) (int32_t)((a) < (mn) ? (mn) : ((a) > (mx) ? (mx) : (a)))
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
@@ -318,25 +324,32 @@ typedef ret_t (*tk_destroy_t)(void* data);
 typedef ret_t (*tk_on_done_t)(void* data);
 typedef ret_t (*tk_on_result_t)(void* ctx, const void* data);
 typedef bool_t (*tk_is_valid_t)(void* data);
+
+/*TRUE 保留，FALSE 忽略*/
 typedef bool_t (*tk_filter_t)(void* ctx, const void* data);
 typedef int (*tk_compare_t)(const void* a, const void* b);
 typedef ret_t (*tk_visit_t)(void* ctx, const void* data);
+typedef ret_t (*tk_callback_t)(void* ctx);
 
 /*TK_NAME_LEN+1 must aligned to 4*/
-enum { TK_NAME_LEN = 31 };
+enum { TK_NAME_LEN = 31, TK_FUNC_NAME_LEN = 63 };
 
 #ifdef WITH_CPPCHECK
 #define tk_str_eq strcmp
-#define tk_str_eq strcasecmp
+#define tk_str_ieq strcasecmp
+#define tk_str_eq_with_len strncmp
 #else
 #define tk_str_eq(s1, s2) \
   (((s1) != NULL) && ((s2) != NULL) && *(s1) == *(s2) && strcmp((s1), (s2)) == 0)
+#define tk_str_eq_with_len(s1, s2, len) \
+  (((s1) != NULL) && ((s2) != NULL) && *(s1) == *(s2) && strncmp((s1), (s2), len) == 0)
 #define tk_str_ieq(s1, s2) (((s1) != NULL) && ((s2) != NULL) && strcasecmp((s1), (s2)) == 0)
 
 #define tk_wstr_eq(s1, s2) \
   (((s1) != NULL) && ((s2) != NULL) && *(s1) == *(s2) && wcscmp((s1), (s2)) == 0)
 #endif /*WITH_CPPCHECK*/
 
+#define tk_lfequal(f1, f2) (fabs((f1) - (f2)) < 0.0001)
 #define tk_fequal(f1, f2) (fabs((f1) - (f2)) < 0.0000001)
 
 #define TK_ROUND_TO(size, round_size) ((((size) + round_size - 1) / round_size) * round_size)
@@ -386,5 +399,14 @@ typedef struct _event_source_manager_t event_source_manager_t;
 
 #define TK_SET_NULL(p) (p) = NULL
 #define TK_ROUND_TO8(size) (((size + 7) >> 3) << 3)
+
+#define TK_SET_BIT(v, n) ((v) |= 1UL << (n))
+#define TK_CLEAR_BIT(v, n) ((v) &= ~(1UL << (n)))
+#define TK_TOGGLE_BIT(v, n) ((v) ^= (1UL << (n)))
+#define TK_TEST_BIT(v, n) (((v) >> (n)) & 1U)
+
+#ifndef TK_DEFAULT_WAIT_TIME
+#define TK_DEFAULT_WAIT_TIME 16
+#endif /*TK_DEFAULT_WAIT_TIME*/
 
 #endif /*TYPES_DEF_H*/

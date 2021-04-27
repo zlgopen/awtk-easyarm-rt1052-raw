@@ -10,7 +10,9 @@
 | <a href="#bitmap_t_bitmap_create">bitmap\_create</a> | 创建图片对象(一般供脚本语言中使用)。 |
 | <a href="#bitmap_t_bitmap_create_ex">bitmap\_create\_ex</a> | 创建图片对象。 |
 | <a href="#bitmap_t_bitmap_destroy">bitmap\_destroy</a> | 销毁图片。 |
+| <a href="#bitmap_t_bitmap_destroy_with_self">bitmap\_destroy\_with\_self</a> | 销毁图片(for script only)。 |
 | <a href="#bitmap_t_bitmap_get_bpp">bitmap\_get\_bpp</a> | 获取图片一个像素占用的字节数。 |
+| <a href="#bitmap_t_bitmap_get_bpp_of_format">bitmap\_get\_bpp\_of\_format</a> | 获取位图格式对应的颜色位数。 |
 | <a href="#bitmap_t_bitmap_get_line_length">bitmap\_get\_line\_length</a> | 获取每一行占用内存的字节数。 |
 | <a href="#bitmap_t_bitmap_get_pixel">bitmap\_get\_pixel</a> | 获取图片指定像素的rgba颜色值(主要用于测试程序)。 |
 | <a href="#bitmap_t_bitmap_init">bitmap\_init</a> | 初始化图片。 |
@@ -92,6 +94,25 @@ ret_t bitmap_destroy (bitmap_t* bitmap);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | bitmap | bitmap\_t* | bitmap对象。 |
+#### bitmap\_destroy\_with\_self 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="bitmap_t_bitmap_destroy_with_self">销毁图片(for script only)。
+
+* 函数原型：
+
+```
+ret_t bitmap_destroy_with_self (bitmap_t* bitmap);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| bitmap | bitmap\_t* | bitmap对象。 |
 #### bitmap\_get\_bpp 函数
 -----------------------
 
@@ -111,6 +132,25 @@ uint32_t bitmap_get_bpp (bitmap_t* bitmap);
 | -------- | ----- | --------- |
 | 返回值 | uint32\_t | 返回一个像素占用的字节数。 |
 | bitmap | bitmap\_t* | bitmap对象。 |
+#### bitmap\_get\_bpp\_of\_format 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="bitmap_t_bitmap_get_bpp_of_format">获取位图格式对应的颜色位数。
+
+* 函数原型：
+
+```
+uint32_t bitmap_get_bpp_of_format (bitmap_format_t format);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | uint32\_t | 成功返回颜色位数，失败返回0。 |
+| format | bitmap\_format\_t | 位图格式。 |
 #### bitmap\_get\_line\_length 函数
 -----------------------
 

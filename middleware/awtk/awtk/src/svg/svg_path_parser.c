@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  svg path_parser
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -250,7 +250,9 @@ static ret_t svg_path_parser_parse_cmd(svg_path_parser_t* parser, char c) {
       }
       break;
     }
-    default: { assert(!"not supported path!"); } break;
+    default: {
+      assert(!"not supported path!");
+    } break;
   }
 
   return RET_OK;

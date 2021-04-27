@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  t9 input method engine
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -32,6 +32,8 @@
 
 typedef struct _input_engine_t9_t {
   input_engine_t input_engine;
+  wbuffer_t pre_candidates;
+  uint32_t pre_candidates_nr;
 
   uint32_t items_nr;
   const table_entry_t* items;
@@ -49,29 +51,27 @@ static ret_t input_engine_t9_reset_input(input_engine_t* engine) {
 }
 
 static const wchar_t* s_table_num_chars[] = {
-    L"", L"ABC", L"DEF", L"GHI", L"JKL", L"MNO", L"PQRS", L"TUV", L"WXYZ", L"",
+    L"", L"", L"ABC", L"DEF", L"GHI", L"JKL", L"MNO", L"PQRS", L"TUV", L"WXYZ", L"",
 };
 
 static ret_t input_engine_table_search(input_engine_t* engine, const char* keys) {
-  wbuffer_t wb;
   uint32_t keys_size = strlen(keys);
   input_engine_t9_t* t9 = (input_engine_t9_t*)engine;
+  return_value_if_fail(engine != NULL, RET_BAD_PARAMS);
+  input_engine_reset_candidates(engine);
 
-  wbuffer_init(&wb, (uint8_t*)(engine->candidates), sizeof(engine->candidates));
   if (keys_size == 1) {
-    engine->candidates_nr = input_engine_add_chars(&wb, s_table_num_chars, keys[0]);
-  } else {
-    engine->candidates_nr = 0;
+    input_engine_add_candidates_from_char(engine, s_table_num_chars, keys[0]);
   }
-  engine->candidates_nr += table_search(t9->items, t9->items_nr, keys, &wb, FALSE);
+  input_engine_add_candidates_from_string(engine, t9->items, t9->items_nr, keys, FALSE);
 
   log_debug("key=%s %d\n", keys, engine->candidates_nr);
   if (engine->candidates_nr == 0 && keys_size > 1) {
-    engine->candidates_nr = 1;
-    wbuffer_write_string(&wb, keys);
+    input_engine_reset_candidates(engine);
+    input_engine_add_candidate(engine, keys);
   }
 
-  input_method_dispatch_candidates(engine->im, engine->candidates, engine->candidates_nr, 0);
+  input_engine_dispatch_candidates(engine, 0);
 
   return RET_OK;
 }

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  value_desc
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -168,7 +168,17 @@ typedef enum _value_format_type_t {
    * @const VALUE_FORMAT_TYPE_UBJSON
    * UBJSON格式。
    */
-  VALUE_FORMAT_TYPE_UBJSON
+  VALUE_FORMAT_TYPE_UBJSON,
+  /**
+   * @const VALUE_FORMAT_TYPE_JS
+   * JS格式。
+   */
+  VALUE_FORMAT_TYPE_JS,
+  /**
+   * @const VALUE_FORMAT_TYPE_CSV
+   * CSV格式。
+   */
+  VALUE_FORMAT_TYPE_CSV
 } value_format_type_t;
 
 /**

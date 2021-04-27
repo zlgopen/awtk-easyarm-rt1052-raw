@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event source interface.
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,7 +34,7 @@ typedef ret_t (*event_source_on_event_t)(event_source_t* source);
 
 /**
  * @class event_source_t
- * @parent object
+ * @parent object_t
  *
  * 表示一个事件源。
  *

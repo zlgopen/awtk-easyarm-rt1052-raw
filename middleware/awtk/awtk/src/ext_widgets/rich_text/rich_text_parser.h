@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  rich_text_parser
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is dirich_text_parseributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +26,8 @@
 
 BEGIN_C_DECLS
 
-rich_text_node_t* rich_text_parse(const char* str, uint32_t size);
+rich_text_node_t* rich_text_parse(const char* str, uint32_t size, const char* font_name,
+                                  uint16_t font_size, color_t color, align_v_t align_v);
 
 END_C_DECLS
 

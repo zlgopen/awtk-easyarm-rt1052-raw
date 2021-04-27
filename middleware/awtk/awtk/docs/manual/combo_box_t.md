@@ -38,7 +38,7 @@ language.xml:
 </popup>
 ```
 
-> 更多用法请参考：[combo_box.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/combo_box.xml)
+> 更多用法请参考：[combo_box.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/combo_box.xml)
 
 
 
@@ -111,7 +111,7 @@ demo](https://github.com/zlgopen/awtk-c-demos/blob/master/demos/combo_box.c)
 ```
 
 > 更多用法请参考：[theme
-default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L422)
+default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L422)
 ----------------------------------
 ### 函数
 <p id="combo_box_t_methods">
@@ -320,7 +320,7 @@ ret_t combo_box_reset_options (widget_t* widget);
 * 函数原型：
 
 ```
-ret_t combo_box_set_custom_open_popup (widget_t* widget, combo_box_custom_open_popup_t open_popup);
+ret_t combo_box_set_custom_open_popup (widget_t* widget, combo_box_custom_open_popup_t open_popup, combo_box_custom_on_layout_combobox_popup_t on_layout_combobox_popup);
 ```
 
 * 参数说明：
@@ -330,6 +330,7 @@ ret_t combo_box_set_custom_open_popup (widget_t* widget, combo_box_custom_open_p
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | combo\_box对象。 |
 | open\_popup | combo\_box\_custom\_open\_popup\_t | 回调函数。 |
+| on\_layout\_combobox\_popup | combo\_box\_custom\_on\_layout\_combobox\_popup\_t | layout 的回调函数。 |
 #### combo\_box\_set\_item\_height 函数
 -----------------------
 

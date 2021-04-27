@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget layout
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,9 +25,52 @@
 #include "base/self_layouter_factory.h"
 #include "base/children_layouter_factory.h"
 
+ret_t widget_auto_adjust_size(widget_t* widget) {
+  int32_t w = 0;
+  int32_t h = 0;
+  int32_t margin = 0;
+  style_t* style = NULL;
+  event_t e = event_init(EVT_WILL_RESIZE, widget);
+  return_value_if_fail(widget != NULL, RET_BAD_PARAMS);
+  style = widget->astyle;
+  widget_dispatch(widget, &e);
+  widget_invalidate_force(widget, NULL);
+
+  if (style != NULL) {
+    margin = style_get_int(style, STYLE_ID_MARGIN, margin);
+  }
+
+  WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
+  int32_t right = iter->x + iter->w + margin;
+  int32_t bottom = iter->y + iter->h + margin;
+  if (right > w) {
+    w = right;
+  }
+  if (bottom > h) {
+    h = bottom;
+  }
+  WIDGET_FOR_EACH_CHILD_END();
+
+  if (w != 0 && h != 0) {
+    widget->w = w;
+    widget->h = h;
+  }
+
+  widget_invalidate_force(widget, NULL);
+
+  e.type = EVT_RESIZE;
+  widget_dispatch(widget, &e);
+
+  return RET_OK;
+}
+
 ret_t widget_layout(widget_t* widget) {
   widget_layout_self(widget);
   widget_layout_children(widget);
+
+  if (widget->auto_adjust_size) {
+    widget_auto_adjust_size(widget);
+  }
 
   return RET_OK;
 }
@@ -85,9 +128,12 @@ ret_t widget_set_self_layout(widget_t* widget, const char* params) {
       return RET_OK;
     }
     self_layouter_destroy(widget->self_layout);
+    widget->self_layout = NULL;
   }
 
-  widget->self_layout = self_layouter_create(params);
+  if (params[0] != '\0') {
+    widget->self_layout = self_layouter_create(params);
+  }
 
   if (widget->self_layout != NULL) {
     str_set(&(widget->self_layout->params), params);

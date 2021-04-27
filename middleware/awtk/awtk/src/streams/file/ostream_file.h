@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  input stream base on file
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,6 +54,19 @@ struct _tk_ostream_file_t {
  *
  */
 tk_ostream_t* tk_ostream_file_create(const char* filename);
+
+/**
+ * @method tk_ostream_file_create_ex
+ *
+ * 创建ostream对象。
+ *
+ * @param {const char*} filename 文件名。
+ * @param {const char*} mode 模式。
+ *
+ * @return {tk_ostream_t*} 返回ostream对象。
+ *
+ */
+tk_ostream_t* tk_ostream_file_create_ex(const char* filename, const char* mode);
 
 #define TK_OSTREAM_FILE(obj) ((tk_ostream_file_t*)(obj))
 

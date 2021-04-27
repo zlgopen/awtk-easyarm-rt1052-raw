@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  slider
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +21,7 @@
 #include "tkc/mem.h"
 #include "tkc/rect.h"
 #include "tkc/utils.h"
+#include "tkc/time_now.h"
 #include "base/keys.h"
 #include "widgets/slider.h"
 #include "base/widget_vtable.h"
@@ -95,7 +96,7 @@ static ret_t slider_fill_rect(widget_t* widget, canvas_t* c, rect_t* r, rect_t* 
   if (color.rgba.a && r->w > 0 && r->h > 0) {
     canvas_set_fill_color(c, color);
     if (radius > 3) {
-      widget_fill_rounded_rect(c, r, br, &color, radius);
+      canvas_fill_rounded_rect(c, r, br, &color, radius);
     } else {
       canvas_fill_rect(c, r->x, r->y, r->w, r->h);
     }
@@ -126,7 +127,7 @@ static ret_t slider_paint_dragger(widget_t* widget, canvas_t* c) {
   if (color.rgba.a) {
     canvas_set_fill_color(c, color);
     if (radius > 3) {
-      widget_fill_rounded_rect(c, r, NULL, &color, radius);
+      canvas_fill_rounded_rect(c, r, NULL, &color, radius);
     } else {
       canvas_fill_rect(c, r->x, r->y, r->w, r->h);
     }
@@ -293,7 +294,7 @@ static ret_t slider_on_event(widget_t* widget, event_t* e) {
         }
 
         value = slider->saved_value + delta;
-        value = tk_clampi(value, slider->min, slider->max);
+        value = tk_clamp(value, slider->min, slider->max);
         slider_set_value_internal(widget, (double)value, EVT_VALUE_CHANGING, FALSE);
       }
 
@@ -331,6 +332,7 @@ static ret_t slider_on_event(widget_t* widget, event_t* e) {
           ret = RET_STOP;
         }
       }
+      slider->last_user_action_time = e->time;
       break;
     }
     case EVT_KEY_UP: {
@@ -348,6 +350,7 @@ static ret_t slider_on_event(widget_t* widget, event_t* e) {
           ret = RET_STOP;
         }
       }
+      slider->last_user_action_time = e->time;
       break;
     }
     case EVT_RESIZE:
@@ -370,7 +373,7 @@ ret_t slider_set_value_internal(widget_t* widget, double value, event_type_t ety
   return_value_if_fail(slider != NULL, RET_BAD_PARAMS);
 
   step = slider->step;
-  value = tk_clampi(value, slider->min, slider->max);
+  value = tk_clamp(value, slider->min, slider->max);
 
   if (step > 0) {
     offset = value - slider->min;
@@ -379,11 +382,12 @@ ret_t slider_set_value_internal(widget_t* widget, double value, event_type_t ety
   }
 
   if (slider->value != value || force) {
-    event_t evt = event_init(etype, widget);
-
+    value_change_event_t evt;
+    value_change_event_init(&evt, etype, widget);
+    value_set_double(&(evt.old_value), slider->value);
+    value_set_double(&(evt.new_value), value);
     slider->value = value;
-    widget_invalidate(widget, NULL);
-    widget_dispatch(widget, &evt);
+    widget_dispatch(widget, (event_t*)&evt);
     widget_invalidate(widget, NULL);
   }
 
@@ -399,8 +403,13 @@ ret_t slider_set_value(widget_t* widget, double value) {
   }
 
   if (slider->value != value) {
-    event_t e = event_init(EVT_VALUE_WILL_CHANGE, widget);
-    widget_dispatch(widget, &e);
+    value_change_event_t evt;
+    value_change_event_init(&evt, EVT_VALUE_WILL_CHANGE, widget);
+    value_set_uint32(&(evt.old_value), slider->value);
+    value_set_uint32(&(evt.new_value), value);
+    if (widget_dispatch(widget, (event_t*)&evt) == RET_STOP) {
+      return RET_OK;
+    }
 
     return slider_set_value_internal(widget, value, EVT_VALUE_CHANGED, FALSE);
   }
@@ -483,6 +492,13 @@ static ret_t slider_get_prop(widget_t* widget, const char* name, value_t* v) {
     return RET_OK;
   } else if (tk_str_eq(name, SLIDER_PROP_SLIDE_WITH_BAR)) {
     value_set_bool(v, slider->slide_with_bar);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_INPUTING)) {
+    int64_t delta = (time_now_ms() - slider->last_user_action_time);
+    bool_t inputing =
+        (delta < TK_INPUTING_TIMEOUT) && (slider->last_user_action_time > 0) && widget->focused;
+
+    value_set_bool(v, inputing || slider->dragging);
     return RET_OK;
   }
 

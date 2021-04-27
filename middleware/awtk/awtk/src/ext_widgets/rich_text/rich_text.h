@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  rich_text
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,7 +46,7 @@ BEGIN_C_DECLS
  * >
  *
  * > 更多用法请参考：
- * [rich_text.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/rich_text.xml)
+ * [rich_text.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/rich_text.xml)
  *
  * 在c代码中使用函数rich\_text\_create创建图文混排控件。如：
  *
@@ -94,18 +94,18 @@ typedef struct _rich_text_t {
   uint32_t line_gap;
 
   /**
-   * @property {uint32_t} margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 边距。
-   */
-  uint32_t margin;
-
-  /**
    * @property {int32_t} yoffset
    * @annotation ["set_prop","get_prop","readable"]
    * y偏移。
    */
   int32_t yoffset;
+
+  /**
+   * @property {bool_t} yslidable
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 标识控件是否允许上下拖动。
+   */
+  bool_t yslidable;
 
   /**
    * @property {bool_t} need_reset
@@ -124,6 +124,13 @@ typedef struct _rich_text_t {
   velocity_t velocity;
   int32_t yoffset_save;
   rich_text_render_node_t* render_node;
+
+  int32_t margin;
+  int32_t attribute_margin;
+  color_t default_color;
+  align_v_t default_align_v;
+  uint16_t default_font_size;
+  const char* default_font_name;
 } rich_text_t;
 
 /**
@@ -150,6 +157,17 @@ widget_t* rich_text_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t rich_text_set_text(widget_t* widget, const char* text);
+
+/**
+ * @method rich_text_set_yslidable
+ * 设置是否允许y方向滑动。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t} yslidable 是否允许滑动。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t rich_text_set_yslidable(widget_t* widget, bool_t yslidable);
 
 /**
  * @method rich_text_cast

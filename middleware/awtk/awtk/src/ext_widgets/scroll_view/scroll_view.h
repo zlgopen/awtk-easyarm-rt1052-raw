@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  scroll_view
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -60,7 +60,7 @@ typedef ret_t (*scroll_view_on_scroll_to_t)(widget_t* widget, int32_t xoffset_en
  * > 滚动视图一般作为列表视图的子控件使用。
  *
  * > 更多用法请参考：[list\_view\_m.xml](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/list_view_m.xml)
+ *https://github.com/zlgopen/awtk/blob/master/design/default/ui/list_view_m.xml)
  *
  * 在c代码中使用函数scroll\_view\_create创建列表视图控件。如：
  *
@@ -122,6 +122,24 @@ typedef struct _scroll_view_t {
    * 是否允许y方向滑动。
    */
   bool_t yslidable;
+  /**
+   * @property {bool_t} snap_to_page
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 滚动时offset是否按页面对齐。
+   */
+  bool_t snap_to_page;
+  /**
+   * @property {bool_t} move_to_page
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否每次翻一页（当 move_to_page 为ture 的时候才有效果，主要用于区分一次翻一页还是一次翻多页）。
+   */
+  bool_t move_to_page;
+  /**
+   * @property {bool_t} recursive
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否递归查找全部子控件。
+   */
+  bool_t recursive;
 
   /*private*/
   point_t down;
@@ -131,6 +149,9 @@ typedef struct _scroll_view_t {
   int32_t yoffset_end;
   int32_t xoffset_save;
   int32_t yoffset_save;
+
+  int32_t curr_page;
+  uint32_t max_page;
 
   velocity_t velocity;
   widget_animator_t* wa;
@@ -228,6 +249,51 @@ ret_t scroll_view_set_xslidable(widget_t* widget, bool_t xslidable);
 ret_t scroll_view_set_yslidable(widget_t* widget, bool_t yslidable);
 
 /**
+ * @method scroll_view_set_snap_to_page
+ * 设置滚动时offset是否按页面对齐。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t} snap_to_page 是否按页面对齐。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t scroll_view_set_snap_to_page(widget_t* widget, bool_t snap_to_page);
+
+/**
+ * @method scroll_view_set_move_to_page
+ * 设置滚动时是否每次翻一页
+ * 备注：当 snap_to_page 为ture 的时候才有效果，主要用于区分一次翻一页还是一次翻多页。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t} move_to_page 是否每次翻一页。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t scroll_view_set_move_to_page(widget_t* widget, bool_t move_to_page);
+
+/**
+ * @method scroll_view_set_recursive
+ * 设置是否递归查找全部子控件。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t} recursive 是否递归查找全部子控件。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t scroll_view_set_recursive(widget_t* widget, bool_t recursive);
+
+/**
+ * @method scroll_view_set_recursive_only
+ * 设置是否递归查找全部子控件。(不触发repaint和relayout)。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t} recursive 是否递归查找全部子控件。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t scroll_view_set_recursive_only(widget_t* widget, bool_t recursive);
+
+/**
  * @method scroll_view_set_offset
  * 设置偏移量。
  * @annotation ["scriptable"]
@@ -244,8 +310,8 @@ ret_t scroll_view_set_offset(widget_t* widget, int32_t xoffset, int32_t yoffset)
  * 设置偏移速度比例。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget 控件对象。
- * @param {float_t} xspeed_scale x偏移速度比例。。
- * @param {float_t} yspeed_scale y偏移速度比例。。
+ * @param {float_t} xspeed_scale x偏移速度比例。
+ * @param {float_t} yspeed_scale y偏移速度比例。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -281,6 +347,9 @@ ret_t scroll_view_scroll_delta_to(widget_t* widget, int32_t xoffset_delta, int32
 
 #define SCROLL_VIEW(widget) ((scroll_view_t*)(scroll_view_cast(WIDGET(widget))))
 
+#define SCROLL_VIEW_RECURSIVE "recursive"
+#define SCROLL_VIEW_SNAP_TO_PAGE "snap_to_page"
+#define SCROLL_VIEW_MOVE_TO_PAGE "move_to_page"
 #define SCROLL_VIEW_X_SPEED_SCALE "xspeed_scale"
 #define SCROLL_VIEW_Y_SPEED_SCALE "yspeed_scale"
 

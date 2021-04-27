@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  tab_button_group
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -49,7 +49,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [tab control](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
+ * [tab control](https://github.com/zlgopen/awtk/blob/master/design/default/ui/)
  *
  * 可用通过style来设置控件的显示风格，如颜色等等。如：
  *

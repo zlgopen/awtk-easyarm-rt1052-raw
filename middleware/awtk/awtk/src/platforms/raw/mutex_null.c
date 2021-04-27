@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mutex do nothing
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -54,5 +54,5 @@ ret_t tk_mutex_destroy(tk_mutex_t* mutex) {
 }
 
 uint64_t tk_thread_self(void) {
-  return 0;
+  return (uint64_t)0;
 }

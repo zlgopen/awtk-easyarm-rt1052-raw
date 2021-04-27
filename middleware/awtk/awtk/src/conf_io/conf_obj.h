@@ -4,7 +4,7 @@
  * Author: AWTK Develop Team
  * Brief:  conf obj
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -90,6 +90,9 @@ ret_t conf_obj_save(object_t* conf);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败
  */
 ret_t conf_obj_set_readonly(object_t* conf, bool_t readonly);
+
+#define CONF_OBJ_PROP_URL "__URL__"
+#define CONF_OBJ_PROP_DEFAULT_URL "__DEFAULT_URL__"
 
 END_C_DECLS
 

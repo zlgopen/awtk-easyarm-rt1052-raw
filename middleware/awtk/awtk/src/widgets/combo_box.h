@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  combo_box
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -33,6 +33,7 @@ typedef struct _combo_box_option_t {
 } combo_box_option_t;
 
 typedef widget_t* (*combo_box_custom_open_popup_t)(widget_t* combobox);
+typedef ret_t (*combo_box_custom_on_layout_combobox_popup_t)(widget_t* combobox);
 
 /**
  * @class combo_box_t
@@ -74,7 +75,7 @@ typedef widget_t* (*combo_box_custom_open_popup_t)(widget_t* combobox);
  * </popup>
  * ```
  *
- * > 更多用法请参考：[combo_box.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/combo_box.xml)
+ * > 更多用法请参考：[combo_box.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/combo_box.xml)
  *
  * 
  *
@@ -147,7 +148,7 @@ typedef widget_t* (*combo_box_custom_open_popup_t)(widget_t* combobox);
  * ```
  * 
  * > 更多用法请参考：[theme
- *default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L422)
+ *default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L422)
  *
  */
 typedef struct _combo_box_t {
@@ -198,8 +199,10 @@ typedef struct _combo_box_t {
   /*private*/
   str_t text;
   bool_t pressed;
+  widget_t* combobox_popup;
   combo_box_option_t* option_items;
   combo_box_custom_open_popup_t open_popup;
+  combo_box_custom_on_layout_combobox_popup_t on_layout_combobox_popup;
 } combo_box_t;
 
 /**
@@ -339,10 +342,13 @@ ret_t combo_box_set_options(widget_t* widget, const char* options);
  * 设置自定义的打开弹出窗口的函数。
  * @param {widget_t*} widget combo_box对象。
  * @param {combo_box_custom_open_popup_t} open_popup 回调函数。
+ * @param {combo_box_custom_on_layout_combobox_popup_t} on_layout_combobox_popup layout 的回调函数。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t combo_box_set_custom_open_popup(widget_t* widget, combo_box_custom_open_popup_t open_popup);
+ret_t combo_box_set_custom_open_popup(
+    widget_t* widget, combo_box_custom_open_popup_t open_popup,
+    combo_box_custom_on_layout_combobox_popup_t on_layout_combobox_popup);
 
 /**
  * @method combo_box_get_option
@@ -382,6 +388,9 @@ TK_EXTERN_VTABLE(combo_box);
 
 /*public for test*/
 ret_t combo_box_parse_options(widget_t* widget, const char* str);
+
+/*private*/
+ret_t combo_box_combobox_popup_on_close_func(void* ctx, event_t* e);
 
 END_C_DECLS
 

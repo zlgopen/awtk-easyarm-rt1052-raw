@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dialog
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -156,7 +156,7 @@ typedef enum _dialog_quit_code_t {
  * ```
  *
  * > 更多用法请参考：
- * [dialog.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
+ * [dialog.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/)
  *
  * > 完整C代码示例请参考：
  *
@@ -174,7 +174,7 @@ typedef enum _dialog_quit_code_t {
  *
  * > 更多用法请参考：
  * [theme default]
- * (https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L324)
+ * (https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L324)
  *
  */
 typedef struct _dialog_t {
@@ -286,7 +286,7 @@ ret_t dialog_set_title(widget_t* widget, const char* title);
  * @annotation ["scriptable"]
  * @param {widget_t*} widget dialog对象。
  *
- * @return {dialog_quit_code_t} 返回退出吗。
+ * @return {dialog_quit_code_t} 返回退出码。
  */
 dialog_quit_code_t dialog_modal(widget_t* widget);
 

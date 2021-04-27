@@ -1,4 +1,6 @@
-﻿enum { BEGIN_IDX = 1, MAX_VIEW_COUNT = 256 };
+﻿#include "vgcanvas_nanovg.inc"
+
+enum { BEGIN_IDX = 1, MAX_VIEW_COUNT = 256 };
 static bool_t arrayViewId[MAX_VIEW_COUNT] = {0};
 static int32_t curViewId = 0;
 
@@ -13,7 +15,7 @@ static ret_t vgcanvas_nanovg_reinit(vgcanvas_t* vg, uint32_t w, uint32_t h, uint
   return RET_OK;
 }
 
-static ret_t vgcanvas_nanovg_begin_frame(vgcanvas_t* vgcanvas, rect_t* dirty_rect) {
+static ret_t vgcanvas_nanovg_begin_frame(vgcanvas_t* vgcanvas, const rect_t* dirty_rect) {
   vgcanvas_nanovg_t* canvas = (vgcanvas_nanovg_t*)vgcanvas;
 
   setBGFXViewRect(0, 0, 0, vgcanvas->w, vgcanvas->h);
@@ -45,7 +47,7 @@ static int32_t getFreeViewId(void) {
   return index;
 }
 
-static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h, framebuffer_object_t* fbo) {
+static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h, bool_t custom_draw_model, framebuffer_object_t* fbo) {
   struct NVGLUframebuffer* handle = NULL;
   NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
   curViewId = getFreeViewId();
@@ -57,11 +59,13 @@ static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32
   fbo->handle = handle;
   fbo->id = getBgfxFboImage(handle);
   fbo->ratio = vgcanvas->ratio;
+  fbo->custom_draw_model = custom_draw_model;
   return RET_OK;
 }
 
 static ret_t vgcanvas_nanovg_destroy_fbo(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo) {
   struct NVGLUframebuffer* handle = (struct NVGLUframebuffer*)fbo->handle;
+  
   nvgluDeleteFramebufferEx(handle);
   arrayViewId[getBgfxFboViewId(handle)] = false;
   curViewId = 0;
@@ -90,13 +94,14 @@ static ret_t vgcanvas_nanovg_unbind_fbo(vgcanvas_t* vgcanvas, framebuffer_object
 }
 
 static ret_t vgcanvas_nanovg_fbo_to_imageData(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo,
-                                              bitmap_t* img, rect_t* r) {
+                                              bitmap_t* img, const rect_t* r) {
   return RET_NOT_IMPL;
 }
 
 static ret_t vgcanvas_nanovg_destroy(vgcanvas_t* vgcanvas) {
   NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
 
+  vgcanvas_nanovg_deinit(vgcanvas);
   nvgDeleteBGFX(vg);
   TKMEM_FREE(vgcanvas);
 

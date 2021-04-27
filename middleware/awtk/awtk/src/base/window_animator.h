@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window_animator
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -142,8 +142,6 @@ struct _window_animator_t {
   canvas_t* canvas;
   float_t time_percent;
 
-  framebuffer_object_t prev_fbo;
-  framebuffer_object_t curr_fbo;
   dialog_highlighter_t* dialog_highlighter;
 
   const window_animator_vtable_t* vt;

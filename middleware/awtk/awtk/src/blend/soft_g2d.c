@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  software implemented image operations
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -72,7 +72,7 @@
 #include "rotate_image_bgra8888.h"
 #include "rotate_image_rgba8888.h"
 
-ret_t soft_copy_image(bitmap_t* dst, bitmap_t* src, rect_t* src_r, xy_t dx, xy_t dy) {
+ret_t soft_copy_image(bitmap_t* dst, bitmap_t* src, const rect_t* src_r, xy_t dx, xy_t dy) {
   uint8_t* src_p = NULL;
   uint8_t* dst_p = NULL;
   uint8_t* src_data = NULL;
@@ -110,7 +110,7 @@ ret_t soft_copy_image(bitmap_t* dst, bitmap_t* src, rect_t* src_r, xy_t dx, xy_t
   return RET_OK;
 }
 
-ret_t soft_clear_rect(bitmap_t* dst, rect_t* dst_r, color_t c) {
+ret_t soft_clear_rect(bitmap_t* dst, const rect_t* dst_r, color_t c) {
   return_value_if_fail(dst != NULL && dst_r != NULL, RET_BAD_PARAMS);
 
   switch (dst->format) {
@@ -149,7 +149,7 @@ ret_t soft_clear_rect(bitmap_t* dst, rect_t* dst_r, color_t c) {
   return RET_NOT_IMPL;
 }
 
-ret_t soft_fill_rect(bitmap_t* dst, rect_t* dst_r, color_t c) {
+ret_t soft_fill_rect(bitmap_t* dst, const rect_t* dst_r, color_t c) {
   return_value_if_fail(dst != NULL && dst_r != NULL, RET_BAD_PARAMS);
 
   switch (dst->format) {
@@ -189,7 +189,7 @@ ret_t soft_fill_rect(bitmap_t* dst, rect_t* dst_r, color_t c) {
   return RET_NOT_IMPL;
 }
 
-ret_t soft_rotate_image(bitmap_t* dst, bitmap_t* src, rect_t* src_r, lcd_orientation_t o) {
+ret_t soft_rotate_image(bitmap_t* dst, bitmap_t* src, const rect_t* src_r, lcd_orientation_t o) {
   return_value_if_fail(dst != NULL && src != NULL && src_r != NULL, RET_BAD_PARAMS);
   return_value_if_fail(dst->format == src->format, RET_BAD_PARAMS);
 
@@ -223,7 +223,8 @@ ret_t soft_rotate_image(bitmap_t* dst, bitmap_t* src, rect_t* src_r, lcd_orienta
   return RET_NOT_IMPL;
 }
 
-ret_t soft_blend_image(bitmap_t* dst, bitmap_t* src, rect_t* dst_r, rect_t* src_r, uint8_t alpha) {
+ret_t soft_blend_image(bitmap_t* dst, bitmap_t* src, const rect_t* dst_r, const rect_t* src_r,
+                       uint8_t alpha) {
   return_value_if_fail(dst != NULL && src != NULL && src_r != NULL && dst_r != NULL,
                        RET_BAD_PARAMS);
 
@@ -240,12 +241,12 @@ ret_t soft_blend_image(bitmap_t* dst, bitmap_t* src, rect_t* dst_r, rect_t* src_
         case BITMAP_FMT_RGBA8888: {
           return blend_image_bgr565_rgba8888(dst, src, dst_r, src_r, alpha);
         }
+        case BITMAP_FMT_BGRA8888: {
+          return blend_image_bgr565_bgra8888(dst, src, dst_r, src_r, alpha);
+        }
 #ifndef LCD_BGR565_LITE
         case BITMAP_FMT_RGB565: {
           return blend_image_bgr565_rgb565(dst, src, dst_r, src_r, alpha);
-        }
-        case BITMAP_FMT_BGRA8888: {
-          return blend_image_bgr565_bgra8888(dst, src, dst_r, src_r, alpha);
         }
 #endif /*LCD_BGR565_LITE*/
         default:

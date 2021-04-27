@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  guage_pointer
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -45,7 +45,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [guage.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/guage.xml)
+ * [guage.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/guage.xml)
  *
  * 在c代码中使用函数guage\_pointer\_create创建仪表指针控件。如：
  *

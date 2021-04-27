@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  utils struct and utils functions.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -24,6 +24,10 @@
 #include "tkc/utf8.h"
 #include "tkc/path.h"
 #include "tkc/utils.h"
+#include "tkc/object.h"
+#include "tkc/named_value.h"
+#include "tkc/data_reader_factory.h"
+#include "tkc/data_writer_factory.h"
 
 const char* tk_skip_to_num(const char* str) {
   const char* p = str;
@@ -216,10 +220,28 @@ double tk_atof(const char* str) {
   return atof(str);
 }
 
+int32_t tk_strtoi(const char* str, const char** end, int base) {
+  long ret = tk_strtol(str, end, base);
+  if (ret > INT32_MAX) {
+    ret = INT32_MAX;
+  } else if (ret < INT32_MIN) {
+    ret = INT32_MIN;
+  }
+  return (int32_t)ret;
+}
+
 long tk_strtol(const char* str, const char** end, int base) {
   return_value_if_fail(str != NULL, 0);
 
   return strtol(str, (char**)end, base);
+}
+
+int64_t tk_strtoll(const char* str, const char** end, int base) {
+  return strtoll(str, (char**)end, base);
+}
+
+uint64_t tk_strtoull(const char* str, const char** end, int base) {
+  return strtoull(str, (char**)end, base);
 }
 
 const char* tk_itoa(char* str, int len, int n) {
@@ -231,8 +253,40 @@ const char* tk_itoa(char* str, int len, int n) {
 }
 #endif /*HAS_NO_LIBC*/
 
-int tk_atoi(const char* str) {
-  return tk_strtol(str, NULL, 10);
+#define IS_HEX_NUM(s) (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+#define IS_BIN_NUM(s) (s[0] == '0' && (s[1] == 'b' || s[1] == 'B'))
+
+int32_t tk_atoi(const char* str) {
+  return_value_if_fail(str != NULL, 0);
+  if (IS_HEX_NUM(str)) {
+    return tk_strtoi(str + 2, NULL, 16);
+  } else if (IS_BIN_NUM(str)) {
+    return tk_strtoi(str + 2, NULL, 2);
+  } else {
+    return tk_strtoi(str, NULL, 10);
+  }
+}
+
+int64_t tk_atol(const char* str) {
+  return_value_if_fail(str != NULL, 0);
+  if (IS_HEX_NUM(str)) {
+    return tk_strtoll(str + 2, NULL, 16);
+  } else if (IS_BIN_NUM(str)) {
+    return tk_strtoll(str + 2, NULL, 2);
+  } else {
+    return tk_strtoll(str, NULL, 10);
+  }
+}
+
+uint64_t tk_atoul(const char* str) {
+  return_value_if_fail(str != NULL, 0);
+  if (IS_HEX_NUM(str)) {
+    return tk_strtoull(str + 2, NULL, 16);
+  } else if (IS_BIN_NUM(str)) {
+    return tk_strtoull(str + 2, NULL, 2);
+  } else {
+    return tk_strtoull(str, NULL, 10);
+  }
 }
 
 const char* tk_ftoa(char* str, int len, double value) {
@@ -243,17 +297,31 @@ const char* tk_ftoa(char* str, int len, double value) {
 
 char* tk_strcpy(char* dst, const char* src) {
   return_value_if_fail(dst != NULL && src != NULL, NULL);
-
-  return strcpy(dst, src);
+  if (dst != src) {
+    return strcpy(dst, src);
+  } else {
+    return dst;
+  }
 }
 
 char* tk_strncpy(char* dst, const char* src, size_t len) {
   return_value_if_fail(dst != NULL && src != NULL, NULL);
 
-  strncpy(dst, src, len);
-  dst[len] = '\0';
+  if (dst != src) {
+    strncpy(dst, src, len);
+    dst[len] = '\0';
+  }
 
   return dst;
+}
+
+char* tk_strncpy_s(char* dst, size_t dst_len, const char* src, size_t src_len) {
+  size_t len = 0;
+  return_value_if_fail(dst != NULL && src != NULL && dst_len > 0, NULL);
+
+  len = tk_min(dst_len - 1, src_len);
+
+  return tk_strncpy(dst, src, len);
 }
 
 char* tk_strndup(const char* str, uint32_t len) {
@@ -443,11 +511,19 @@ extern int vsnprintf(char* str, size_t size, const char* format, va_list ap);
 int tk_snprintf(char* str, size_t size, const char* format, ...) {
   int ret = 0;
   va_list va;
+  return_value_if_fail(str != NULL && format != NULL, 0);
+
   va_start(va, format);
-  ret = vsnprintf(str, size, format, va);
+  ret = tk_vsnprintf(str, size, format, va);
   va_end(va);
 
   return ret;
+}
+
+int tk_vsnprintf(char* str, size_t size, const char* format, va_list ap) {
+  return_value_if_fail(str != NULL && format != NULL, 0);
+
+  return vsnprintf(str, size, format, ap);
 }
 
 int tk_sscanf(const char* str, const char* format, ...) {
@@ -493,6 +569,45 @@ ret_t filename_to_name(const char* filename, char* str, uint32_t size) {
 }
 
 #define INCLUDE_XML "<?include"
+#define TAG_PROPERTY "property"
+#define CHAR_DOUDLE_QUOTE '\"'
+#define CHAR_SINGLE_QUOTE '\''
+
+typedef enum _xml_property_close_state_t {
+  XML_PROPERTY_CLOSE_STATE_CLOSE = 0x0,
+  XML_PROPERTY_CLOSE_STATE_OPEN_PROPERTY,
+  XML_PROPERTY_CLOSE_STATE_OPEN_DOUDLE_QUOTE,
+  XML_PROPERTY_CLOSE_STATE_OPEN_SINGLE_QUOTE,
+} xml_property_close_state_t;
+
+static xml_property_close_state_t xml_property_get_close_state(const char* start, const char* end) {
+  const char* tmp = start;
+  xml_property_close_state_t close_state = XML_PROPERTY_CLOSE_STATE_CLOSE;
+
+  while (tmp != end) {
+    if (*tmp == CHAR_DOUDLE_QUOTE) {
+      if (close_state == XML_PROPERTY_CLOSE_STATE_OPEN_DOUDLE_QUOTE) {
+        close_state = XML_PROPERTY_CLOSE_STATE_CLOSE;
+      } else if (close_state == XML_PROPERTY_CLOSE_STATE_CLOSE) {
+        close_state = XML_PROPERTY_CLOSE_STATE_OPEN_DOUDLE_QUOTE;
+      }
+    } else if (*tmp == CHAR_SINGLE_QUOTE) {
+      if (close_state == XML_PROPERTY_CLOSE_STATE_OPEN_SINGLE_QUOTE) {
+        close_state = XML_PROPERTY_CLOSE_STATE_CLOSE;
+      } else if (close_state == XML_PROPERTY_CLOSE_STATE_CLOSE) {
+        close_state = XML_PROPERTY_CLOSE_STATE_OPEN_SINGLE_QUOTE;
+      }
+    } else if (strstr(tmp, TAG_PROPERTY) == tmp) {
+      if (close_state == XML_PROPERTY_CLOSE_STATE_OPEN_PROPERTY) {
+        close_state = XML_PROPERTY_CLOSE_STATE_CLOSE;
+      } else if (close_state == XML_PROPERTY_CLOSE_STATE_CLOSE) {
+        close_state = XML_PROPERTY_CLOSE_STATE_OPEN_PROPERTY;
+      }
+    }
+    tmp++;
+  }
+  return close_state;
+}
 
 ret_t xml_file_expand(const char* filename, str_t* s, const char* data) {
   str_t ss;
@@ -503,29 +618,53 @@ ret_t xml_file_expand(const char* filename, str_t* s, const char* data) {
 
   str_init(&ss, 1024);
   while (p != NULL) {
-    str_set(&ss, "");
-    str_append_with_len(s, start, p - start);
+    /* 过滤在属性中的 INCLUDE_XML */
+    xml_property_close_state_t close_state = xml_property_get_close_state(start, p);
+    if (close_state == XML_PROPERTY_CLOSE_STATE_CLOSE) {
+      str_set(&ss, "");
+      str_append_with_len(s, start, p - start);
 
-    /*<include filename="subfilename">*/
-    while (*p != '\"' && *p != '\0') {
+      /*<include filename="subfilename">*/
+      while (*p != '\"' && *p != '\0') {
+        p++;
+      }
+      return_value_if_fail(*p == '\"', RET_FAIL);
       p++;
-    }
-    return_value_if_fail(*p == '\"', RET_FAIL);
-    p++;
-    while (*p != '\"' && *p != '\0') {
-      str_append_char(&ss, *p++);
-    }
-    return_value_if_fail(*p == '\"', RET_FAIL);
-    while (*p != '>' && *p != '\0') {
+      while (*p != '\"' && *p != '\0') {
+        str_append_char(&ss, *p++);
+      }
+      return_value_if_fail(*p == '\"', RET_FAIL);
+      while (*p != '>' && *p != '\0') {
+        p++;
+      }
+      return_value_if_fail(*p == '>', RET_FAIL);
       p++;
+
+      path_replace_basename(subfilename, MAX_PATH, filename, ss.str);
+      xml_file_expand_read(subfilename, &ss);
+
+      str_append(s, ss.str);
+    } else {
+      int size = 0;
+      char* str_end = NULL;
+      char* include_string_end = strstr(p, "?>");
+      if (close_state == XML_PROPERTY_CLOSE_STATE_OPEN_PROPERTY) {
+        str_end = TAG_PROPERTY;
+        size = tk_strlen(TAG_PROPERTY);
+      } else if (close_state == XML_PROPERTY_CLOSE_STATE_OPEN_SINGLE_QUOTE) {
+        size = 1;
+        str_end = "\'";
+      } else if (close_state == XML_PROPERTY_CLOSE_STATE_OPEN_DOUDLE_QUOTE) {
+        size = 1;
+        str_end = "\"";
+      }
+      if (str_end == NULL) {
+        log_error("do not find close property string !");
+      } else {
+        p = strstr(include_string_end, str_end) + size;
+        str_append_with_len(s, start, p - start);
+      }
     }
-    return_value_if_fail(*p == '>', RET_FAIL);
-    p++;
-
-    path_replace_basename(subfilename, MAX_PATH, filename, ss.str);
-    xml_file_expand_read(subfilename, &ss);
-
-    str_append(s, ss.str);
 
     start = p;
     p = strstr(start, INCLUDE_XML);
@@ -832,3 +971,159 @@ uint32_t tk_wstr_count_c(const wchar_t* str, wchar_t c) {
 
   return nr;
 }
+
+ret_t image_region_parse(uint32_t img_w, uint32_t img_h, const char* region, rect_t* r) {
+  return_value_if_fail(r != NULL && region != NULL, RET_BAD_PARAMS);
+  if (*region == '#') {
+    region++;
+  }
+
+  if (strncmp(region, "xywh(", 5) == 0) {
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0;
+    ENSURE(tk_sscanf(region, "xywh(%d,%d,%d,%d)", &x, &y, &w, &h) == 4);
+
+    *r = rect_init(x, y, w, h);
+    return RET_OK;
+  } else if (strncmp(region, "grid(", 5) == 0) {
+    int rows = 0;
+    int cols = 0;
+    int row = 0;
+    int col = 0;
+    int tile_w = 0;
+    int tile_h = 0;
+    ENSURE(tk_sscanf(region, "grid(%d,%d,%d,%d)", &rows, &cols, &row, &col) == 4);
+    return_value_if_fail(rows > 0 && cols > 0 && row >= 0 && col >= 0, RET_FAIL);
+    return_value_if_fail(rows > row && cols > col, RET_FAIL);
+
+    tile_w = img_w / cols;
+    tile_h = img_h / rows;
+
+    *r = rect_init(col * tile_w, row * tile_h, tile_w, tile_h);
+    return RET_OK;
+  }
+
+  return RET_FAIL;
+}
+
+typedef struct _to_json_ctx_t {
+  object_t* obj;
+  str_t* str;
+  uint32_t index;
+} to_json_ctx_t;
+
+static ret_t escape_json_str(str_t* str, const char* p) {
+  str_append_char(str, '\"');
+  if (p != NULL) {
+    while (*p) {
+      if (*p == '\"' || *p == '\\') {
+        str_append_char(str, '\\');
+      }
+      str_append_char(str, *p);
+      p++;
+    }
+  }
+  str_append_char(str, '\"');
+
+  return RET_OK;
+}
+
+static ret_t to_json_on_prop(void* ctx, const void* data) {
+  named_value_t* nv = (named_value_t*)data;
+  to_json_ctx_t* info = (to_json_ctx_t*)ctx;
+
+  if (info->index > 0) {
+    str_append_char(info->str, ',');
+  }
+
+  if (!object_is_collection(info->obj)) {
+    str_append_more(info->str, "\"", nv->name, "\":", NULL);
+  }
+
+  switch (nv->value.type) {
+    case VALUE_TYPE_OBJECT: {
+      str_t str;
+      str_init(&str, 100);
+      object_to_json(value_object(&(nv->value)), &str);
+      str_append(info->str, str.str);
+      str_reset(&str);
+      break;
+    }
+    case VALUE_TYPE_STRING: {
+      escape_json_str(info->str, value_str(&(nv->value)));
+      break;
+    }
+    case VALUE_TYPE_WSTRING: {
+      str_t str;
+      str_init(&str, 100);
+      str_from_wstr(&str, value_wstr(&(nv->value)));
+      escape_json_str(info->str, str.str);
+      str_reset(&str);
+      break;
+    }
+    default: {
+      char buff[32];
+      str_append(info->str, value_str_ex(&(nv->value), buff, sizeof(buff) - 1));
+      break;
+    }
+  }
+
+  info->index++;
+  return RET_OK;
+}
+
+ret_t object_to_json(object_t* obj, str_t* str) {
+  to_json_ctx_t ctx = {obj, str, 0};
+  return_value_if_fail(obj != NULL && str != NULL, RET_BAD_PARAMS);
+
+  if (object_is_collection(obj)) {
+    str_set(str, "[");
+    object_foreach_prop(obj, to_json_on_prop, &ctx);
+    str_append_char(str, ']');
+  } else {
+    str_set(str, "{");
+    object_foreach_prop(obj, to_json_on_prop, &ctx);
+    str_append_char(str, '}');
+  }
+
+  return RET_OK;
+}
+
+#ifdef WITH_DATA_READER_WRITER
+ret_t data_url_copy(const char* dst_url, const char* src_url) {
+  ret_t ret = RET_OK;
+  return_value_if_fail(dst_url != NULL && src_url != NULL, RET_BAD_PARAMS);
+
+  data_reader_t* reader = data_reader_factory_create_reader(data_reader_factory(), src_url);
+  if (reader != NULL) {
+    uint32_t size = data_reader_get_size(reader);
+    if (size > 0) {
+      data_writer_t* writer = data_writer_factory_create_writer(data_writer_factory(), dst_url);
+      if (writer != NULL) {
+        void* buff = TKMEM_CALLOC(1, size + 1);
+        if (buff != NULL) {
+          int32_t rsize = data_reader_read(reader, 0, buff, size);
+          assert(rsize == size);
+          rsize = data_writer_write(writer, 0, buff, rsize);
+          assert(rsize == size);
+          TKMEM_FREE(buff);
+          log_debug("copy: %s=>%s\n", src_url, dst_url);
+        } else {
+          ret = RET_FAIL;
+        }
+        data_writer_destroy(writer);
+      } else {
+        ret = RET_FAIL;
+        log_debug("open dst(%s) failed\n", dst_url);
+      }
+    } else {
+      log_debug("open src(%s) failed\n", src_url);
+    }
+    data_reader_destroy(reader);
+  }
+
+  return ret;
+}
+#endif /*WITH_DATA_READER_WRITER*/

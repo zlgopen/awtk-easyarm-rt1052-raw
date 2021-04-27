@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  style factory
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,7 @@ BEGIN_C_DECLS
 struct _style_factory_t;
 typedef struct _style_factory_t style_factory_t;
 
-typedef style_t* (*style_factory_create_style_t)(style_factory_t* factory, widget_t* widget);
+typedef style_t* (*style_factory_create_style_t)(style_factory_t* factory, const char* style_type);
 
 /**
  * @class style_factory_t
@@ -46,11 +46,11 @@ struct _style_factory_t {
  * @method style_factory_create_style
  * 创建style。
  * @param {style_factory_t*} factory factory对象。
- * @param {widget_t*} widget 控件对象。
+ * @param {const char*} style_type style类型。
  *
  * @return {style_t*} 返回style对象。
  */
-style_t* style_factory_create_style(style_factory_t* factory, widget_t* widget);
+style_t* style_factory_create_style(style_factory_t* factory, const char* style_type);
 
 /**
  * @method style_factory

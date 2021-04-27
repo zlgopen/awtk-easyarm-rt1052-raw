@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  make parent widget or window draggable
  *
- * Copyright (c) 2019 - 2020 Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021 Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,7 +51,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [draggable.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/draggable.xml)
+ * [draggable.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/draggable.xml)
  *
  * 在c代码中使用函数draggable\_create创建按钮控件。如：
  *

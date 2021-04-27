@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  tab_button
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,18 +26,44 @@
 #include "base/image_manager.h"
 #include "base/widget_vtable.h"
 
+static ret_t tab_button_pointer_up_cleanup(widget_t* widget) {
+  tab_button_t* tab_button = TAB_BUTTON(widget);
+  return_value_if_fail(tab_button != NULL, RET_BAD_PARAMS);
+
+  widget_set_state(widget, WIDGET_STATE_NORMAL);
+  tab_button->pressed = FALSE;
+  widget_ungrab(widget->parent, widget);
+
+  return RET_OK;
+}
+
 static ret_t tab_button_on_event(widget_t* widget, event_t* e) {
   uint16_t type = e->type;
+  tab_button_t* tab_button = TAB_BUTTON(widget);
+  return_value_if_fail(tab_button != NULL && e != NULL, RET_BAD_PARAMS);
   switch (type) {
     case EVT_POINTER_DOWN: {
       widget_set_state(widget, WIDGET_STATE_PRESSED);
+      tab_button->pressed = TRUE;
+      widget_grab(widget->parent, widget);
       break;
     }
     case EVT_POINTER_UP: {
-      tab_button_set_value(widget, TRUE);
-      widget_set_state(widget, WIDGET_STATE_NORMAL);
+      pointer_event_t evt = *(pointer_event_t*)e;
+      if (tab_button->pressed && widget_is_point_in(widget, evt.x, evt.y, FALSE)) {
+        evt.e.type = EVT_CLICK;
+        widget_dispatch(widget, (event_t*)&(evt));
+      }
+      tab_button_pointer_up_cleanup(widget);
       break;
     }
+    case EVT_CLICK: {
+      tab_button_set_value(widget, TRUE);
+      break;
+    }
+    case EVT_POINTER_DOWN_ABORT:
+      tab_button_pointer_up_cleanup(widget);
+      break;
     case EVT_POINTER_LEAVE:
       widget_set_state(widget, WIDGET_STATE_NORMAL);
       break;
@@ -67,16 +93,22 @@ static ret_t tab_button_set_value_only(widget_t* widget, bool_t value) {
   return_value_if_fail(tab_button != NULL, RET_BAD_PARAMS);
 
   if (tab_button->value != value) {
-    event_t e = event_init(EVT_VALUE_WILL_CHANGE, widget);
-    widget_dispatch(widget, &e);
-    tab_button->value = value;
-    if (!value) {
-      value_set_bool(&v, value);
-      widget_set_prop(widget, WIDGET_PROP_VALUE, &v);
+    value_change_event_t evt;
+    value_change_event_init(&evt, EVT_VALUE_WILL_CHANGE, widget);
+    value_set_bool(&(evt.old_value), tab_button->value);
+    value_set_bool(&(evt.new_value), value);
+
+    if (widget_dispatch(widget, (event_t*)&evt) != RET_STOP) {
+      tab_button->value = value;
+      if (!value) {
+        value_set_bool(&v, value);
+        widget_set_prop(widget, WIDGET_PROP_VALUE, &v);
+      }
+      widget_set_need_update_style(widget);
+
+      evt.e.type = EVT_VALUE_CHANGED;
+      widget_dispatch(widget, (event_t*)&evt);
     }
-    e = event_init(EVT_VALUE_CHANGED, widget);
-    widget_dispatch(widget, &e);
-    widget_set_need_update_style(widget);
   }
 
   return RET_OK;
@@ -164,7 +196,7 @@ ret_t tab_button_set_value(widget_t* widget, bool_t value) {
         return_value_if_fail(index >= 0, RET_BAD_PARAMS);
 
         widget_set_value(pages, index);
-      } else if (tab_button->ui == NULL) {
+      } else if (tab_button->ui == NULL && !widget->loading) {
         tab_button_load_ui(tab_button, pages);
       }
     } else {
@@ -260,6 +292,8 @@ static ret_t tab_button_on_destroy(widget_t* widget) {
 static const char* s_tab_button_clone_properties[] = {WIDGET_PROP_VALUE, NULL};
 TK_DECL_VTABLE(tab_button) = {.size = sizeof(tab_button_t),
                               .type = WIDGET_TYPE_TAB_BUTTON,
+                              .space_key_to_activate = TRUE,
+                              .return_key_to_activate = TRUE,
                               .clone_properties = s_tab_button_clone_properties,
                               .parent = TK_PARENT_VTABLE(widget),
                               .create = tab_button_create,
@@ -289,7 +323,7 @@ ret_t tab_button_set_active_icon(widget_t* widget, const char* name) {
   return RET_OK;
 }
 
-static ret_t tab_button_ex_open_idle_func(const idle_info_t* idle) {
+static ret_t tab_button_open_idle_func(const idle_info_t* idle) {
   widget_t* widget = WIDGET(idle->ctx);
   tab_button_t* tab_button = TAB_BUTTON(widget);
   return_value_if_fail(tab_button != NULL && widget != NULL, RET_BAD_PARAMS);
@@ -309,7 +343,7 @@ widget_t* tab_button_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
 
   tab_button_set_value_only(widget, FALSE);
 
-  idle_add(tab_button_ex_open_idle_func, widget);
+  widget_add_idle(widget, tab_button_open_idle_func);
 
   return widget;
 }

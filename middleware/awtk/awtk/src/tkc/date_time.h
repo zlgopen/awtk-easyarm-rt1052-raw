@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  date time
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -98,6 +98,78 @@ date_time_t* date_time_create(void);
 date_time_t* date_time_init(date_time_t* dt);
 
 /**
+ * @method date_time_set_year
+ * 设置年。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ * @param {uint32_t} year 年。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t date_time_set_year(date_time_t* dt, uint32_t year);
+
+/**
+ * @method date_time_set_month
+ * 设置月。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ * @param {uint32_t} month 月。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t date_time_set_month(date_time_t* dt, uint32_t month);
+
+/**
+ * @method date_time_set_day
+ * 设置日。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ * @param {uint32_t} day 日。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t date_time_set_day(date_time_t* dt, uint32_t day);
+
+/**
+ * @method date_time_set_hour
+ * 设置小时。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ * @param {uint32_t} hour 小时。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t date_time_set_hour(date_time_t* dt, uint32_t hour);
+
+/**
+ * @method date_time_set_minute
+ * 设置分钟。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ * @param {uint32_t} minute 分钟。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t date_time_set_minute(date_time_t* dt, uint32_t minute);
+
+/**
+ * @method date_time_set_second
+ * 设置秒。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ * @param {uint32_t} second 秒。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t date_time_set_second(date_time_t* dt, uint32_t second);
+
+/**
  * @method date_time_set
  * 设置当前时间。
  *
@@ -119,6 +191,29 @@ ret_t date_time_set(date_time_t* dt);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t date_time_from_time(date_time_t* dt, uint64_t time);
+
+/**
+ * @method date_time_to_time
+ * 转换成time。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ *
+ * @return {uint64_t} 返回time。
+ */
+uint64_t date_time_to_time(date_time_t* dt);
+
+/**
+ * @method date_time_add_delta
+ * 加上一个偏移量(s)。
+ *
+ * @annotation ["scriptable"]
+ * @param {date_time_t*} dt date_time对象。
+ * @param {int64_t} delta 偏移量(s)。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t date_time_add_delta(date_time_t* dt, int64_t delta);
 
 /**
  * @method date_time_is_leap
@@ -192,11 +287,13 @@ ret_t date_time_destroy(date_time_t* dt);
 typedef ret_t (*date_time_get_now_t)(date_time_t* dt);
 typedef ret_t (*date_time_set_now_t)(date_time_t* dt);
 typedef ret_t (*date_time_from_time_t)(date_time_t* dt, uint64_t time);
+typedef uint64_t (*date_time_to_time_t)(date_time_t* dt);
 
 typedef struct _date_time_vtable_t {
   date_time_get_now_t get_now;
   date_time_set_now_t set_now;
   date_time_from_time_t from_time;
+  date_time_to_time_t to_time;
 } date_time_vtable_t;
 
 /**

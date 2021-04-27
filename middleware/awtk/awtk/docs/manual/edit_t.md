@@ -27,7 +27,7 @@ tips="age" input_type="uint" min="0" max="150" step="1" auto_fix="true" style="n
 > XXX：需要在min/max/step之前设置input\_type。
 
 >更多用法请参考：
-[edit.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/edit.xml)
+[edit.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/edit.xml)
 
 在c代码中使用函数edit\_create创建编辑器控件。如：
 
@@ -55,7 +55,7 @@ widget_set_text(edit, L"OK");
 
 > 更多用法请参考：
 [theme
-default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L104)
+default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L104)
 ----------------------------------
 ### 函数
 <p id="edit_t_methods">
@@ -68,6 +68,8 @@ default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/st
 | <a href="#edit_t_edit_get_int">edit\_get\_int</a> | 获取int类型的值。 |
 | <a href="#edit_t_edit_set_action_text">edit\_set\_action\_text</a> | 设置软键盘上action按钮的文本。 |
 | <a href="#edit_t_edit_set_auto_fix">edit\_set\_auto\_fix</a> | 设置编辑器是否为自动改正。 |
+| <a href="#edit_t_edit_set_cancelable">edit\_set\_cancelable</a> | 设置编辑器是否为可撤销修改。 |
+| <a href="#edit_t_edit_set_close_im_when_blured">edit\_set\_close\_im\_when\_blured</a> | 设置编辑器是否在失去焦点时关闭输入法。 |
 | <a href="#edit_t_edit_set_cursor">edit\_set\_cursor</a> | 设置输入框的光标坐标。 |
 | <a href="#edit_t_edit_set_dec_value">edit\_set\_dec\_value</a> | 设置减少值的回调函数。 |
 | <a href="#edit_t_edit_set_double">edit\_set\_double</a> | 设置double类型的值。 |
@@ -96,20 +98,18 @@ default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/st
 | -------- | ----- | ------------ | 
 | <a href="#edit_t_action_text">action\_text</a> | char* | 软键盘上action按钮的文本。内置取值有： |
 | <a href="#edit_t_auto_fix">auto\_fix</a> | bool\_t | 输入无效时，是否自动改正。 |
-| <a href="#edit_t_bottom_margin">bottom\_margin</a> | uint8\_t | 下边距。 |
+| <a href="#edit_t_cancelable">cancelable</a> | bool\_t | 是否支持撤销编辑。如果为TRUE，在失去焦点之前可以撤销所有修改(恢复获得焦点之前的内容)。 |
+| <a href="#edit_t_close_im_when_blured">close\_im\_when\_blured</a> | bool\_t | 是否在失去焦点时关闭输入法(默认是)。 |
 | <a href="#edit_t_input_type">input\_type</a> | input\_type\_t | 输入类型。 |
 | <a href="#edit_t_keyboard">keyboard</a> | char* | 自定义软键盘名称。AWTK优先查找keyboard属性设置的键盘文件名（该键盘的XML文件需要在default\raw\ui目录下存在），如果keyboard为空就找input_type设置的键盘类型 |
-| <a href="#edit_t_left_margin">left\_margin</a> | uint8\_t | 左边距。 |
 | <a href="#edit_t_max">max</a> | double | 最大值或最大长度。 |
 | <a href="#edit_t_min">min</a> | double | 最小值或最小长度。 |
 | <a href="#edit_t_open_im_when_focused">open\_im\_when\_focused</a> | bool\_t | 获得焦点时打开输入法。 |
 | <a href="#edit_t_password_visible">password\_visible</a> | bool\_t | 密码是否可见。 |
 | <a href="#edit_t_readonly">readonly</a> | bool\_t | 编辑器是否为只读。 |
-| <a href="#edit_t_right_margin">right\_margin</a> | uint8\_t | 右边距。 |
 | <a href="#edit_t_select_none_when_focused">select\_none\_when\_focused</a> | bool\_t | 获得焦点时不选中文本。 |
 | <a href="#edit_t_step">step</a> | double | 步长。 |
 | <a href="#edit_t_tips">tips</a> | char* | 输入提示。 |
-| <a href="#edit_t_top_margin">top\_margin</a> | uint8\_t | 上边距。 |
 | <a href="#edit_t_tr_tips">tr\_tips</a> | char* | 保存用于翻译的提示信息。 |
 ### 事件
 <p id="edit_t_events">
@@ -238,6 +238,46 @@ ret_t edit_set_auto_fix (widget_t* widget, bool_t auto_fix);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | widget对象。 |
 | auto\_fix | bool\_t | 自动改正。 |
+#### edit\_set\_cancelable 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="edit_t_edit_set_cancelable">设置编辑器是否为可撤销修改。
+
+* 函数原型：
+
+```
+ret_t edit_set_cancelable (widget_t* widget, bool_t cancelable);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+| cancelable | bool\_t | 是否为可撤销修。 |
+#### edit\_set\_close\_im\_when\_blured 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="edit_t_edit_set_close_im_when_blured">设置编辑器是否在失去焦点时关闭输入法。
+
+* 函数原型：
+
+```
+ret_t edit_set_close_im_when_blured (widget_t* widget, bool_t close_im_when_blured);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+| close\_im\_when\_blured | bool\_t | 是否是否在失去焦点时关闭输入法。在失去焦点时关闭输入法。 |
 #### edit\_set\_cursor 函数
 -----------------------
 
@@ -514,6 +554,9 @@ ret_t edit_set_keyboard (widget_t* widget, char* keyboard);
 
 > <p id="edit_t_edit_set_open_im_when_focused">设置编辑器是否在获得焦点时打开输入法。
 
+> * 设置默认焦点时，打开窗口时不弹出软键盘。
+> * 用键盘切换焦点时，编辑器获得焦点时不弹出软键盘。
+
 * 函数原型：
 
 ```
@@ -706,11 +749,30 @@ ret_t edit_set_tr_tips (widget_t* widget, const char* tr_tips);
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
-#### bottom\_margin 属性
+#### cancelable 属性
 -----------------------
-> <p id="edit_t_bottom_margin">下边距。
+> <p id="edit_t_cancelable">是否支持撤销编辑。如果为TRUE，在失去焦点之前可以撤销所有修改(恢复获得焦点之前的内容)。
 
-* 类型：uint8\_t
+> * 1.一般配合keyboard的"cancel"按钮使用。
+> * 2.为TRUE时，如果内容有变化，会设置编辑器的状态为changed，所以此时编辑器需要支持changed状态的style。
+
+* 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
+#### close\_im\_when\_blured 属性
+-----------------------
+> <p id="edit_t_close_im_when_blured">是否在失去焦点时关闭输入法(默认是)。
+
+* 类型：bool\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -743,22 +805,6 @@ ret_t edit_set_tr_tips (widget_t* widget, const char* tr_tips);
 > <p id="edit_t_keyboard">自定义软键盘名称。AWTK优先查找keyboard属性设置的键盘文件名（该键盘的XML文件需要在default\raw\ui目录下存在），如果keyboard为空就找input_type设置的键盘类型
 
 * 类型：char*
-
-| 特性 | 是否支持 |
-| -------- | ----- |
-| 可直接读取 | 是 |
-| 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
-| 可在XML中设置 | 是 |
-| 可通过widget\_get\_prop读取 | 是 |
-| 可通过widget\_set\_prop修改 | 是 |
-#### left\_margin 属性
------------------------
-> <p id="edit_t_left_margin">左边距。
-
-* 类型：uint8\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -852,22 +898,6 @@ ret_t edit_set_tr_tips (widget_t* widget, const char* tr_tips);
 | 可在XML中设置 | 是 |
 | 可通过widget\_get\_prop读取 | 是 |
 | 可通过widget\_set\_prop修改 | 是 |
-#### right\_margin 属性
------------------------
-> <p id="edit_t_right_margin">右边距。
-
-* 类型：uint8\_t
-
-| 特性 | 是否支持 |
-| -------- | ----- |
-| 可直接读取 | 是 |
-| 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
-| 可在XML中设置 | 是 |
-| 可通过widget\_get\_prop读取 | 是 |
-| 可通过widget\_set\_prop修改 | 是 |
 #### select\_none\_when\_focused 属性
 -----------------------
 > <p id="edit_t_select_none_when_focused">获得焦点时不选中文本。
@@ -908,22 +938,6 @@ ret_t edit_set_tr_tips (widget_t* widget, const char* tr_tips);
 > <p id="edit_t_tips">输入提示。
 
 * 类型：char*
-
-| 特性 | 是否支持 |
-| -------- | ----- |
-| 可直接读取 | 是 |
-| 可直接修改 | 否 |
-| 可持久化   | 是 |
-| 可脚本化   | 是 |
-| 可在IDE中设置 | 是 |
-| 可在XML中设置 | 是 |
-| 可通过widget\_get\_prop读取 | 是 |
-| 可通过widget\_set\_prop修改 | 是 |
-#### top\_margin 属性
------------------------
-> <p id="edit_t_top_margin">上边距。
-
-* 类型：uint8\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  list_item
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,7 @@ static ret_t list_item_on_paint_self(widget_t* widget, canvas_t* c) {
 
 static ret_t list_item_on_parent_pointer_up(void* ctx, event_t* e) {
   list_item_t* list_item = LIST_ITEM(ctx);
-
+  return_value_if_fail(list_item != NULL, RET_BAD_PARAMS);
   list_item->dragged = FALSE;
   list_item->pressed = FALSE;
   list_item->downed = FALSE;
@@ -103,16 +103,16 @@ static ret_t list_item_on_event(widget_t* widget, event_t* e) {
       list_item_remove_timer(widget);
       widget_invalidate_force(widget, NULL);
       widget_set_state(widget, WIDGET_STATE_NORMAL);
-
+      widget_ungrab(widget->parent, widget);
       if (!list_item->dragged && list_item->pressed) {
         pointer_event_t evt = *(pointer_event_t*)e;
         evt.e = event_init(EVT_CLICK, widget);
+        evt.e.size = sizeof(pointer_event_t);
         widget_dispatch(widget, (event_t*)&evt);
       }
       list_item->dragged = FALSE;
       list_item->pressed = FALSE;
       list_item->downed = FALSE;
-      widget_ungrab(widget->parent, widget);
       break;
     }
     case EVT_POINTER_MOVE: {

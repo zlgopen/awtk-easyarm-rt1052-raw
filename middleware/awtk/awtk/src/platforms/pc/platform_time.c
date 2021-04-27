@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  default platform
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,6 +25,12 @@ uint64_t stm_now_ms() {
   uint64_t now = stm_now();
 
   return now / 1000000;
+}
+
+uint64_t stm_now_us() {
+  uint64_t now = stm_now();
+
+  return now / 1000;
 }
 
 void stm_time_init(void) {

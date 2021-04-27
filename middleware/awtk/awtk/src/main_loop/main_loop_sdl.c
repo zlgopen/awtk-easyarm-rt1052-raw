@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  sdl2 implemented main_loop interface
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * this program is distributed in the hope that it will be useful,
  * but without any warranty; without even the implied warranty of
@@ -94,7 +94,24 @@ static ret_t main_loop_sdl2_dispatch_wheel_event(main_loop_simple_t* loop, SDL_E
   return RET_OK;
 }
 
+static ret_t main_loop_sdl2_dispatch_multi_gesture_event(main_loop_simple_t* loop,
+                                                         SDL_Event* sdl_event) {
+  multi_gesture_event_t event;
+  widget_t* widget = loop->base.wm;
+  int32_t x = sdl_event->mgesture.x * widget->w;
+  int32_t y = sdl_event->mgesture.y * widget->h;
+  float rotation = sdl_event->mgesture.dTheta;
+  float distance = sdl_event->mgesture.dDist;
+  event_t* e = multi_gesture_event_init(&event, widget, x, y, rotation, distance);
+
+  event.e.native_window_handle = NULL;
+  window_manager_dispatch_input_event(widget, e);
+
+  return RET_OK;
+}
+
 static ret_t main_loop_sdl2_dispatch_mouse_event(main_loop_simple_t* loop, SDL_Event* sdl_event) {
+  key_event_t key_event;
   pointer_event_t event;
   int type = sdl_event->type;
   widget_t* widget = loop->base.wm;
@@ -112,11 +129,15 @@ static ret_t main_loop_sdl2_dispatch_mouse_event(main_loop_simple_t* loop, SDL_E
 
         SDL_CaptureMouse(TRUE);
         window_manager_dispatch_input_event(widget, (event_t*)&event);
+      } else if (sdl_event->button.button == 2) {
+        key_event_init(&key_event, EVT_KEY_DOWN, widget, TK_KEY_WHEEL);
+        window_manager_dispatch_input_event(widget, (event_t*)&key_event);
       }
       break;
     }
     case SDL_MOUSEBUTTONUP: {
       if (sdl_event->button.button == 1) {
+        SDL_CaptureMouse(FALSE);
         pointer_event_init(&event, EVT_POINTER_UP, widget, sdl_event->button.x,
                            sdl_event->button.y);
         event.button = sdl_event->button.button;
@@ -125,13 +146,15 @@ static ret_t main_loop_sdl2_dispatch_mouse_event(main_loop_simple_t* loop, SDL_E
 
         window_manager_dispatch_input_event(widget, (event_t*)&event);
         loop->pressed = 0;
-        SDL_CaptureMouse(FALSE);
       } else if (sdl_event->button.button == 3) {
         pointer_event_init(&event, EVT_CONTEXT_MENU, widget, sdl_event->button.x,
                            sdl_event->button.y);
         event.button = sdl_event->button.button;
         event.e.native_window_handle = SDL_GetWindowFromID(sdl_event->button.windowID);
         window_manager_dispatch_input_event(widget, (event_t*)&event);
+      } else if (sdl_event->button.button == 2) {
+        key_event_init(&key_event, EVT_KEY_UP, widget, TK_KEY_WHEEL);
+        window_manager_dispatch_input_event(widget, (event_t*)&key_event);
       }
       break;
     }
@@ -152,12 +175,22 @@ static ret_t main_loop_sdl2_dispatch_mouse_event(main_loop_simple_t* loop, SDL_E
   return RET_OK;
 }
 
+static ret_t on_resized_timer(const timer_info_t* info) {
+  widget_t* wm = WIDGET(info->ctx);
+  widget_set_need_relayout_children(wm);
+  widget_invalidate_force(wm, NULL);
+
+  log_debug("on_resized_timer\n");
+  return RET_REMOVE;
+}
+
 static ret_t main_loop_sdl2_dispatch_window_event(main_loop_simple_t* loop, SDL_Event* event) {
   main_loop_t* l = (main_loop_t*)(loop);
 
   switch (event->window.event) {
     case SDL_WINDOWEVENT_SHOWN:
       log_debug("Window %d shown\n", event->window.windowID);
+      widget_invalidate_force(l->wm, NULL);
       break;
     case SDL_WINDOWEVENT_HIDDEN:
       log_debug("Window %d hidden\n", event->window.windowID);
@@ -173,6 +206,7 @@ static ret_t main_loop_sdl2_dispatch_window_event(main_loop_simple_t* loop, SDL_
     case SDL_WINDOWEVENT_RESIZED:
       log_debug("Window %d resized to %dx%d\n", event->window.windowID, event->window.data1,
                 event->window.data2);
+      timer_add(on_resized_timer, l->wm, 100);
       break;
     case SDL_WINDOWEVENT_SIZE_CHANGED: {
       event_t e = event_init(EVT_NATIVE_WINDOW_RESIZED, NULL);
@@ -183,6 +217,7 @@ static ret_t main_loop_sdl2_dispatch_window_event(main_loop_simple_t* loop, SDL_
       system_info_set_lcd_w(system_info(), ww);
       system_info_set_lcd_h(system_info(), wh);
       window_manager_dispatch_native_window_event(l->wm, &e, win);
+      timer_add(on_resized_timer, l->wm, 100);
       break;
     }
     case SDL_WINDOWEVENT_MINIMIZED:
@@ -206,6 +241,7 @@ static ret_t main_loop_sdl2_dispatch_window_event(main_loop_simple_t* loop, SDL_
       log_debug("Window %d gained keyboard focus\n", event->window.windowID);
       break;
     case SDL_WINDOWEVENT_FOCUS_LOST:
+      SDL_CaptureMouse(FALSE);
       log_debug("Window %d lost keyboard focus\n", event->window.windowID);
       break;
 #if SDL_VERSION_ATLEAST(2, 0, 5)
@@ -251,6 +287,10 @@ static ret_t main_loop_sdl2_dispatch(main_loop_simple_t* loop) {
       }
       case SDL_MOUSEWHEEL: {
         ret = main_loop_sdl2_dispatch_wheel_event(loop, &event);
+        break;
+      }
+      case SDL_MULTIGESTURE: {
+        ret = main_loop_sdl2_dispatch_multi_gesture_event(loop, &event);
         break;
       }
       case SDL_WINDOWEVENT: {

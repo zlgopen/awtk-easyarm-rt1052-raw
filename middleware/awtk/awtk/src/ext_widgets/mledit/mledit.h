@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mledit
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -42,7 +42,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[mledit.xml](
- * https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/mledit.xml)
+ * https://github.com/zlgopen/awtk/blob/master/design/default/ui/mledit.xml)
  *
  * 在c代码中使用函数mledit\_create创建多行编辑器控件。如：
  *
@@ -59,36 +59,6 @@ BEGIN_C_DECLS
 typedef struct _mledit_t {
   widget_t widget;
 
-  /**
-   * @property {bool_t} readonly
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 编辑器是否为只读。
-   */
-  bool_t readonly;
-  /**
-   * @property {uint8_t} top_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 上边距。
-   */
-  uint8_t top_margin;
-  /**
-   * @property {uint8_t} bottom_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 下边距。
-   */
-  uint8_t bottom_margin;
-  /**
-   * @property {uint8_t} left_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 左边距。
-   */
-  uint8_t left_margin;
-  /**
-   * @property {uint8_t} right_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 右边距。
-   */
-  uint8_t right_margin;
   /**
    * @property {char*} tips
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
@@ -109,13 +79,6 @@ typedef struct _mledit_t {
   char* keyboard;
 
   /**
-   * @property {bool_t} wrap_word
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 是否自动折行。
-   */
-  bool_t wrap_word;
-
-  /**
    * @property {uint32_t} max_lines
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * 最大行数。
@@ -123,17 +86,62 @@ typedef struct _mledit_t {
   uint32_t max_lines;
 
   /**
+   * @property {bool_t} wrap_word
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否自动折行。
+   */
+  bool_t wrap_word;
+  /**
    * @property {uint32_t} scroll_line
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * 鼠标一次滚动行数。
    */
   uint32_t scroll_line;
+  /**
+   * @property {bool_t} readonly
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 编辑器是否为只读。
+   */
+  bool_t readonly;
 
+  /**
+   * @property {bool_t} cancelable
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否支持撤销编辑。如果为TRUE，在失去焦点之前可以撤销所有修改(恢复获得焦点之前的内容)。
+   *
+   * > * 1.一般配合keyboard的"cancel"按钮使用。
+   * > * 2.为TRUE时，如果内容有变化，会设置编辑器的状态为changed，所以此时编辑器需要支持changed状态的style。
+   */
+  bool_t cancelable;
+  /**
+   * @property {bool_t} open_im_when_focused
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 获得焦点时打开输入法。
+   *
+   * > 主要用于没有指针设备的情况，否则每次切换焦点时都打开输入法。
+   */
+  bool_t open_im_when_focused;
+  /**
+   * @property {bool_t} close_im_when_blured
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 
+   * 是否在失去焦点时关闭输入法(默认是)。
+   *
+   */
+  bool_t close_im_when_blured;
   /*private*/
+  uint8_t margin;
+  uint8_t top_margin;
+  uint8_t left_margin;
+  uint8_t right_margin;
+  uint8_t bottom_margin;
+
   text_edit_t* model;
   uint32_t timer_id;
 
   wstr_t temp;
+  wstr_t saved_text;
+  uint64_t last_user_action_time;
 } mledit_t;
 
 /**
@@ -170,6 +178,17 @@ widget_t* mledit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t mledit_set_readonly(widget_t* widget, bool_t readonly);
+
+/**
+ * @method mledit_set_cancelable
+ * 设置编辑器是否为可撤销修改。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} cancelable 是否为可撤销修。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t mledit_set_cancelable(widget_t* widget, bool_t cancelable);
 
 /**
  * @method mledit_set_focus
@@ -259,6 +278,33 @@ ret_t mledit_set_cursor(widget_t* widget, uint32_t cursor);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t mledit_set_scroll_line(widget_t* widget, uint32_t scroll_line);
+
+/**
+ * @method mledit_set_open_im_when_focused
+ * 设置编辑器是否在获得焦点时打开输入法。
+ *
+ *> * 设置默认焦点时，打开窗口时不弹出软键盘。
+ *> * 用键盘切换焦点时，编辑器获得焦点时不弹出软键盘。
+ *
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} open_im_when_focused 是否在获得焦点时打开输入法。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t mledit_set_open_im_when_focused(widget_t* widget, bool_t open_im_when_focused);
+
+/**
+ * @method mledit_set_close_im_when_blured
+ * 设置编辑器是否在失去焦点时关闭输入法。
+ *
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} close_im_when_blured 是否是否在失去焦点时关闭输入法。在失去焦点时关闭输入法。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t mledit_set_close_im_when_blured(widget_t* widget, bool_t close_im_when_blured);
 
 /**
  * @method mledit_cast

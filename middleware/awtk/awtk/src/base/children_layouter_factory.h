@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  children layouter factory
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -94,8 +94,6 @@ children_layouter_t* children_layouter_factory_create_layouter(children_layouter
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t children_layouter_factory_destroy(children_layouter_factory_t* factory);
-
-children_layouter_t* children_layouter_create(const char* params);
 
 END_C_DECLS
 

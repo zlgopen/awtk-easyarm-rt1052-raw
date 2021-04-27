@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  fill on bgr888
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,8 +23,8 @@
 
 #include "base/bitmap.h"
 
-ret_t fill_bgr888_rect(bitmap_t* fb, rect_t* dst, color_t c);
+ret_t fill_bgr888_rect(bitmap_t* fb, const rect_t* dst, color_t c);
 
-ret_t clear_bgr888_rect(bitmap_t* fb, rect_t* dst, color_t c);
+ret_t clear_bgr888_rect(bitmap_t* fb, const rect_t* dst, color_t c);
 
 #endif /*TK_FILL_IMAGE_BGR888_H*/

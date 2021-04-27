@@ -1,0 +1,42 @@
+{
+  "name": "demoui",
+  "version": "1.0",
+  "assets": "res/assets",
+  "author": "xianjimli@hotmail.com",
+  "copyright": "Guangzhou ZHIYUAN Electronics Co.,Ltd.",
+  "themes":["default", "dark"],
+  "web": {
+    "app_type": "c",
+    "assets": "design",
+    "sources": [
+      "demos/assets.c",
+      "demos/demo_ui_app.c"
+    ],
+    "config": {
+      "fontScale": "0.8",
+      "defaultFont": "sans"
+    }
+  },
+  "android": {
+    "app_name": "org.zlgopen.demoui",
+    "sources": [
+      "demos/assets.c",
+      "demos/demo_ui_app.c",
+      "demos/vg_common.inc",
+      "res/assets.inc",
+      "res/assets/__assets_dark.inc",
+      "res/assets/__assets_default.inc"
+    ]
+  },
+  "ios": {
+    "app_name": "org.zlgopen.demoui",
+    "sources": [
+      "demos/assets.c",
+      "demos/demo_ui_app.c",
+      "demos/vg_common.inc",
+      "res/assets.inc",
+      "res/assets/__assets_dark.inc",
+      "res/assets/__assets_default.inc"
+    ]
+  }
+}

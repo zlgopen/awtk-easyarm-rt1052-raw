@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event_recorder_player
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -139,7 +139,9 @@ static ret_t event_recorder_player_record(event_recorder_player_t* p, event_t* e
       memcpy(&event, e, sizeof(wheel_event_t));
       break;
     }
-    default: { return RET_OK; }
+    default: {
+      return RET_OK;
+    }
   }
 
   ENSURE(fs_file_write(p->fp, &event, sizeof(log_event_t)) == sizeof(log_event_t));

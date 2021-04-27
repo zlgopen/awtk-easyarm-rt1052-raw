@@ -23,6 +23,7 @@ TEST(AppConf, basic) {
   ASSERT_STREQ(app_conf_get_str("str", NULL), "123");
 
   ASSERT_EQ(app_conf_deinit(), RET_OK);
+  OBJECT_UNREF(obj);
 }
 
 static ret_t on_prop_changed(void* ctx, event_t* e) {
@@ -53,6 +54,7 @@ TEST(AppConf, event) {
   ASSERT_EQ(count, 2);
 
   ASSERT_EQ(app_conf_deinit(), RET_OK);
+  OBJECT_UNREF(obj);
 }
 
 TEST(AppConf, init) {
@@ -87,6 +89,27 @@ TEST(AppConf, reload) {
 
   ASSERT_EQ(app_conf_reload(), RET_OK);
   ASSERT_EQ(app_conf_get_int("int", 0), 123);
+
+  ASSERT_EQ(app_conf_deinit(), RET_OK);
+}
+
+TEST(AppConf, reset) {
+  app_conf_init_json("conf_test");
+
+  ASSERT_STREQ(app_conf_get_str("name", NULL), "test");
+  ASSERT_EQ(app_conf_get_int("age", 0), 100);
+
+  ASSERT_EQ(app_conf_set_str("name", "awtk"), RET_OK);
+  ASSERT_EQ(app_conf_set_int("age", 200), RET_OK);
+
+  ASSERT_STREQ(app_conf_get_str("name", NULL), "awtk");
+  ASSERT_EQ(app_conf_get_int("age", 0), 200);
+
+  ASSERT_EQ(app_conf_save(), RET_OK);
+  ASSERT_EQ(app_conf_reset(), RET_OK);
+
+  ASSERT_STREQ(app_conf_get_str("name", NULL), "test");
+  ASSERT_EQ(app_conf_get_int("age", 0), 100);
 
   ASSERT_EQ(app_conf_deinit(), RET_OK);
 }

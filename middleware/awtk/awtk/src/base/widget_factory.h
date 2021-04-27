@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget factory
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -30,7 +30,7 @@ BEGIN_C_DECLS
 
 /**
  * @class widget_factory_t
- * @parent emitter
+ * @parent emitter_t
  * 控件工厂对象。
  *
  * 提供通过类型创建控件的能力。

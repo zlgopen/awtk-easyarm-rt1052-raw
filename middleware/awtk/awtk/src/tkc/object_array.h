@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  object array
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,20 +44,20 @@ typedef struct _object_array_t {
   object_t object;
 
   /**
-   * @property {uint32_t} props_size
+   * @property {uint32_t} size
    * @annotation ["readable", "scriptable"]
    * 属性个数。
    *
    */
-  uint32_t props_size;
+  uint32_t size;
 
   /**
-   * @property {uint32_t} props_capacity
+   * @property {uint32_t} capacity
    * @annotation ["readable"]
    * 属性数组的容量。
    *
    */
-  uint32_t props_capacity;
+  uint32_t capacity;
 
   /**
    * @property {value_t} props
@@ -119,6 +119,82 @@ ret_t object_array_unref(object_t* obj);
  *
  */
 ret_t object_array_clear_props(object_t* obj);
+
+/**
+ * @method object_array_insert
+ *
+ * 在指定位置插入一个元素。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj 对象。
+ * @param {uint32_t} index  位置。
+ * @param {const value_t*} v 值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ *
+ */
+ret_t object_array_insert(object_t* obj, uint32_t index, const value_t* v);
+
+/**
+ * @method object_array_push
+ *
+ * 追加一个元素。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj 对象。
+ * @param {const value_t*} v 值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ *
+ */
+ret_t object_array_push(object_t* obj, const value_t* v);
+
+/**
+ * @method object_array_remove
+ *
+ * 在指定位置删除一个元素。
+ *
+ * @annotation ["scriptable"]
+ * @param {object_t*} obj 对象。
+ * @param {uint32_t} index  位置。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ *
+ */
+ret_t object_array_remove(object_t* obj, uint32_t index);
+/**
+ * @method object_array_pop
+ *
+ * 弹出一个元素。
+ * @param {object_t*} obj 对象。
+ * @param {value_t*} v 返回值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ *
+ */
+ret_t object_array_pop(object_t* obj, value_t* v);
+
+/**
+ * @method object_array_get
+ * 获取指定序数的元素。
+ * @param {object_t*} obj 数组对象。
+ * @param {uint32_t} i 序数。
+ * @param {value_t*} v 返回的元素。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t object_array_get(object_t* obj, uint32_t i, value_t* v);
+
+/**
+ * @method object_array_set
+ * 设置指定序数的元素。
+ * @param {object_t*} obj 数组对象。
+ * @param {uint32_t} i 序数。
+ * @param {const value_t*} v 元素。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t object_array_set(object_t* obj, uint32_t i, const value_t* v);
 
 object_array_t* object_array_cast(object_t* obj);
 #define OBJECT_ARRAY(obj) object_array_cast(obj)

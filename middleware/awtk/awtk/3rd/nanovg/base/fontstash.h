@@ -257,11 +257,11 @@ int fons__tt_getGlyphKernAdvance(FONSttFontImpl *font, int glyph1, int glyph2)
 #else
 
 #define STB_TRUETYPE_IMPLEMENTATION
-static void* fons__tmpalloc(size_t size, void* up);
-static void fons__tmpfree(void* ptr, void* up);
-#define STBTT_malloc(x,u)    fons__tmpalloc(x,u)
-#define STBTT_free(x,u)      fons__tmpfree(x,u)
-#include "stb_truetype.h"
+// static void* fons__tmpalloc(size_t size, void* up);
+// static void fons__tmpfree(void* ptr, void* up);
+// #define STBTT_malloc(x,u)    fons__tmpalloc(x,u)
+// #define STBTT_free(x,u)      fons__tmpfree(x,u)
+#include "stb/stb_truetype.h"
 
 struct FONSttFontImpl {
 	stbtt_fontinfo font;
@@ -328,7 +328,7 @@ int fons__tt_getGlyphKernAdvance(FONSttFontImpl *font, int glyph1, int glyph2)
 #endif
 
 #ifndef FONS_SCRATCH_BUF_SIZE
-#	define FONS_SCRATCH_BUF_SIZE 96000
+#	define FONS_SCRATCH_BUF_SIZE 1
 #endif
 #ifndef FONS_HASH_LUT_SIZE
 #	define FONS_HASH_LUT_SIZE 256

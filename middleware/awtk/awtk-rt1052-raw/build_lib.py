@@ -3,8 +3,8 @@ import sys
 import os
 import shutil
 
-GCC_PREFIX = r""
-GCC_PATH = r""
+GCC_PREFIX = r"arm-none-eabi-"
+GCC_PATH = r"D:\eclipse_neon_2016q3_x86\GNU Tools ARM Embedded\2016q3\bin;"
 ARMCC_PATH = r"C:\Keil_v5\ARM\ARMCC\bin;"
 SCONS_RUN = r"scons.bat"
 

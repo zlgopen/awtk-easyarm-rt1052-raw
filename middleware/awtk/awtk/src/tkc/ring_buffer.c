@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  ring_buffer
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -242,7 +242,8 @@ ret_t ring_buffer_read_len(ring_buffer_t* ring_buffer, void* buff, uint32_t size
 ret_t ring_buffer_skip(ring_buffer_t* ring_buffer, uint32_t size) {
   return_value_if_fail(ring_buffer != NULL, RET_BAD_PARAMS);
 
-  if (ring_buffer_size(ring_buffer) >= size) {
+  if (ring_buffer_size(ring_buffer) >= size && size > 0) {
+    ring_buffer->full = FALSE;
     ring_buffer->r = (ring_buffer->r + size) % ring_buffer->capacity;
 
     return RET_OK;

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  pages
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,68 +22,60 @@
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "widgets/pages.h"
+#include "tkc/tokenizer.h"
 #include "base/widget_vtable.h"
 #include "base/image_manager.h"
+#include "default_focused_child.inc"
 
-static ret_t pages_on_target_destroy(void* ctx, event_t* evt) {
-  widget_t* view = WIDGET(ctx);
-
-  widget_set_prop_pointer(view, "save_target", NULL);
-
-  return RET_REMOVE;
+static bool_t pages_target_is_page(widget_t* target) {
+  return target->vt != NULL && tk_str_eq(target->vt->type, WIDGET_TYPE_PAGES);
 }
 
 static ret_t pages_save_target(widget_t* widget) {
-  widget_t* target = NULL;
   pages_t* pages = PAGES(widget);
-  widget_t* active_view = widget_get_child(widget, pages->active);
+  return_value_if_fail(pages != NULL, RET_BAD_PARAMS);
 
-  if (active_view != NULL) {
-    target = active_view;
-    while (target->target != NULL) {
-      target = target->target;
-    }
+  if (widget->children != NULL && widget->children->size > pages->active) {
+    widget_t* active_view = widget_get_child(widget, pages->active);
 
-    if (target != NULL) {
-      widget_set_prop_pointer(active_view, "save_target", target);
-      widget_on(target, EVT_DESTROY, pages_on_target_destroy, active_view);
+    if (active_view != NULL) {
+      default_focused_child_set_save_target(widget, active_view, pages_target_is_page);
     }
   }
+  return RET_OK;
+}
+
+static ret_t pages_on_idle_set_target_focused(const idle_info_t* idle) {
+  pages_t* pages = NULL;
+  return_value_if_fail(idle != NULL, RET_BAD_PARAMS);
+  pages = PAGES(idle->ctx);
+
+  default_focused_child_set_target_focused(&(pages->str_target), WIDGET(pages));
+
+  pages->focused_idle_id = TK_INVALID_ID;
 
   return RET_OK;
 }
 
 static ret_t pages_restore_target(widget_t* widget) {
   widget_t* target = NULL;
+  widget_t* active_view = NULL;
   pages_t* pages = PAGES(widget);
-  widget_t* active_view = widget_get_child(widget, pages->active);
+  return_value_if_fail(pages != NULL, RET_BAD_PARAMS);
+  active_view = widget_get_child(widget, pages->active);
 
   if (active_view != NULL) {
-    target = WIDGET(widget_get_prop_pointer(active_view, "save_target"));
+    target = default_focused_child_get_save_target(widget, active_view);
 
-    if (target == NULL || target->parent == NULL) {
-      const char* default_focused_child =
-          widget_get_prop_str(active_view, "default_focused_child", NULL);
-      if (default_focused_child != NULL) {
-        target = widget_lookup(active_view, default_focused_child, TRUE);
-        if (target == NULL) {
-          target = widget_lookup_by_type(active_view, default_focused_child, TRUE);
-        }
-      }
-    }
-
-    if (target == NULL || target->parent == NULL) {
+    if (target == NULL || target->parent == NULL || target == widget) {
       target = active_view;
     }
-    widget_off_by_func(target, EVT_DESTROY, pages_on_target_destroy, active_view);
-
-    log_debug("target=%s\n", target->vt->type);
-    while (target->parent != NULL) {
-      target->parent->target = target;
-      target->parent->key_target = target;
-      target = target->parent;
-      if (target == widget) {
-        break;
+    if (pages_target_is_page(target)) {
+      pages_restore_target(target);
+    } else {
+      default_focused_child_save_target_to_string(&(pages->str_target), target, widget);
+      if (pages->focused_idle_id == TK_INVALID_ID) {
+        pages->focused_idle_id = idle_add(pages_on_idle_set_target_focused, widget);
       }
     }
   }
@@ -96,15 +88,20 @@ ret_t pages_set_active(widget_t* widget, uint32_t index) {
   return_value_if_fail(pages != NULL, RET_BAD_PARAMS);
 
   if (pages->active != index && widget->children != NULL) {
-    event_t evt = event_init(EVT_VALUE_WILL_CHANGE, widget);
+    value_change_event_t evt;
 
     pages_save_target(widget);
-    widget_dispatch(widget, &evt);
-    pages->active = index;
-    evt = event_init(EVT_VALUE_CHANGED, widget);
-    widget_dispatch(widget, &evt);
+    value_change_event_init(&evt, EVT_VALUE_WILL_CHANGE, widget);
+    value_set_uint32(&(evt.old_value), pages->active);
+    value_set_uint32(&(evt.new_value), index);
+
+    if (widget_dispatch(widget, (event_t*)&evt) != RET_STOP) {
+      pages->active = index;
+      evt.e.type = EVT_VALUE_CHANGED;
+      widget_dispatch(widget, (event_t*)&evt);
+      widget_invalidate(widget, NULL);
+    }
     pages_restore_target(widget);
-    widget_invalidate(widget, NULL);
   } else {
     pages->active = index;
   }
@@ -140,7 +137,7 @@ static ret_t pages_on_paint_children(widget_t* widget, canvas_t* c) {
   pages_t* pages = PAGES(widget);
   return_value_if_fail(widget != NULL && pages != NULL, RET_BAD_PARAMS);
 
-  if (widget->children == NULL) {
+  if (widget->children == NULL || widget->children->size == 0) {
     return RET_OK;
   }
 
@@ -172,6 +169,46 @@ static ret_t pages_set_prop(widget_t* widget, const char* name, const value_t* v
   return RET_NOT_FOUND;
 }
 
+static ret_t pages_on_event(widget_t* widget, event_t* e) {
+  uint16_t type = e->type;
+  return_value_if_fail(widget != NULL && e != NULL, RET_BAD_PARAMS);
+  switch (type) {
+    case EVT_BLUR: {
+      pages_save_target(widget);
+      break;
+    }
+  }
+
+  return RET_OK;
+}
+
+static ret_t pages_on_idle_init_save_target(const idle_info_t* idle) {
+  pages_t* pages = NULL;
+  return_value_if_fail(idle != NULL, RET_BAD_PARAMS);
+  pages = PAGES(idle->ctx);
+
+  pages_restore_target(WIDGET(pages));
+  pages->init_idle_id = TK_INVALID_ID;
+
+  return RET_OK;
+}
+
+static ret_t pages_on_destroy(widget_t* widget) {
+  pages_t* pages = PAGES(widget);
+  return_value_if_fail(pages != NULL, RET_BAD_PARAMS);
+
+  if (pages->init_idle_id != TK_INVALID_ID) {
+    idle_remove(pages->init_idle_id);
+  }
+  if (pages->focused_idle_id != TK_INVALID_ID) {
+    idle_remove(pages->focused_idle_id);
+  }
+
+  str_reset(&(pages->str_target));
+
+  return RET_OK;
+}
+
 static const char* const s_pages_clone_properties[] = {WIDGET_PROP_VALUE, NULL};
 
 TK_DECL_VTABLE(pages) = {.size = sizeof(pages_t),
@@ -184,11 +221,18 @@ TK_DECL_VTABLE(pages) = {.size = sizeof(pages_t),
                          .on_paint_self = widget_on_paint_null,
                          .find_target = pages_find_target,
                          .on_paint_children = pages_on_paint_children,
+                         .on_event = pages_on_event,
                          .get_prop = pages_get_prop,
-                         .set_prop = pages_set_prop};
+                         .set_prop = pages_set_prop,
+                         .on_destroy = pages_on_destroy};
 
 widget_t* pages_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
-  return widget_create(parent, TK_REF_VTABLE(pages), x, y, w, h);
+  widget_t* widget = widget_create(parent, TK_REF_VTABLE(pages), x, y, w, h);
+  pages_t* pages = PAGES(widget);
+  return_value_if_fail(pages != NULL, NULL);
+  str_init(&(pages->str_target), DEFAULT_FOCUSED_CHILD_SAVE_TARGET_TAG_LENGT);
+  pages->init_idle_id = idle_add(pages_on_idle_init_save_target, widget);
+  return widget;
 }
 
 widget_t* pages_cast(widget_t* widget) {

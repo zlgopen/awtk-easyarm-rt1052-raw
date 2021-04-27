@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dynamic darray.
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -100,7 +100,7 @@ darray_t* darray_create(uint32_t capacity, tk_destroy_t destroy, tk_compare_t co
  * 初始化darray对象。
  *
  * @param {darray_t*} darray 数组对象。
- * @param {uint32_t*} capacity 数组的初始容量。
+ * @param {uint32_t} capacity 数组的初始容量。
  * @param {tk_destroy_t} destroy 元素销毁函数。
  * @param {tk_compare_t} compare 元素比较函数。
  *
@@ -127,9 +127,9 @@ void* darray_find(darray_t* darray, void* ctx);
  * @param {tk_compare_t} cmp 比较函数，为NULL则使用内置的比较函数。
  * @param {void*} ctx 比较函数的上下文。
  *
- * @return {int} 如果找到，返回满足条件的对象的位置，否则返回-1。
+ * @return {int32_t} 如果找到，返回满足条件的对象的位置，否则返回-1。
  */
-int darray_bsearch_index(darray_t* darray, tk_compare_t cmp, void* ctx);
+int32_t darray_bsearch_index(darray_t* darray, tk_compare_t cmp, void* ctx);
 
 /**
  * @method darray_bsearch
@@ -159,9 +159,9 @@ void* darray_get(darray_t* darray, uint32_t index);
  * @param {darray_t*} darray 数组对象。
  * @param {void*} ctx 比较函数的上下文。
  *
- * @return {int} 如果找到，返回满足条件的对象的位置，否则返回-1。
+ * @return {int32_t} 如果找到，返回满足条件的对象的位置，否则返回-1。
  */
-int darray_find_index(darray_t* darray, void* ctx);
+int32_t darray_find_index(darray_t* darray, void* ctx);
 
 /**
  * @method darray_remove
@@ -261,6 +261,17 @@ void* darray_head(darray_t* darray);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t darray_push(darray_t* darray, void* data);
+
+/**
+ * @method darray_insert
+ * 插入一个元素。
+ * @param {darray_t*} darray 数组对象。
+ * @param {uint32_t} index 位置序数。
+ * @param {void*} data 待插入的元素。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t darray_insert(darray_t* darray, uint32_t index, void* data);
 
 /**
  * @method darray_count

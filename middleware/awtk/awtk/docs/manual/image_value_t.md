@@ -24,7 +24,7 @@ image\_value\_t是[widget\_t](widget_t.md)的子类控件，widget\_t的函数�
 ```
 
 > 更多用法请参考：
-[image\_value](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/image_value.xml)
+[image\_value](https://github.com/zlgopen/awtk/blob/master/design/default/ui/image_value.xml)
 
 在c代码中使用函数image\_value\_create创建图片值控件。如：
 
@@ -57,12 +57,12 @@ image_value_set_value(image_value, 100);
 
 | 属性名称 | 类型 | 说明 | 
 | -------- | ----- | ------------ | 
-| <a href="#image_value_t_click_add_delta">click\_add\_delta</a> | float\_t | 点击时加上一个增量。 |
+| <a href="#image_value_t_click_add_delta">click\_add\_delta</a> | double | 点击时加上一个增量。 |
 | <a href="#image_value_t_format">format</a> | char* | 数值到字符串转换时的格式，缺省为"%d"。 |
 | <a href="#image_value_t_image">image</a> | char* | 图片名称的前缀。 |
-| <a href="#image_value_t_max">max</a> | float\_t | 最大值(如果设置了click\_add\_delta，到达最大值后回到最小值)。 |
-| <a href="#image_value_t_min">min</a> | float\_t | 最小值(如果设置了click\_add\_delta，到达最小值后回到最大值)。 |
-| <a href="#image_value_t_value">value</a> | float\_t | 值。 |
+| <a href="#image_value_t_max">max</a> | double | 最大值(如果设置了click\_add\_delta，到达最大值后回到最小值)。 |
+| <a href="#image_value_t_min">min</a> | double | 最小值(如果设置了click\_add\_delta，到达最小值后回到最大值)。 |
+| <a href="#image_value_t_value">value</a> | double | 值。 |
 ### 事件
 <p id="image_value_t_events">
 
@@ -122,7 +122,7 @@ widget_t* image_value_create (widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
 * 函数原型：
 
 ```
-ret_t image_value_set_click_add_delta (widget_t* widget, float_t delta);
+ret_t image_value_set_click_add_delta (widget_t* widget, double delta);
 ```
 
 * 参数说明：
@@ -131,7 +131,7 @@ ret_t image_value_set_click_add_delta (widget_t* widget, float_t delta);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | image\_value对象。 |
-| delta | float\_t | 增量。 |
+| delta | double | 增量。 |
 #### image\_value\_set\_format 函数
 -----------------------
 
@@ -182,7 +182,7 @@ ret_t image_value_set_image (widget_t* widget, const char* image);
 * 函数原型：
 
 ```
-ret_t image_value_set_max (widget_t* widget, float_t max);
+ret_t image_value_set_max (widget_t* widget, double max);
 ```
 
 * 参数说明：
@@ -191,7 +191,7 @@ ret_t image_value_set_max (widget_t* widget, float_t max);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | image\_max对象。 |
-| max | float\_t | 最大值。 |
+| max | double | 最大值。 |
 #### image\_value\_set\_min 函数
 -----------------------
 
@@ -202,7 +202,7 @@ ret_t image_value_set_max (widget_t* widget, float_t max);
 * 函数原型：
 
 ```
-ret_t image_value_set_min (widget_t* widget, float_t min);
+ret_t image_value_set_min (widget_t* widget, double min);
 ```
 
 * 参数说明：
@@ -211,7 +211,7 @@ ret_t image_value_set_min (widget_t* widget, float_t min);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | image\_min对象。 |
-| min | float\_t | 最小值。 |
+| min | double | 最小值。 |
 #### image\_value\_set\_value 函数
 -----------------------
 
@@ -222,7 +222,7 @@ ret_t image_value_set_min (widget_t* widget, float_t min);
 * 函数原型：
 
 ```
-ret_t image_value_set_value (widget_t* widget, float_t value);
+ret_t image_value_set_value (widget_t* widget, double value);
 ```
 
 * 参数说明：
@@ -231,12 +231,12 @@ ret_t image_value_set_value (widget_t* widget, float_t value);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | image\_value对象。 |
-| value | float\_t | 值。 |
+| value | double | 值。 |
 #### click\_add\_delta 属性
 -----------------------
 > <p id="image_value_t_click_add_delta">点击时加上一个增量。
 
-* 类型：float\_t
+* 类型：double
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -284,7 +284,7 @@ ret_t image_value_set_value (widget_t* widget, float_t value);
 -----------------------
 > <p id="image_value_t_max">最大值(如果设置了click\_add\_delta，到达最大值后回到最小值)。
 
-* 类型：float\_t
+* 类型：double
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -300,7 +300,7 @@ ret_t image_value_set_value (widget_t* widget, float_t value);
 -----------------------
 > <p id="image_value_t_min">最小值(如果设置了click\_add\_delta，到达最小值后回到最大值)。
 
-* 类型：float\_t
+* 类型：double
 
 | 特性 | 是否支持 |
 | -------- | ----- |
@@ -316,7 +316,7 @@ ret_t image_value_set_value (widget_t* widget, float_t value);
 -----------------------
 > <p id="image_value_t_value">值。
 
-* 类型：float\_t
+* 类型：double
 
 | 特性 | 是否支持 |
 | -------- | ----- |

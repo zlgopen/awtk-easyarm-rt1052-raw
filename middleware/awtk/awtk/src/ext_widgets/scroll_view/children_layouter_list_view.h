@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  children layouter list view
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,6 +44,7 @@ typedef struct _children_layouter_list_view_t {
   uint16_t cols;
   uint16_t item_height;
   uint16_t default_item_height;
+  uint8_t hlayouter : 1;
   uint8_t keep_invisible : 1;
   uint8_t keep_disable : 1;
 } children_layouter_list_view_t;

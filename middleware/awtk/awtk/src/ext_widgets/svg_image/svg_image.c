@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  svg_image
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -36,7 +36,8 @@ static ret_t svg_image_load_bsvg(widget_t* widget) {
     svg_image->bsvg_asset = NULL;
   }
 
-  svg_image->bsvg_asset = widget_load_asset(widget, ASSET_TYPE_IMAGE, image_base->image);
+  svg_image->bsvg_asset =
+      widget_load_asset_ex(widget, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_BSVG, image_base->image);
   return_value_if_fail(svg_image->bsvg_asset != NULL, RET_NOT_FOUND);
 
   if (svg_image->bsvg_asset->subtype != ASSET_TYPE_IMAGE_BSVG) {

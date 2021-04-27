@@ -1,18 +1,70 @@
 ﻿#include "nanovg.h"
 #include "tkc/mem.h"
 #include "tkc/utf8.h"
+#include "base/events.h"
 #include "base/vgcanvas.h"
 #include "base/system_info.h"
 #include "base/image_manager.h"
 #include "base/font_manager.h"
 #include "base/assets_manager.h"
 
+static int vgcanvas_nanovg_ensure_image(vgcanvas_nanovg_t* canvas, bitmap_t* img);
+
+static ret_t vgcanvas_nanovg_destroy(vgcanvas_t* vgcanvas);
+static ret_t vgcanvas_nanovg_end_frame(vgcanvas_t* vgcanvas);
 static ret_t vgcanvas_nanovg_set_antialias(vgcanvas_t* vgcanvas, bool_t value);
+static ret_t vgcanvas_nanovg_destroy_fbo(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo);
+static ret_t vgcanvas_nanovg_reinit(vgcanvas_t* vg, uint32_t w, uint32_t h, uint32_t stride,
+                                    bitmap_format_t format, void* data);
+static ret_t vgcanvas_nanovg_begin_frame(vgcanvas_t* vgcanvas, const rect_t* dirty_rect);
+static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h,
+                                        bool_t custom_draw_model, framebuffer_object_t* fbo);
+static ret_t vgcanvas_nanovg_bind_fbo(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo);
+static ret_t vgcanvas_nanovg_unbind_fbo(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo);
+static ret_t vgcanvas_nanovg_fbo_to_bitmap(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo,
+                                           bitmap_t* img, const rect_t* r);
+
+static ret_t vgcanvas_nanovg_on_asset_events(void* ctx, event_t* e) {
+  NVGcontext* vg = ((vgcanvas_nanovg_t*)ctx)->vg;
+  assets_event_t* evt = (assets_event_t*)e;
+
+  if (evt->type == ASSET_TYPE_FONT) {
+    asset_info_t* info = evt->asset_info;
+    if (e->type == EVT_ASSET_MANAGER_CLEAR_CACHE) {
+      nvgDeleteFontByName(vg, NULL);
+    } else if (e->type == EVT_ASSET_MANAGER_UNLOAD_ASSET) {
+      nvgDeleteFontByName(vg, info->name);
+    }
+  }
+
+  return RET_OK;
+}
+
+static ret_t vgcanvas_nanovg_init(vgcanvas_t* vgcanvas) {
+  emitter_t* emitter = EMITTER(assets_manager());
+  emitter_on(emitter, EVT_ASSET_MANAGER_CLEAR_CACHE, vgcanvas_nanovg_on_asset_events, vgcanvas);
+  emitter_on(emitter, EVT_ASSET_MANAGER_UNLOAD_ASSET, vgcanvas_nanovg_on_asset_events, vgcanvas);
+
+  return RET_OK;
+}
+
+static ret_t vgcanvas_nanovg_deinit(vgcanvas_t* vgcanvas) {
+  emitter_t* emitter = EMITTER(assets_manager());
+  emitter_off_by_ctx(emitter, vgcanvas);
+
+  return RET_OK;
+}
 
 static ret_t vgcanvas_nanovg_reset(vgcanvas_t* vgcanvas) {
   /*TODO: unload fonts*/
   NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
   nvgDeleteFontByName(vg, NULL);
+  return RET_OK;
+}
+
+static ret_t vgcanvas_nanovg_reset_curr_state(vgcanvas_t* vgcanvas) {
+  NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
+  nvgReset(vg);
   return RET_OK;
 }
 
@@ -243,10 +295,21 @@ static ret_t vgcanvas_nanovg_clip_rect(vgcanvas_t* vgcanvas, float_t x, float_t 
   /* 判断如果 vg 没有旋转和缩放的坐标系，直接使用 rect_intersect 函数做交集提高效率 */
   if (vgcanvas_nanovg_is_system_orientation_0_or_180(xform) ||
       vgcanvas_nanovg_is_system_orientation_90_or_270(xform)) {
+    bool_t is_int = tk_abs(vgcanvas->ratio - (uint32_t)vgcanvas->ratio) < 0.001f;
     r1 = rect_init(x, y, w, h);
     cilp_rect = rect_intersect((const rect_t*)&vgcanvas->dirty_rect, (const rect_t*)&r1);
-    nvgScissor(vg, (float_t)cilp_rect.x, (float_t)cilp_rect.y, (float_t)cilp_rect.w,
-               (float_t)cilp_rect.h);
+    if (is_int) {
+      x = cilp_rect.x;
+      y = cilp_rect.y;
+      w = cilp_rect.w;
+      h = cilp_rect.h;
+    } else {
+      x = ((uint32_t)(cilp_rect.x * vgcanvas->ratio)) / vgcanvas->ratio;
+      y = ((uint32_t)(cilp_rect.y * vgcanvas->ratio)) / vgcanvas->ratio;
+      w = ((uint32_t)(cilp_rect.w * vgcanvas->ratio)) / vgcanvas->ratio;
+      h = ((uint32_t)(cilp_rect.h * vgcanvas->ratio)) / vgcanvas->ratio;
+    }
+    nvgScissor(vg, x, y, w, h);
   } else {
     nvgIntersectScissorForOtherRect(
         vg, x, y, w, h, (float_t)vgcanvas->dirty_rect.x, (float_t)vgcanvas->dirty_rect.y,
@@ -333,14 +396,15 @@ static ret_t vgcanvas_nanovg_set_font(vgcanvas_t* vgcanvas, const char* name) {
 
     if (r != NULL && r->subtype == ASSET_TYPE_FONT_TTF) {
       font_id = nvgCreateFontMem(vg, name, (unsigned char*)r->data, r->size, 0);
+      if (font_id < 0) {
+        log_warn("load font %s failed\n", name);
+      }
     }
 
     if (r != NULL) {
       assets_manager_unref(am, r);
     }
   }
-
-  return_value_if_fail(font_id >= 0, RET_FAIL);
 
   canvas->font_id = font_id;
   nvgFontFaceId(vg, font_id);
@@ -398,24 +462,24 @@ static float_t vgcanvas_nanovg_measure_text(vgcanvas_t* vgcanvas, const char* te
 }
 
 #ifdef WITH_NANOVG_GPU
-static ret_t vgcanvas_nanovg_get_text_metrics(vgcanvas_t* vgcanvas, float_t* ascent, 
-                                      float_t* descent, float_t* line_hight) {
+static ret_t vgcanvas_nanovg_get_text_metrics(vgcanvas_t* vgcanvas, float_t* ascent,
+                                              float_t* descent, float_t* line_hight) {
   NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
 
   float a = 0;
-  float  d = 0;
-  float  h = 0;
+  float d = 0;
+  float h = 0;
 
   nvgTextMetrics(vg, &a, &d, &h);
-  if(ascent != NULL) {
+  if (ascent != NULL) {
     *ascent = a;
   }
 
-  if(descent != NULL) {
+  if (descent != NULL) {
     *descent = d;
   }
 
-  if(line_hight != NULL) {
+  if (line_hight != NULL) {
     *line_hight = h;
   }
 
@@ -423,7 +487,7 @@ static ret_t vgcanvas_nanovg_get_text_metrics(vgcanvas_t* vgcanvas, float_t* asc
 }
 #else
 #define vgcanvas_nanovg_get_text_metrics NULL
-#endif/*WITH_NANOVG_GPU*/
+#endif /*WITH_NANOVG_GPU*/
 
 static ret_t vgcanvas_nanovg_draw_image(vgcanvas_t* vgcanvas, bitmap_t* img, float_t sx, float_t sy,
                                         float_t sw, float_t sh, float_t dx, float_t dy, float_t dw,
@@ -553,6 +617,8 @@ static ret_t vgcanvas_nanovg_set_line_cap(vgcanvas_t* vgcanvas, const char* valu
     line_cap = NVG_ROUND;
   } else if (*value == 's') {
     line_cap = NVG_SQUARE;
+  } else if (*value == 'b') {
+    line_cap = NVG_BUTT;
   }
 
   nvgLineCap(vg, line_cap);
@@ -599,10 +665,19 @@ static ret_t vgcanvas_nanovg_restore(vgcanvas_t* vgcanvas) {
   return RET_OK;
 }
 
+static ret_t vgcanvas_nanovg_clear_cache(vgcanvas_t* vgcanvas) {
+  NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
+
+  nvgClearCache(vg);
+  nvgDeleteFontByName(vg, NULL);
+  return RET_OK;
+}
+
 static const vgcanvas_vtable_t vt = {
     .reinit = vgcanvas_nanovg_reinit,
     .begin_frame = vgcanvas_nanovg_begin_frame,
     .reset = vgcanvas_nanovg_reset,
+    .reset_curr_state = vgcanvas_nanovg_reset_curr_state,
     .flush = vgcanvas_nanovg_flush,
     .clear_rect = vgcanvas_nanovg_clear_rect,
     .begin_path = vgcanvas_nanovg_begin_path,
@@ -655,4 +730,5 @@ static const vgcanvas_vtable_t vt = {
     .destroy_fbo = vgcanvas_nanovg_destroy_fbo,
     .unbind_fbo = vgcanvas_nanovg_unbind_fbo,
     .fbo_to_bitmap = vgcanvas_nanovg_fbo_to_bitmap,
+    .clear_cache = vgcanvas_nanovg_clear_cache,
     .destroy = vgcanvas_nanovg_destroy};

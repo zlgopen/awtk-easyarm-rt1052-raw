@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  inject error into stream
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,7 +25,7 @@
 static ret_t tk_iostream_noisy_on_destroy(object_t* obj) {
   tk_iostream_noisy_t* iostream_noisy = TK_IOSTREAM_NOISY(obj);
 
-  OBJECT_UNREF(iostream_noisy->istream);
+  OBJECT_UNREF(iostream_noisy->ostream);
   OBJECT_UNREF(iostream_noisy->real_iostream);
 
   return RET_OK;

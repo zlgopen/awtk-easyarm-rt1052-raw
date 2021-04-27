@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  system_bar
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,7 +29,7 @@
 #include "widgets/system_bar.h"
 #include "base/window_manager.h"
 
-static const char* s_system_bar_properties[] = {WIDGET_PROP_THEME, NULL};
+static const char* s_system_bar_properties[] = {NULL};
 
 static ret_t system_bar_on_request_close_window(void* ctx, event_t* e) {
   widget_t* widget = WIDGET(ctx);
@@ -98,10 +98,12 @@ static ret_t system_bar_on_top_window_changed(void* ctx, event_t* e) {
   window_event_t* evt = (window_event_t*)e;
   widget_t* top_window = evt->window;
 
-  widget_off_by_ctx(top_window, ctx);
-  system_bar_update_title(widget, top_window);
-  system_bar_update_close(widget, top_window);
-  widget_on(top_window, EVT_PROP_CHANGED, system_bar_on_top_window_prop_changed, ctx);
+  if (top_window != NULL) {
+    widget_off_by_ctx(top_window, ctx);
+    system_bar_update_title(widget, top_window);
+    system_bar_update_close(widget, top_window);
+    widget_on(top_window, EVT_PROP_CHANGED, system_bar_on_top_window_prop_changed, ctx);
+  }
 
   return RET_OK;
 }

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  json 
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +22,8 @@
 #include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "conf_io/conf_json.h"
+#include "tkc/data_reader_factory.h"
+#include "tkc/data_writer_factory.h"
 
 typedef enum _parser_state_t {
   STATE_NONE = 0,
@@ -150,6 +152,12 @@ static ret_t conf_json_parse_array(json_parser_t* parser) {
   conf_node_t* node = NULL;
 
   parser->cursor++;
+  conf_json_skip_spaces(parser);
+  c = parser->data[parser->cursor];
+  if (c == ']') {
+    parser->cursor++;
+    return RET_OK;
+  }
 
   while (parser->cursor < parser->size) {
     tk_snprintf(name, TK_NAME_LEN, "%u", i++);
@@ -306,8 +314,14 @@ static ret_t conf_json_save_node_value_simple(conf_node_t* node, str_t* str, uin
       while (*s) {
         if (*s == '\"') {
           return_value_if_fail(str_append_char(str, '\\') == RET_OK, RET_OOM);
+          return_value_if_fail(str_append_char(str, *s) == RET_OK, RET_OOM);
+        } else if (*s == '\r') {
+          return_value_if_fail(str_append(str, "\\r") == RET_OK, RET_OOM);
+        } else if (*s == '\n') {
+          return_value_if_fail(str_append(str, "\\n") == RET_OK, RET_OOM);
+        } else {
+          return_value_if_fail(str_append_char(str, *s) == RET_OK, RET_OOM);
         }
-        return_value_if_fail(str_append_char(str, *s) == RET_OK, RET_OOM);
         s++;
       }
     }
@@ -457,4 +471,21 @@ error:
 object_t* conf_json_load(const char* url, bool_t create_if_not_exist) {
   return conf_obj_create(conf_doc_save_json_writer, conf_doc_load_json_reader, url,
                          create_if_not_exist);
+}
+
+ret_t conf_json_save_as(object_t* obj, const char* url) {
+  data_writer_t* writer = NULL;
+  conf_doc_t* doc = conf_obj_get_doc(obj);
+  return_value_if_fail(doc != NULL && url != NULL, RET_BAD_PARAMS);
+  writer = data_writer_factory_create_writer(data_writer_factory(), url);
+  return_value_if_fail(writer != NULL, RET_BAD_PARAMS);
+
+  conf_doc_save_json_writer(doc, writer);
+  data_writer_destroy(writer);
+
+  return RET_OK;
+}
+
+object_t* conf_json_create(void) {
+  return conf_json_load(NULL, TRUE);
 }

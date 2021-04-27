@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  edit
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -65,7 +65,7 @@ typedef bool_t (*edit_is_valid_char_t)(widget_t* widget, wchar_t c);
  * > XXX：需要在min/max/step之前设置input\_type。
  *
  * >更多用法请参考：
- * [edit.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/edit.xml)
+ * [edit.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/edit.xml)
  *
  * 在c代码中使用函数edit\_create创建编辑器控件。如：
  *
@@ -93,70 +93,11 @@ typedef bool_t (*edit_is_valid_char_t)(widget_t* widget, wchar_t c);
  *
  * > 更多用法请参考：
  * [theme
- *default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L104)
+ *default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L104)
  *
  */
 typedef struct _edit_t {
   widget_t widget;
-
-  /**
-   * @property {bool_t} readonly
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 编辑器是否为只读。
-   */
-  bool_t readonly;
-  /**
-   * @property {bool_t} password_visible
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 密码是否可见。
-   */
-  bool_t password_visible;
-  /**
-   * @property {bool_t} auto_fix
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 输入无效时，是否自动改正。
-   */
-  bool_t auto_fix;
-  /**
-   * @property {bool_t} select_none_when_focused
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 获得焦点时不选中文本。
-   *
-   * > 主要用于没有指针设备的情况，否则软键盘无法取消选中文本。
-   */
-  bool_t select_none_when_focused;
-  /**
-   * @property {bool_t} open_im_when_focused
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 获得焦点时打开输入法。
-   *
-   * > 主要用于没有指针设备的情况，否则每次切换焦点时都打开输入法。
-   */
-  bool_t open_im_when_focused;
-  /**
-   * @property {uint8_t} top_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 上边距。
-   */
-  uint8_t top_margin;
-  /**
-   * @property {uint8_t} bottom_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 下边距。
-   */
-  uint8_t bottom_margin;
-  /**
-   * @property {uint8_t} left_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 左边距。
-   */
-  uint8_t left_margin;
-  /**
-   * @property {uint8_t} right_margin
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 右边距。
-   */
-  uint8_t right_margin;
 
   /**
    * @property {char*} tips
@@ -193,13 +134,6 @@ typedef struct _edit_t {
   char* keyboard;
 
   /**
-   * @property {input_type_t} input_type
-   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * 输入类型。
-   */
-  input_type_t input_type;
-
-  /**
    * @property {double} min
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
    * 最小值或最小长度。
@@ -221,17 +155,82 @@ typedef struct _edit_t {
    */
   double step;
 
+  /**
+   * @property {input_type_t} input_type
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 输入类型。
+   */
+  input_type_t input_type;
+  /**
+   * @property {bool_t} readonly
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 编辑器是否为只读。
+   */
+  bool_t readonly;
+  /**
+   * @property {bool_t} password_visible
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 密码是否可见。
+   */
+  bool_t password_visible;
+  /**
+   * @property {bool_t} auto_fix
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 输入无效时，是否自动改正。
+   */
+  bool_t auto_fix;
+  /**
+   * @property {bool_t} select_none_when_focused
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 获得焦点时不选中文本。
+   *
+   * > 主要用于没有指针设备的情况，否则软键盘无法取消选中文本。
+   */
+  bool_t select_none_when_focused;
+  /**
+   * @property {bool_t} open_im_when_focused
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 获得焦点时打开输入法。
+   *
+   * > 主要用于没有指针设备的情况，否则每次切换焦点时都打开输入法。
+   */
+  bool_t open_im_when_focused;
+  /**
+   * @property {bool_t} close_im_when_blured
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 
+   * 是否在失去焦点时关闭输入法(默认是)。
+   *
+   */
+  bool_t close_im_when_blured;
+  /**
+   * @property {bool_t} cancelable
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否支持撤销编辑。如果为TRUE，在失去焦点之前可以撤销所有修改(恢复获得焦点之前的内容)。
+   *
+   * > * 1.一般配合keyboard的"cancel"按钮使用。
+   * > * 2.为TRUE时，如果内容有变化，会设置编辑器的状态为changed，所以此时编辑器需要支持changed状态的style。
+   */
+  bool_t cancelable;
+
   /*private*/
+  uint8_t margin;
+  uint8_t top_margin;
+  uint8_t bottom_margin;
+  uint8_t left_margin;
+  uint8_t right_margin;
+
   uint32_t idle_id;
   uint32_t timer_id;
   text_edit_t* model;
-
+  wstr_t saved_text;
   edit_inc_value_t inc_value;
   edit_dec_value_t dec_value;
   edit_fix_value_t fix_value;
   edit_pre_input_t pre_input;
   edit_is_valid_char_t is_valid_char;
   edit_is_valid_value_t is_valid_value;
+  uint64_t last_user_action_time;
 } edit_t;
 
 /**
@@ -360,6 +359,17 @@ ret_t edit_set_float_limit(widget_t* widget, double min, double max, double step
 ret_t edit_set_readonly(widget_t* widget, bool_t readonly);
 
 /**
+ * @method edit_set_cancelable
+ * 设置编辑器是否为可撤销修改。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} cancelable 是否为可撤销修。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_cancelable(widget_t* widget, bool_t cancelable);
+
+/**
  * @method edit_set_auto_fix
  * 设置编辑器是否为自动改正。
  * @annotation ["scriptable"]
@@ -384,6 +394,10 @@ ret_t edit_set_select_none_when_focused(widget_t* widget, bool_t select_none_whe
 /**
  * @method edit_set_open_im_when_focused
  * 设置编辑器是否在获得焦点时打开输入法。
+ *
+ *> * 设置默认焦点时，打开窗口时不弹出软键盘。
+ *> * 用键盘切换焦点时，编辑器获得焦点时不弹出软键盘。
+ *
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
  * @param {bool_t} open_im_when_focused 是否在获得焦点时打开输入法。
@@ -391,6 +405,18 @@ ret_t edit_set_select_none_when_focused(widget_t* widget, bool_t select_none_whe
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t edit_set_open_im_when_focused(widget_t* widget, bool_t open_im_when_focused);
+
+/**
+ * @method edit_set_close_im_when_blured
+ * 设置编辑器是否在失去焦点时关闭输入法。
+ *
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget widget对象。
+ * @param {bool_t} close_im_when_blured 是否是否在失去焦点时关闭输入法。在失去焦点时关闭输入法。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t edit_set_close_im_when_blured(widget_t* widget, bool_t close_im_when_blured);
 
 /**
  * @method edit_set_input_type

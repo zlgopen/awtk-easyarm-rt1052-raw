@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  lcd interface
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,11 +19,13 @@
  *
  */
 
+#include "tkc/mem.h"
+#include "tkc/utils.h"
 #include "base/lcd.h"
 #include "tkc/time_now.h"
 #include "base/system_info.h"
 
-ret_t lcd_begin_frame(lcd_t* lcd, rect_t* dirty_rect, lcd_draw_mode_t draw_mode) {
+ret_t lcd_begin_frame(lcd_t* lcd, const rect_t* dirty_rect, lcd_draw_mode_t draw_mode) {
   return_value_if_fail(lcd != NULL && lcd->begin_frame != NULL, RET_BAD_PARAMS);
 
   lcd->draw_mode = draw_mode;
@@ -40,7 +42,7 @@ ret_t lcd_begin_frame(lcd_t* lcd, rect_t* dirty_rect, lcd_draw_mode_t draw_mode)
   return lcd->begin_frame(lcd, dirty_rect);
 }
 
-ret_t lcd_set_clip_rect(lcd_t* lcd, rect_t* rect) {
+ret_t lcd_set_clip_rect(lcd_t* lcd, const rect_t* rect) {
   return_value_if_fail(lcd != NULL && lcd->set_clip_rect != NULL, RET_BAD_PARAMS);
 
   return lcd->set_clip_rect(lcd, rect);
@@ -99,7 +101,7 @@ ret_t lcd_set_fill_color(lcd_t* lcd, color_t color) {
 ret_t lcd_set_font_name(lcd_t* lcd, const char* name) {
   return_value_if_fail(lcd != NULL, RET_BAD_PARAMS);
 
-  lcd->font_name = name;
+  lcd->font_name = tk_str_copy(lcd->font_name, name);
   if (lcd->set_font_name != NULL) {
     lcd->set_font_name(lcd, name);
   }
@@ -147,6 +149,15 @@ ret_t lcd_fill_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
   return lcd->fill_rect(lcd, x, y, w, h);
 }
 
+ret_t lcd_clear_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
+  return_value_if_fail(lcd != NULL && lcd->clear_rect != NULL, RET_BAD_PARAMS);
+  if (w == 0 || h == 0) {
+    return RET_BAD_PARAMS;
+  }
+
+  return lcd->clear_rect(lcd, x, y, w, h);
+}
+
 ret_t lcd_stroke_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
   return_value_if_fail(lcd != NULL && lcd->stroke_rect != NULL, RET_BAD_PARAMS);
 
@@ -174,7 +185,7 @@ color_t lcd_get_point_color(lcd_t* lcd, xy_t x, xy_t y) {
   }
 }
 
-ret_t lcd_draw_image(lcd_t* lcd, bitmap_t* img, rect_t* src, rect_t* dst) {
+ret_t lcd_draw_image(lcd_t* lcd, bitmap_t* img, const rect_t* src, const rect_t* dst) {
   return_value_if_fail(lcd != NULL && lcd->draw_image != NULL && src != NULL && dst != NULL,
                        RET_BAD_PARAMS);
 
@@ -191,7 +202,7 @@ ret_t lcd_draw_image_matrix(lcd_t* lcd, draw_image_info_t* info) {
   return RET_NOT_IMPL;
 }
 
-ret_t lcd_draw_glyph(lcd_t* lcd, glyph_t* glyph, rect_t* src, xy_t x, xy_t y) {
+ret_t lcd_draw_glyph(lcd_t* lcd, glyph_t* glyph, const rect_t* src, xy_t x, xy_t y) {
   return_value_if_fail(lcd != NULL && lcd->draw_glyph != NULL && glyph != NULL && src != NULL,
                        RET_BAD_PARAMS);
 
@@ -263,7 +274,7 @@ bool_t lcd_is_swappable(lcd_t* lcd) {
 
 ret_t lcd_destroy(lcd_t* lcd) {
   return_value_if_fail(lcd != NULL && lcd->destroy != NULL, RET_BAD_PARAMS);
-
+  TKMEM_FREE(lcd->font_name);
   return lcd->destroy(lcd);
 }
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  bitmap interface
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -34,6 +34,13 @@ bitmap_t* bitmap_create(void) {
   return bitmap;
 }
 
+ret_t bitmap_destroy_with_self(bitmap_t* bitmap) {
+  return_value_if_fail(bitmap != NULL, RET_BAD_PARAMS);
+  bitmap->should_free_handle = TRUE;
+
+  return bitmap_destroy(bitmap);
+}
+
 ret_t bitmap_destroy(bitmap_t* bitmap) {
   return_value_if_fail(bitmap != NULL, RET_BAD_PARAMS);
 
@@ -50,15 +57,19 @@ ret_t bitmap_destroy(bitmap_t* bitmap) {
       graphic_buffer_destroy(bitmap->buffer);
     }
 
-    if (bitmap->gif_delays) {
+    if (bitmap->gif_delays != NULL) {
       TKMEM_FREE(bitmap->gif_delays);
       bitmap->gif_delays = NULL;
     }
+
+    TKMEM_FREE(bitmap->data_free_ptr);
   }
 
   if (bitmap->should_free_handle) {
     memset(bitmap, 0x00, sizeof(bitmap_t));
     TKMEM_FREE(bitmap);
+  } else {
+    memset(bitmap, 0x00, sizeof(bitmap_t));
   }
 
   return RET_OK;
@@ -458,6 +469,7 @@ ret_t bitmap_init(bitmap_t* bitmap, uint32_t w, uint32_t h, bitmap_format_t form
     bitmap_alloc_data(bitmap);
   } else {
     bitmap->buffer = GRAPHIC_BUFFER_CREATE_WITH_DATA(data, w, h, format);
+    bitmap->should_free_data = TRUE;
   }
 
   return bitmap->buffer != NULL ? RET_OK : RET_OOM;
@@ -561,13 +573,16 @@ bitmap_t* bitmap_clone(bitmap_t* bitmap) {
   return b;
 }
 
-#if defined(WITH_STB_IMAGE) && defined(HAS_STDIO)
-
+#if defined(WITH_STB_IMAGE)
+#define STB_IMAGE_STATIC 1
+#define STBI_WRITE_NO_STDIO 1
+#define STB_IMAGE_WRITE_STATIC 1
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_FREE TKMEM_FREE
 #define STBI_MALLOC TKMEM_ALLOC
 #define STBI_REALLOC(p, s) TKMEM_REALLOC(p, s)
 
+#include "tkc/fs.h"
 #include "stb/stb_image_write.h"
 
 bitmap_t* bitmap_rgba8888_from_bitmap(bitmap_t* bitmap) {
@@ -594,11 +609,28 @@ bitmap_t* bitmap_rgba8888_from_bitmap(bitmap_t* bitmap) {
 }
 
 static bool_t bitmap_rgba8888_save_png(bitmap_t* bitmap, const char* filename) {
+  int32_t len = 0;
   bitmap_t* t = bitmap;
-  uint32_t* tdata = NULL;
-  tdata = (uint32_t*)bitmap_lock_buffer_for_write(t);
-  stbi_write_png(filename, t->w, t->h, 4, tdata, t->w * 4);
+  uint8_t* tdata = NULL;
+  unsigned char* png_data = NULL;
+  tdata = bitmap_lock_buffer_for_write(t);
+  png_data = stbi_write_png_to_mem(tdata, t->w * 4, t->w, t->h, 4, &len);
   bitmap_unlock_buffer(t);
+
+  if (png_data == NULL) {
+    return_value_if_fail(png_data != NULL, FALSE);
+  } else {
+    fs_t* fs = os_fs();
+    fs_file_t* png_file = fs_open_file(fs, filename, "wb");
+    if (png_file != NULL) {
+      fs_file_write(png_file, png_data, len);
+    } else {
+      ENSURE(!" do not open file, do not save png file !");
+    }
+    STBIW_FREE(png_data);
+
+    return_value_if_fail(fs_file_close(png_file) == RET_OK, FALSE);
+  }
 
   return TRUE;
 }
@@ -623,7 +655,7 @@ bool_t bitmap_save_png(bitmap_t* bitmap, const char* filename) {
   return FALSE;
 }
 
-#endif /*defined(WITH_STB_IMAGE) || defined(HAS_STDIO)*/
+#endif /*defined(WITH_STB_IMAGE)*/
 
 /*helper*/
 #define BIT_OFFSET(xx) (7 - ((xx) % 8))
@@ -703,6 +735,8 @@ uint8_t* bitmap_lock_buffer_for_read(bitmap_t* bitmap) {
 }
 
 uint8_t* bitmap_lock_buffer_for_write(bitmap_t* bitmap) {
+  return_value_if_fail(bitmap != NULL, NULL);
+
   if (bitmap->buffer != NULL) {
     if (!graphic_buffer_is_valid_for(bitmap->buffer, bitmap)) {
       assert(!" graphic_buffer is not valid ");

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  blend rgba8888 on rgb888
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,7 +23,7 @@
 
 #include "base/bitmap.h"
 
-ret_t blend_image_rgb888_rgba8888(bitmap_t* dst, bitmap_t* src, rect_t* dst_r, rect_t* src_r,
-                                  uint8_t a);
+ret_t blend_image_rgb888_rgba8888(bitmap_t* dst, bitmap_t* src, const rect_t* dst_r,
+                                  const rect_t* src_r, uint8_t a);
 
 #endif /*TK_BLEND_IMAGE_RGB888_RGBA8888_H*/

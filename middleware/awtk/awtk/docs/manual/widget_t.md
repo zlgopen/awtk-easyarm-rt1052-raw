@@ -66,17 +66,26 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_create_animator">widget\_create\_animator</a> | 创建动画。 |
 | <a href="#widget_t_widget_destroy">widget\_destroy</a> | 从父控件中移除控件，并调用unref函数销毁控件。 |
 | <a href="#widget_t_widget_destroy_animator">widget\_destroy\_animator</a> | 销毁动画。 |
+| <a href="#widget_t_widget_destroy_async">widget\_destroy\_async</a> | 从父控件中移除控件，并调用unref函数销毁控件。 |
 | <a href="#widget_t_widget_destroy_children">widget\_destroy\_children</a> | 销毁全部子控件。 |
 | <a href="#widget_t_widget_dispatch">widget\_dispatch</a> | 分发一个事件。 |
+| <a href="#widget_t_widget_dispatch_event_to_target_recursive">widget\_dispatch\_event\_to\_target\_recursive</a> | 递归分发事件到targe控件。 |
 | <a href="#widget_t_widget_dispatch_recursive">widget\_dispatch\_recursive</a> | 分发一个事件控件本身及所有子控件。 |
 | <a href="#widget_t_widget_dispatch_simple_event">widget\_dispatch\_simple\_event</a> | 分发一个简单事件。 |
+| <a href="#widget_t_widget_dispatch_to_key_target">widget\_dispatch\_to\_key\_target</a> | 递归的分发一个事件到所有key_target子控件。 |
+| <a href="#widget_t_widget_dispatch_to_target">widget\_dispatch\_to\_target</a> | 递归的分发一个事件到所有target子控件。 |
 | <a href="#widget_t_widget_draw_background">widget\_draw\_background</a> | 根据控件的style绘制背景矩形。 |
+| <a href="#widget_t_widget_draw_text_in_rect">widget\_draw\_text\_in\_rect</a> | 在canvas绘制一行文本。 |
 | <a href="#widget_t_widget_end_wait_pointer_cursor">widget\_end\_wait\_pointer\_cursor</a> | 结束等待鼠标指针。 |
 | <a href="#widget_t_widget_ensure_visible_in_viewport">widget\_ensure\_visible\_in\_viewport</a> | 使控件滚动到可见区域。 |
 | <a href="#widget_t_widget_equal">widget\_equal</a> | 判断两个widget是否相同。 |
+| <a href="#widget_t_widget_fill_bg_rect">widget\_fill\_bg\_rect</a> | 根据控件的style绘制背景矩形。 |
+| <a href="#widget_t_widget_fill_fg_rect">widget\_fill\_fg\_rect</a> | 根据控件的style绘制前景矩形。 |
 | <a href="#widget_t_widget_find_animator">widget\_find\_animator</a> | 查找指定名称的动画。 |
 | <a href="#widget_t_widget_find_target">widget\_find\_target</a> | 查找x/y坐标对应的子控件。 |
 | <a href="#widget_t_widget_focus_first">widget\_focus\_first</a> | 置焦点于第一个控件。 |
+| <a href="#widget_t_widget_focus_next">widget\_focus\_next</a> | 把焦点移动下一个控件。 |
+| <a href="#widget_t_widget_focus_prev">widget\_focus\_prev</a> | 把焦点移动前一个控件。 |
 | <a href="#widget_t_widget_foreach">widget\_foreach</a> | 遍历当前控件及子控件。 |
 | <a href="#widget_t_widget_get_assets_manager">widget\_get\_assets\_manager</a> | 获取assets_manager对象。 |
 | <a href="#widget_t_widget_get_canvas">widget\_get\_canvas</a> | 获取canvas对象。 |
@@ -91,11 +100,15 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_get_prop_int">widget\_get\_prop\_int</a> | 获取整数格式的属性。 |
 | <a href="#widget_t_widget_get_prop_pointer">widget\_get\_prop\_pointer</a> | 获取指针格式的属性。 |
 | <a href="#widget_t_widget_get_prop_str">widget\_get\_prop\_str</a> | 获取字符串格式的属性。 |
+| <a href="#widget_t_widget_get_state_for_style">widget\_get\_state\_for\_style</a> | 把控件的状态转成获取style选要的状态，一般只在子类中使用。 |
+| <a href="#widget_t_widget_get_style_type">widget\_get\_style\_type</a> | 获取 widget 对应风格类型 |
 | <a href="#widget_t_widget_get_text">widget\_get\_text</a> | 获取控件的文本。 |
+| <a href="#widget_t_widget_get_text_utf8">widget\_get\_text\_utf8</a> | 获取控件的文本。 |
 | <a href="#widget_t_widget_get_type">widget\_get\_type</a> | 获取当前控件的类型名称。 |
 | <a href="#widget_t_widget_get_value">widget\_get\_value</a> | 获取控件的值。只是对widget\_get\_prop的包装，值的意义由子类控件决定。 |
 | <a href="#widget_t_widget_get_window">widget\_get\_window</a> | 获取当前控件所在的窗口。 |
 | <a href="#widget_t_widget_get_window_manager">widget\_get\_window\_manager</a> | 获取当前的窗口管理器。 |
+| <a href="#widget_t_widget_get_window_theme">widget\_get\_window\_theme</a> | 获取控件的窗口主题 |
 | <a href="#widget_t_widget_grab">widget\_grab</a> | 让指定子控件抓住事件。 |
 | <a href="#widget_t_widget_index_of">widget\_index\_of</a> | 获取控件在父控件中的索引编号。 |
 | <a href="#widget_t_widget_init">widget\_init</a> | 初始化控件。仅在子类控件构造函数中使用。 |
@@ -104,11 +117,17 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_invalidate_force">widget\_invalidate\_force</a> | 请求强制重绘控件。 |
 | <a href="#widget_t_widget_is_designing_window">widget\_is\_designing\_window</a> | 判断当前控件是否是设计窗口。 |
 | <a href="#widget_t_widget_is_dialog">widget\_is\_dialog</a> | 检查控件是否是对话框类型。 |
+| <a href="#widget_t_widget_is_direct_parent_of">widget\_is\_direct\_parent\_of</a> | 判断当前控件是否是指定控件的直系父控件。 |
 | <a href="#widget_t_widget_is_instance_of">widget\_is\_instance\_of</a> | 检查控件是否是指定的类型。 |
+| <a href="#widget_t_widget_is_keyboard">widget\_is\_keyboard</a> | 判断当前控件是否是keyboard。 |
 | <a href="#widget_t_widget_is_normal_window">widget\_is\_normal\_window</a> | 检查控件是否是普通窗口类型。 |
+| <a href="#widget_t_widget_is_opened_dialog">widget\_is\_opened\_dialog</a> | 检查控件弹出对话框控件是否已经打开了（而非挂起状态）。 |
 | <a href="#widget_t_widget_is_opened_popup">widget\_is\_opened\_popup</a> | 检查控件弹出窗口控件是否已经打开了（而非挂起状态）。 |
+| <a href="#widget_t_widget_is_overlay">widget\_is\_overlay</a> | 检查控件是否是overlay窗口类型。 |
+| <a href="#widget_t_widget_is_parent_of">widget\_is\_parent\_of</a> | 判断当前控件是否是指定控件的父控件(包括非直系)。 |
 | <a href="#widget_t_widget_is_point_in">widget\_is\_point\_in</a> | 判断一个点是否在控件内。 |
 | <a href="#widget_t_widget_is_popup">widget\_is\_popup</a> | 检查控件是否是弹出窗口类型。 |
+| <a href="#widget_t_widget_is_style_exist">widget\_is\_style\_exist</a> | 查询指定的style是否存在。 |
 | <a href="#widget_t_widget_is_system_bar">widget\_is\_system\_bar</a> | 检查控件是否是system bar类型。 |
 | <a href="#widget_t_widget_is_window">widget\_is\_window</a> | 判断当前控件是否是窗口。 |
 | <a href="#widget_t_widget_is_window_manager">widget\_is\_window\_manager</a> | 判断当前控件是否是窗口管理器。 |
@@ -116,9 +135,11 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_layout">widget\_layout</a> | 布局当前控件及子控件。 |
 | <a href="#widget_t_widget_layout_children">widget\_layout\_children</a> | layout子控件。 |
 | <a href="#widget_t_widget_load_asset">widget\_load\_asset</a> | 加载资源。 |
+| <a href="#widget_t_widget_load_asset_ex">widget\_load\_asset\_ex</a> | 加载资源。 |
 | <a href="#widget_t_widget_load_image">widget\_load\_image</a> | 加载图片。 |
 | <a href="#widget_t_widget_lookup">widget\_lookup</a> | 查找指定名称的子控件(返回第一个)。 |
 | <a href="#widget_t_widget_lookup_by_type">widget\_lookup\_by\_type</a> | 查找指定类型的子控件(返回第一个)。 |
+| <a href="#widget_t_widget_measure_text">widget\_measure\_text</a> | 计算文本的宽度。 |
 | <a href="#widget_t_widget_move">widget\_move</a> | 移动控件。 |
 | <a href="#widget_t_widget_move_resize">widget\_move\_resize</a> | 移动控件并调整控件的大小。 |
 | <a href="#widget_t_widget_off">widget\_off</a> | 注销指定事件的处理函数。 |
@@ -134,6 +155,7 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_paint">widget\_paint</a> | 绘制控件到一个canvas上。 |
 | <a href="#widget_t_widget_paint_helper">widget\_paint\_helper</a> | 帮助子控件实现自己的绘制函数。 |
 | <a href="#widget_t_widget_pause_animator">widget\_pause\_animator</a> | 暂停动画。 |
+| <a href="#widget_t_widget_prepare_text_style">widget\_prepare\_text\_style</a> | 从widget的style中取出字体名称、大小和颜色数据，设置到canvas中。 |
 | <a href="#widget_t_widget_re_translate_text">widget\_re\_translate\_text</a> | 语言改变后，重新翻译控件上的文本(包括子控件)。 |
 | <a href="#widget_t_widget_ref">widget\_ref</a> | 增加控件的引用计数。 |
 | <a href="#widget_t_widget_remove_child">widget\_remove\_child</a> | 移出指定的子控件(并不销毁)。 |
@@ -143,8 +165,11 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_restack">widget\_restack</a> | 调整控件在父控件中的位置序数。 |
 | <a href="#widget_t_widget_set_animation">widget\_set\_animation</a> | 设置控件的动画参数(仅用于在UI文件使用)。 |
 | <a href="#widget_t_widget_set_animator_time_scale">widget\_set\_animator\_time\_scale</a> | 设置动画的时间倍率，<0: 时间倒退，<1: 时间变慢，>1 时间变快。 |
+| <a href="#widget_t_widget_set_as_key_target">widget\_set\_as\_key\_target</a> | 递归的把父控件的key_target设置为自己。 |
+| <a href="#widget_t_widget_set_auto_adjust_size">widget\_set\_auto\_adjust\_size</a> | 设置控件是否根据子控件和文本自动调整控件自身大小。 |
 | <a href="#widget_t_widget_set_child_text_utf8">widget\_set\_child\_text\_utf8</a> | 设置子控件的文本。 |
 | <a href="#widget_t_widget_set_child_text_with_double">widget\_set\_child\_text\_with\_double</a> | 用一个浮点数去设置子控件的文本。 |
+| <a href="#widget_t_widget_set_child_text_with_int">widget\_set\_child\_text\_with\_int</a> | 用一个整数去设置子控件的文本。 |
 | <a href="#widget_t_widget_set_children_layout">widget\_set\_children\_layout</a> | 设置子控件的布局参数。 |
 | <a href="#widget_t_widget_set_dirty_rect_tolerance">widget\_set\_dirty\_rect\_tolerance</a> | 设置控件脏矩形超出控件本身大小的最大范围(一般不用指定)。 |
 | <a href="#widget_t_widget_set_enable">widget\_set\_enable</a> | 设置控件的可用性。 |
@@ -154,6 +179,7 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_set_focused">widget\_set\_focused</a> | 设置控件是否获得焦点。 |
 | <a href="#widget_t_widget_set_name">widget\_set\_name</a> | 设置控件的名称。 |
 | <a href="#widget_t_widget_set_need_relayout_children">widget\_set\_need\_relayout\_children</a> | 设置控件需要relayout标识。 |
+| <a href="#widget_t_widget_set_need_update_style">widget\_set\_need\_update\_style</a> | 设置需要更新Style。 |
 | <a href="#widget_t_widget_set_opacity">widget\_set\_opacity</a> | 设置控件的不透明度。 |
 | <a href="#widget_t_widget_set_pointer_cursor">widget\_set\_pointer\_cursor</a> | 设置鼠标指针的图片名。 |
 | <a href="#widget_t_widget_set_prop">widget\_set\_prop</a> | 设置控件指定属性的值。 |
@@ -178,17 +204,22 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | <a href="#widget_t_widget_set_visible_only">widget\_set\_visible\_only</a> | 设置控件的可见性(不触发repaint和relayout)。 |
 | <a href="#widget_t_widget_start_animator">widget\_start\_animator</a> | 播放动画。 |
 | <a href="#widget_t_widget_stop_animator">widget\_stop\_animator</a> | 停止动画(控件的相应属性回归原位)。 |
+| <a href="#widget_t_widget_stroke_border_rect">widget\_stroke\_border\_rect</a> | 根据控件的style绘制边框矩形。 |
 | <a href="#widget_t_widget_take_snapshot">widget\_take\_snapshot</a> | 创建一个bitmap对象，将控件绘制到bitmap上，并返回bitmap对象。 |
 | <a href="#widget_t_widget_take_snapshot_rect">widget\_take\_snapshot\_rect</a> | 创建一个bitmap对象，将控件绘制到bitmap上并且可以设置该控件的截屏区域，返回bitmap对象。 |
 | <a href="#widget_t_widget_to_global">widget\_to\_global</a> | 将控件内的本地坐标转换成全局坐标。 |
 | <a href="#widget_t_widget_to_local">widget\_to\_local</a> | 将屏幕坐标转换成控件内的本地坐标，即相对于控件左上角的坐标。 |
 | <a href="#widget_t_widget_to_screen">widget\_to\_screen</a> | 将控件内的本地坐标转换成屏幕上的坐标。 |
+| <a href="#widget_t_widget_to_screen_ex">widget\_to\_screen\_ex</a> | 将控件内的本地坐标根据祖父级控件转换成相对于祖父级控件的屏幕相对坐标。 |
+| <a href="#widget_t_widget_to_xml">widget\_to\_xml</a> | 将widget转换成xml。 |
 | <a href="#widget_t_widget_ungrab">widget\_ungrab</a> | 让指定子控件放弃抓住事件。 |
 | <a href="#widget_t_widget_unload_asset">widget\_unload\_asset</a> | 卸载资源。 |
 | <a href="#widget_t_widget_unload_image">widget\_unload\_image</a> | 卸载图片。 |
 | <a href="#widget_t_widget_unref">widget\_unref</a> | 减少控件的引用计数。引用计数为0时销毁控件。 |
 | <a href="#widget_t_widget_update_pointer_cursor">widget\_update\_pointer\_cursor</a> | 更新鼠标指针。 |
-| <a href="#widget_t_widget_use_style">widget\_use\_style</a> | 启用指定的主题。 |
+| <a href="#widget_t_widget_update_style">widget\_update\_style</a> | 让控件根据自己当前状态更新style。 |
+| <a href="#widget_t_widget_update_style_recursive">widget\_update\_style\_recursive</a> | 让控件及子控件根据自己当前状态更新style。 |
+| <a href="#widget_t_widget_use_style">widget\_use\_style</a> | 启用指定的style。 |
 ### 属性
 <p id="widget_t_properties">
 
@@ -196,6 +227,7 @@ widget_on(button, EVT_CLICK, on_click, NULL);
 | -------- | ----- | ------------ | 
 | <a href="#widget_t_animation">animation</a> | char* | 动画参数。请参考[控件动画](https://github.com/zlgopen/awtk/blob/master/docs/widget_animator.md) |
 | <a href="#widget_t_astyle">astyle</a> | style\_t* | Style对象。 |
+| <a href="#widget_t_auto_adjust_size">auto\_adjust\_size</a> | bool\_t | 是否根据子控件和文本自动调整控件自身大小。 |
 | <a href="#widget_t_auto_created">auto\_created</a> | bool\_t | 是否由父控件自动创建。 |
 | <a href="#widget_t_children">children</a> | darray\_t* | 全部子控件。 |
 | <a href="#widget_t_children_layout">children\_layout</a> | children\_layouter\_t* | 子控件布局器。请参考[控件布局参数](https://github.com/zlgopen/awtk/blob/master/docs/layout.md) |
@@ -632,6 +664,27 @@ ret_t widget_destroy_animator (widget_t* widget, const char* name);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | name | const char* | 动画名称。 |
+#### widget\_destroy\_async 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_destroy_async">从父控件中移除控件，并调用unref函数销毁控件。
+
+> 一般无需直接调用，关闭窗口时，自动销毁相关控件。
+
+* 函数原型：
+
+```
+ret_t widget_destroy_async (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
 #### widget\_destroy\_children 函数
 -----------------------
 
@@ -671,6 +724,26 @@ ret_t widget_dispatch (widget_t* widget, event_t* e);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | e | event\_t* | 事件。 |
+#### widget\_dispatch\_event\_to\_target\_recursive 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_dispatch_event_to_target_recursive">递归分发事件到targe控件。
+
+* 函数原型：
+
+```
+ret_t widget_dispatch_event_to_target_recursive (widget_t* widget, event_t* e);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| e | event\_t* | 事件对象。 |
 #### widget\_dispatch\_recursive 函数
 -----------------------
 
@@ -711,6 +784,46 @@ ret_t widget_dispatch_simple_event (widget_t* widget, uint32_t type);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | type | uint32\_t | 事件类型。 |
+#### widget\_dispatch\_to\_key\_target 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_dispatch_to_key_target">递归的分发一个事件到所有key_target子控件。
+
+* 函数原型：
+
+```
+ret_t widget_dispatch_to_key_target (widget_t* widget, event_t* e);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| e | event\_t* | 事件。 |
+#### widget\_dispatch\_to\_target 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_dispatch_to_target">递归的分发一个事件到所有target子控件。
+
+* 函数原型：
+
+```
+ret_t widget_dispatch_to_target (widget_t* widget, event_t* e);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| e | event\_t* | 事件。 |
 #### widget\_draw\_background 函数
 -----------------------
 
@@ -731,6 +844,30 @@ ret_t widget_draw_background (widget_t* widget, canvas_t* c);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | c | canvas\_t* | 画布对象。 |
+#### widget\_draw\_text\_in\_rect 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_draw_text_in_rect">在canvas绘制一行文本。
+
+* 函数原型：
+
+```
+ret_t widget_draw_text_in_rect (widget_t* widget, canvas_t* c, const wchar_t* str, uint32_t size, const rect_t* r, bool_t ellipses);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| c | canvas\_t* | 画布对象。 |
+| str | const wchar\_t* | 文本。 |
+| size | uint32\_t | 文本长度。 |
+| r | const rect\_t* | 矩形区域。 |
+| ellipses | bool\_t | 宽度不够时是否显示省略号。 |
 #### widget\_end\_wait\_pointer\_cursor 函数
 -----------------------
 
@@ -789,6 +926,50 @@ bool_t widget_equal (widget_t* widget, widget_t* other);
 | 返回值 | bool\_t | 返回TRUE表示相同，否则表示不同。 |
 | widget | widget\_t* | 控件对象。 |
 | other | widget\_t* | 要比较的控件对象。 |
+#### widget\_fill\_bg\_rect 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_fill_bg_rect">根据控件的style绘制背景矩形。
+
+* 函数原型：
+
+```
+ret_t widget_fill_bg_rect (widget_t* widget, canvas_t* c, const rect_t* r, image_draw_type_t draw_type);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| c | canvas\_t* | 画布对象。 |
+| r | const rect\_t* | 矩形区域。 |
+| draw\_type | image\_draw\_type\_t | 图片缺省绘制方式。 |
+#### widget\_fill\_fg\_rect 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_fill_fg_rect">根据控件的style绘制前景矩形。
+
+* 函数原型：
+
+```
+ret_t widget_fill_fg_rect (widget_t* widget, canvas_t* c, const rect_t* r, image_draw_type_t draw_type);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| c | canvas\_t* | 画布对象。 |
+| r | const rect\_t* | 矩形区域。 |
+| draw\_type | image\_draw\_type\_t | 图片缺省绘制方式。 |
 #### widget\_find\_animator 函数
 -----------------------
 
@@ -849,6 +1030,48 @@ ret_t widget_focus_first (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
+#### widget\_focus\_next 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_focus_next">把焦点移动下一个控件。
+
+>widget必须是当前焦点控件。
+
+* 函数原型：
+
+```
+ret_t widget_focus_next (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+#### widget\_focus\_prev 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_focus_prev">把焦点移动前一个控件。
+
+>widget必须是当前焦点控件。
+
+* 函数原型：
+
+```
+ret_t widget_focus_prev (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
 #### widget\_foreach 函数
 -----------------------
 
@@ -1128,6 +1351,46 @@ const char* widget_get_prop_str (widget_t* widget, const char* name, const char*
 | widget | widget\_t* | 控件对象。 |
 | name | const char* | 属性的名称。 |
 | defval | const char* | 缺省值。 |
+#### widget\_get\_state\_for\_style 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_get_state_for_style">把控件的状态转成获取style选要的状态，一般只在子类中使用。
+
+* 函数原型：
+
+```
+const char* widget_get_state_for_style (widget_t* widget, bool_t active, bool_t checked);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | const char* | 返回状态值。 |
+| widget | widget\_t* | widget对象。 |
+| active | bool\_t | 控件是否为当前项。 |
+| checked | bool\_t | 控件是否为选中项。 |
+#### widget\_get\_style\_type 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_get_style_type">获取 widget 对应风格类型
+
+* 函数原型：
+
+```
+const char* widget_get_style_type (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | const char* | 返回 widget 的对应风格类型。 |
+| widget | widget\_t* | widget对象。 |
 #### widget\_get\_text 函数
 -----------------------
 
@@ -1158,6 +1421,28 @@ const wchar_t* widget_get_text (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | const wchar\_t* | 返回文本。 |
 | widget | widget\_t* | 控件对象。 |
+#### widget\_get\_text\_utf8 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_get_text_utf8">获取控件的文本。
+只是对widget\_get\_prop的包装，文本的意义由子类控件决定。
+
+* 函数原型：
+
+```
+ret_t widget_get_text_utf8 (widget_t* widget, char* text, uint32_t size);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| text | char* | 用于返回文本。 |
+| size | uint32\_t | text内存长度。 |
 #### widget\_get\_type 函数
 -----------------------
 
@@ -1234,6 +1519,27 @@ widget_t* widget_get_window_manager (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | widget\_t* | 窗口管理器对象。 |
 | widget | widget\_t* | 控件对象。 |
+#### widget\_get\_window\_theme 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_get_window_theme">获取控件的窗口主题
+
+* 函数原型：
+
+```
+ret_t widget_get_window_theme (widget_t* widget, theme_t** win_theme, theme_t** default_theme);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| win\_theme | theme\_t** | 返回窗口主题。 |
+| default\_theme | theme\_t** | 返回全局默认主题。 |
 #### widget\_grab 函数
 -----------------------
 
@@ -1334,7 +1640,7 @@ ret_t widget_insert_child (widget_t* widget, uint32_t index, widget_t* child);
 * 函数原型：
 
 ```
-ret_t widget_invalidate (widget_t* widget, rect_t* r);
+ret_t widget_invalidate (widget_t* widget, const rect_t* r);
 ```
 
 * 参数说明：
@@ -1343,7 +1649,7 @@ ret_t widget_invalidate (widget_t* widget, rect_t* r);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
-| r | rect\_t* | 矩形对象(widget本地坐标)。 |
+| r | const rect\_t* | 矩形对象(widget本地坐标)。 |
 #### widget\_invalidate\_force 函数
 -----------------------
 
@@ -1354,7 +1660,7 @@ ret_t widget_invalidate (widget_t* widget, rect_t* r);
 * 函数原型：
 
 ```
-ret_t widget_invalidate_force (widget_t* widget, rect_t* r);
+ret_t widget_invalidate_force (widget_t* widget, const rect_t* r);
 ```
 
 * 参数说明：
@@ -1363,7 +1669,7 @@ ret_t widget_invalidate_force (widget_t* widget, rect_t* r);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
-| r | rect\_t* | 矩形对象(widget本地坐标)。 |
+| r | const rect\_t* | 矩形对象(widget本地坐标)。 |
 #### widget\_is\_designing\_window 函数
 -----------------------
 
@@ -1402,6 +1708,26 @@ bool_t widget_is_dialog (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | bool\_t | 返回FALSE表示不是，否则表示是。 |
 | widget | widget\_t* | widget对象。 |
+#### widget\_is\_direct\_parent\_of 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_is_direct_parent_of">判断当前控件是否是指定控件的直系父控件。
+
+* 函数原型：
+
+```
+bool_t widget_is_direct_parent_of (widget_t* widget, widget_t* child);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 返回TRUE表示是，否则表示不是。 |
+| widget | widget\_t* | 控件对象。 |
+| child | widget\_t* | 控件对象。 |
 #### widget\_is\_instance\_of 函数
 -----------------------
 
@@ -1422,6 +1748,33 @@ bool_t widget_is_instance_of (widget_t* widget, widget_vtable_t* vt);
 | 返回值 | bool\_t | 返回TRUE表示是，FALSE表示否。 |
 | widget | widget\_t* | 控件对象。 |
 | vt | widget\_vtable\_t* | 虚表。 |
+#### widget\_is\_keyboard 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_is_keyboard">判断当前控件是否是keyboard。
+
+> keyboard收到pointer事件时，不会让当前控件失去焦点。
+
+在自定义软键盘时，将所有按钮放到一个容器当中，并设置为is_keyboard。
+
+```c
+widget_set_prop_bool(group, WIDGET_PROP_IS_KEYBOARD, TRUE);
+```
+
+* 函数原型：
+
+```
+bool_t widget_is_keyboard (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 返回FALSE表示不是，否则表示是。 |
+| widget | widget\_t* | 控件对象。 |
 #### widget\_is\_normal\_window 函数
 -----------------------
 
@@ -1433,6 +1786,25 @@ bool_t widget_is_instance_of (widget_t* widget, widget_vtable_t* vt);
 
 ```
 bool_t widget_is_normal_window (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 返回FALSE表示不是，否则表示是。 |
+| widget | widget\_t* | widget对象。 |
+#### widget\_is\_opened\_dialog 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_is_opened_dialog">检查控件弹出对话框控件是否已经打开了（而非挂起状态）。
+
+* 函数原型：
+
+```
+bool_t widget_is_opened_dialog (widget_t* widget);
 ```
 
 * 参数说明：
@@ -1460,6 +1832,45 @@ bool_t widget_is_opened_popup (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | bool\_t | 返回FALSE表示不是，否则表示是。 |
 | widget | widget\_t* | widget对象。 |
+#### widget\_is\_overlay 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_is_overlay">检查控件是否是overlay窗口类型。
+
+* 函数原型：
+
+```
+bool_t widget_is_overlay (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 返回FALSE表示不是，否则表示是。 |
+| widget | widget\_t* | widget对象。 |
+#### widget\_is\_parent\_of 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_is_parent_of">判断当前控件是否是指定控件的父控件(包括非直系)。
+
+* 函数原型：
+
+```
+bool_t widget_is_parent_of (widget_t* widget, widget_t* child);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 返回TRUE表示是，否则表示不是。 |
+| widget | widget\_t* | 控件对象。 |
+| child | widget\_t* | 控件对象。 |
 #### widget\_is\_point\_in 函数
 -----------------------
 
@@ -1501,6 +1912,27 @@ bool_t widget_is_popup (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | bool\_t | 返回FALSE表示不是，否则表示是。 |
 | widget | widget\_t* | widget对象。 |
+#### widget\_is\_style\_exist 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_is_style_exist">查询指定的style是否存在。
+
+* 函数原型：
+
+```
+bool_t widget_is_style_exist (widget_t* widget, const char* style_name, const char* state_name);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | bool\_t | 存在返回 TRUE，不存在返回 FALSE。 |
+| widget | widget\_t* | 控件对象。 |
+| style\_name | const char* | style的名称（如果为 NULL，则默认为 default）。 |
+| state\_name | const char* | state的名称（如果为 NULL，则默认为 normal）。 |
 #### widget\_is\_system\_bar 函数
 -----------------------
 
@@ -1644,6 +2076,36 @@ const asset_info_t* widget_load_asset (widget_t* widget, asset_type_t type, cons
 | widget | widget\_t* | 控件对象。 |
 | type | asset\_type\_t | 资源类型。 |
 | name | const char* | 资源名。 |
+#### widget\_load\_asset\_ex 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_load_asset_ex">加载资源。
+
+使用示例：
+
+```c
+const asset_info_t* asset = widget_load_asset_ex(widget, ASSET_TYPE_IMAGE, ASSET_TYPE_IMAGE_BSVG, "mysvg");
+...
+widget_unload_asset(widget, asset);
+```
+
+* 函数原型：
+
+```
+const asset_info_t* widget_load_asset_ex (widget_t* widget, asset_type_t type, uint16_t subtype, const char* name);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | const asset\_info\_t* | 返回资源句柄。 |
+| widget | widget\_t* | 控件对象。 |
+| type | asset\_type\_t | 资源类型。 |
+| subtype | uint16\_t | 资源子类型。 |
+| name | const char* | 资源名。 |
 #### widget\_load\_image 函数
 -----------------------
 
@@ -1717,6 +2179,27 @@ widget_t* widget_lookup_by_type (widget_t* widget, const char* type, bool_t recu
 | widget | widget\_t* | 控件对象。 |
 | type | const char* | 子控件的名称。 |
 | recursive | bool\_t | 是否递归查找全部子控件。 |
+#### widget\_measure\_text 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_measure_text">计算文本的宽度。
+字体由控件当前的状态和style决定。
+
+* 函数原型：
+
+```
+float_t widget_measure_text (widget_t* widget, wchar_t* text);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | float\_t | 返回文本的宽度。 |
+| widget | widget\_t* | 控件对象。 |
+| text | wchar\_t* | 文本。 |
 #### widget\_move 函数
 -----------------------
 
@@ -2044,6 +2527,26 @@ ret_t widget_pause_animator (widget_t* widget, const char* name);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | name | const char* | 动画名称。 |
+#### widget\_prepare\_text\_style 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_prepare_text_style">从widget的style中取出字体名称、大小和颜色数据，设置到canvas中。
+
+* 函数原型：
+
+```
+ret_t widget_prepare_text_style (widget_t* widget, canvas_t* c);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| c | canvas\_t* | 画布对象。 |
 #### widget\_re\_translate\_text 函数
 -----------------------
 
@@ -2229,6 +2732,45 @@ ret_t widget_set_animator_time_scale (widget_t* widget, const char* name, float_
 | widget | widget\_t* | 控件对象。 |
 | name | const char* | 动画名称。 |
 | time\_scale | float\_t | 时间倍率。 |
+#### widget\_set\_as\_key\_target 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_set_as_key_target">递归的把父控件的key_target设置为自己。
+
+* 函数原型：
+
+```
+ret_t widget_set_as_key_target (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+#### widget\_set\_auto\_adjust\_size 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_set_auto_adjust_size">设置控件是否根据子控件和文本自动调整控件自身大小。
+
+* 函数原型：
+
+```
+ret_t widget_set_auto_adjust_size (widget_t* widget, bool_t auto_adjust_size);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| auto\_adjust\_size | bool\_t | 是否根据子控件和文本自动调整控件自身大小。 |
 #### widget\_set\_child\_text\_utf8 函数
 -----------------------
 
@@ -2274,6 +2816,29 @@ ret_t widget_set_child_text_with_double (widget_t* widget, const char* name, con
 | name | const char* | 子控件的名称。 |
 | format | const char* | 格式字符串(如："%2.2lf")。 |
 | value | double | 浮点数值。 |
+#### widget\_set\_child\_text\_with\_int 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_set_child_text_with_int">用一个整数去设置子控件的文本。
+只是对widget\_set\_prop的包装，文本的意义由子类控件决定。
+
+* 函数原型：
+
+```
+ret_t widget_set_child_text_with_int (widget_t* widget, const char* name, const char* format, int value);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| name | const char* | 子控件的名称。 |
+| format | const char* | 格式字符串(如："%d")。 |
+| value | int | 值。 |
 #### widget\_set\_children\_layout 函数
 -----------------------
 
@@ -2454,6 +3019,25 @@ ret_t widget_set_need_relayout_children (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回。 |
 | widget | widget\_t* | 控件对象。 |
+#### widget\_set\_need\_update\_style 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_set_need_update_style">设置需要更新Style。
+
+* 函数原型：
+
+```
+ret_t widget_set_need_update_style (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。。 |
+| widget | widget\_t* | 控件对象。 |
 #### widget\_set\_opacity 函数
 -----------------------
 
@@ -2569,7 +3153,7 @@ ret_t widget_set_prop_int (widget_t* widget, const char* name, int32_t v);
 * 函数原型：
 
 ```
-ret_t widget_set_prop_pointer (widget_t* widget, const char* name, void** v);
+ret_t widget_set_prop_pointer (widget_t* widget, const char* name, void* v);
 ```
 
 * 参数说明：
@@ -2579,7 +3163,7 @@ ret_t widget_set_prop_pointer (widget_t* widget, const char* name, void** v);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | name | const char* | 属性的名称。 |
-| v | void** | 属性的值。 |
+| v | void* | 属性的值。 |
 #### widget\_set\_prop\_str 函数
 -----------------------
 
@@ -2712,6 +3296,16 @@ ret_t widget_set_style (widget_t* widget, const char* state_and_name, const valu
 
 > <p id="widget_t_widget_set_style_color">设置颜色类型的style。
 
+> * [state 的取值](https://github.com/zlgopen/awtk/blob/master/docs/manual/widget_state_t.md)
+> * [name 的取值](https://github.com/zlgopen/awtk/blob/master/docs/theme.md)
+
+
+在下面这个例子中，R=0x11 G=0x22 B=0x33 A=0xFF
+
+```c
+widget_set_style_color(label, "style:normal:bg_color", 0xFF332211);
+```
+
 * 函数原型：
 
 ```
@@ -2725,13 +3319,16 @@ ret_t widget_set_style_color (widget_t* widget, const char* state_and_name, uint
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | state\_and\_name | const char* | 状态和名字，用英文的冒号分隔。 |
-| value | uint32\_t | 值。 |
+| value | uint32\_t | 值。颜色值一般用十六进制表示，每两个数字表示一个颜色通道，从高位到低位，依次是ABGR。 |
 #### widget\_set\_style\_int 函数
 -----------------------
 
 * 函数功能：
 
 > <p id="widget_t_widget_set_style_int">设置整数类型的style。
+
+> * [state 的取值](https://github.com/zlgopen/awtk/blob/master/docs/manual/widget_state_t.md)
+> * [name 的取值](https://github.com/zlgopen/awtk/blob/master/docs/theme.md)
 
 * 函数原型：
 
@@ -2753,6 +3350,9 @@ ret_t widget_set_style_int (widget_t* widget, const char* state_and_name, int32_
 * 函数功能：
 
 > <p id="widget_t_widget_set_style_str">设置字符串类型的style。
+
+> * [state 的取值](https://github.com/zlgopen/awtk/blob/master/docs/manual/widget_state_t.md)
+> * [name 的取值](https://github.com/zlgopen/awtk/blob/master/docs/theme.md)
 
 * 函数原型：
 
@@ -2883,7 +3483,7 @@ ret_t widget_set_value (widget_t* widget, int32_t value);
 * 函数原型：
 
 ```
-ret_t widget_set_visible (widget_t* widget, bool_t visible, bool_t recursive);
+ret_t widget_set_visible (widget_t* widget, bool_t visible);
 ```
 
 * 参数说明：
@@ -2893,7 +3493,6 @@ ret_t widget_set_visible (widget_t* widget, bool_t visible, bool_t recursive);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | visible | bool\_t | 是否可见。 |
-| recursive | bool\_t | 是否递归设置全部子控件。 |
 #### widget\_set\_visible\_only 函数
 -----------------------
 
@@ -2964,6 +3563,27 @@ ret_t widget_stop_animator (widget_t* widget, const char* name);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | name | const char* | 动画名称。 |
+#### widget\_stroke\_border\_rect 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_stroke_border_rect">根据控件的style绘制边框矩形。
+
+* 函数原型：
+
+```
+ret_t widget_stroke_border_rect (widget_t* widget, canvas_t* c, const rect_t* r);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| c | canvas\_t* | 画布对象。 |
+| r | const rect\_t* | 矩形区域。 |
 #### widget\_take\_snapshot 函数
 -----------------------
 
@@ -3009,7 +3629,7 @@ bitmap_destroy(bitmap);
 * 函数原型：
 
 ```
-bitmap_t* widget_take_snapshot_rect (widget_t* widget, rect_t* r);
+bitmap_t* widget_take_snapshot_rect (widget_t* widget, const rect_t* r);
 ```
 
 * 参数说明：
@@ -3018,7 +3638,7 @@ bitmap_t* widget_take_snapshot_rect (widget_t* widget, rect_t* r);
 | -------- | ----- | --------- |
 | 返回值 | bitmap\_t* | 返回位图对象。 |
 | widget | widget\_t* | 控件对象。 |
-| r | rect\_t* | 截屏区域（输入NULL，则为控件全区域截屏）。 |
+| r | const rect\_t* | 截屏区域（输入NULL，则为控件全区域截屏）。 |
 #### widget\_to\_global 函数
 -----------------------
 
@@ -3079,6 +3699,48 @@ ret_t widget_to_screen (widget_t* widget, point_t* p);
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
 | widget | widget\_t* | 控件对象。 |
 | p | point\_t* | 坐标点。 |
+#### widget\_to\_screen\_ex 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_to_screen_ex">将控件内的本地坐标根据祖父级控件转换成相对于祖父级控件的屏幕相对坐标。
+备注：如果 parent 不是 widget 控件的父级或者祖父级话，该函数会退化为 widget_to_screen 函数。
+
+* 函数原型：
+
+```
+ret_t widget_to_screen_ex (widget_t* widget, widget_t* parent, point_t* p);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | 控件对象。 |
+| parent | widget\_t* | 祖父级控。 |
+| p | point\_t* | 坐标点。 |
+#### widget\_to\_xml 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_to_xml">将widget转换成xml。
+
+* 函数原型：
+
+```
+ret_t widget_to_xml (widget_t* widget, str_t* str);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+| str | str\_t* | 用于保存xml结果。 |
 #### widget\_ungrab 函数
 -----------------------
 
@@ -3187,12 +3849,50 @@ ret_t widget_update_pointer_cursor (widget_t* widget);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。。 |
 | widget | widget\_t* | 控件对象。 |
+#### widget\_update\_style 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_update_style">让控件根据自己当前状态更新style。
+
+* 函数原型：
+
+```
+ret_t widget_update_style (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
+#### widget\_update\_style\_recursive 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="widget_t_widget_update_style_recursive">让控件及子控件根据自己当前状态更新style。
+
+* 函数原型：
+
+```
+ret_t widget_update_style_recursive (widget_t* widget);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | widget对象。 |
 #### widget\_use\_style 函数
 -----------------------
 
 * 函数功能：
 
-> <p id="widget_t_widget_use_style">启用指定的主题。
+> <p id="widget_t_widget_use_style">启用指定的style。
 
 * 函数原型：
 
@@ -3233,6 +3933,25 @@ ret_t widget_use_style (widget_t* widget, const char* style);
 | -------- | ----- |
 | 可直接读取 | 是 |
 | 可直接修改 | 否 |
+#### auto\_adjust\_size 属性
+-----------------------
+> <p id="widget_t_auto_adjust_size">是否根据子控件和文本自动调整控件自身大小。
+
+> 为true时，最好不要使用child_layout，否则可能有冲突。
+> 注意：只是调整控件的本身的宽高，不会修改控件本身的位置。
+
+* 类型：bool\_t
+
+| 特性 | 是否支持 |
+| -------- | ----- |
+| 可直接读取 | 是 |
+| 可直接修改 | 否 |
+| 可持久化   | 是 |
+| 可脚本化   | 是 |
+| 可在IDE中设置 | 是 |
+| 可在XML中设置 | 是 |
+| 可通过widget\_get\_prop读取 | 是 |
+| 可通过widget\_set\_prop修改 | 是 |
 #### auto\_created 属性
 -----------------------
 > <p id="widget_t_auto_created">是否由父控件自动创建。
@@ -3377,7 +4096,7 @@ ret_t widget_use_style (widget_t* widget, const char* style);
 | 特性 | 是否支持 |
 | -------- | ----- |
 | 可直接读取 | 是 |
-| 可直接修改 | 是 |
+| 可直接修改 | 否 |
 | 可持久化   | 是 |
 | 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |
@@ -3535,7 +4254,7 @@ ret_t widget_use_style (widget_t* widget, const char* style);
 | 特性 | 是否支持 |
 | -------- | ----- |
 | 可直接读取 | 是 |
-| 可直接修改 | 是 |
+| 可直接修改 | 否 |
 | 可持久化   | 是 |
 | 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |
@@ -3603,7 +4322,7 @@ ret_t widget_use_style (widget_t* widget, const char* style);
 | 特性 | 是否支持 |
 | -------- | ----- |
 | 可直接读取 | 是 |
-| 可直接修改 | 是 |
+| 可直接修改 | 否 |
 | 可持久化   | 是 |
 | 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |
@@ -3639,14 +4358,14 @@ ret_t widget_use_style (widget_t* widget, const char* style);
 #### with\_focus\_state 属性
 -----------------------
 > <p id="widget_t_with_focus_state">是否支持焦点状态。
-> 如果希望style支持焦点状态，但有不希望焦点停留，可用本属性。
+> 如果希望style支持焦点状态，但又不希望焦点停留，可用本属性。
 
 * 类型：bool\_t
 
 | 特性 | 是否支持 |
 | -------- | ----- |
 | 可直接读取 | 是 |
-| 可直接修改 | 是 |
+| 可直接修改 | 否 |
 | 可持久化   | 是 |
 | 可脚本化   | 是 |
 | 可在IDE中设置 | 是 |

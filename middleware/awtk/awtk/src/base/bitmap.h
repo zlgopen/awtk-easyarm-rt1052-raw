@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  bitmap interface
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -261,13 +261,34 @@ bool_t bitmap_save_png(bitmap_t* bitmap, const char* filename);
 ret_t bitmap_mono_dump(const uint8_t* buff, uint32_t w, uint32_t h);
 
 /**
- * @method bitmap_destroy
- * 销毁图片。
+ * @method bitmap_destroy_with_self
+ * 销毁图片(for script only)。
+ * @alias bitmap_destroy
  * @annotation ["deconstructor", "scriptable", "gc"]
  * @param {bitmap_t*} bitmap bitmap对象。
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
+ret_t bitmap_destroy_with_self(bitmap_t* bitmap);
+
+/**
+ * @method bitmap_destroy
+ * 销毁图片。
+ * @annotation ["deconstructor"]
+ * @param {bitmap_t*} bitmap bitmap对象。
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t bitmap_destroy(bitmap_t* bitmap);
+
+/**
+ * @method bitmap_get_bpp_of_format
+ * 获取位图格式对应的颜色位数。
+ * @annotation ["scriptable", "static"]
+ * 
+ * @param {bitmap_format_t} format 位图格式。
+ * 
+ * @return {uint32_t} 成功返回颜色位数，失败返回0。
+ */
+uint32_t bitmap_get_bpp_of_format(bitmap_format_t format);
 
 /**
  * @enum image_draw_type_t
@@ -411,7 +432,6 @@ typedef enum _image_draw_type_t {
 
 /*private*/
 ret_t bitmap_alloc_data(bitmap_t* bitmap);
-uint32_t bitmap_get_bpp_of_format(bitmap_format_t format);
 bool_t rgba_data_is_opaque(const uint8_t* data, uint32_t w, uint32_t h, uint8_t comp);
 
 bitmap_t* bitmap_clone(bitmap_t* bitmap);

@@ -33,7 +33,7 @@ static string itos(int v) {
   return string(str);
 }
 
-static ret_t lcd_log_begin_frame(lcd_t* lcd, rect_t* dirty_rect) {
+static ret_t lcd_log_begin_frame(lcd_t* lcd, const rect_t* dirty_rect) {
   lcd_log_t* log = (lcd_log_t*)lcd;
   log->str += "bf();";
 
@@ -76,7 +76,15 @@ static ret_t lcd_log_fill_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
   return RET_OK;
 }
 
-static ret_t lcd_log_draw_glyph(lcd_t* lcd, glyph_t* glyph, rect_t* src, xy_t x, xy_t y) {
+static ret_t lcd_log_clear_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
+  lcd_log_t* log = (lcd_log_t*)lcd;
+  log->str += "cr(" + (itos(x)) + string(",") + (itos(y)) + string(",") + (itos(w)) + string(",") +
+              (itos(h)) + string(");");
+
+  return RET_OK;
+}
+
+static ret_t lcd_log_draw_glyph(lcd_t* lcd, glyph_t* glyph, const rect_t* src, xy_t x, xy_t y) {
   lcd_log_t* log = (lcd_log_t*)lcd;
 
   log->str += "dg(" + (itos(src->x)) + string(",") + (itos(src->y)) + string(",") + (itos(src->w)) +
@@ -86,7 +94,7 @@ static ret_t lcd_log_draw_glyph(lcd_t* lcd, glyph_t* glyph, rect_t* src, xy_t x,
   return RET_OK;
 }
 
-static ret_t lcd_log_draw_image(lcd_t* lcd, bitmap_t* img, rect_t* src, rect_t* dst) {
+static ret_t lcd_log_draw_image(lcd_t* lcd, bitmap_t* img, const rect_t* src, const rect_t* dst) {
   lcd_log_t* log = (lcd_log_t*)lcd;
 
   log->str += "dg(" + (itos(src->x)) + string(",") + (itos(src->y)) + string(",") + (itos(src->w)) +
@@ -120,6 +128,7 @@ lcd_t* lcd_log_init(wh_t w, wh_t h) {
   base->draw_vline = lcd_log_draw_vline;
   base->draw_hline = lcd_log_draw_hline;
   base->fill_rect = lcd_log_fill_rect;
+  base->clear_rect = lcd_log_clear_rect;
   base->draw_image = lcd_log_draw_image;
   base->draw_glyph = lcd_log_draw_glyph;
   base->draw_points = lcd_log_draw_points;
@@ -128,6 +137,7 @@ lcd_t* lcd_log_init(wh_t w, wh_t h) {
 
   base->w = w;
   base->h = h;
+  base->ratio = 1;
   base->support_dirty_rect = TRUE;
 
   return base;

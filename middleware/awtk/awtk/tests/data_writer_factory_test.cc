@@ -1,6 +1,7 @@
 ﻿#include "gtest/gtest.h"
 #include "tkc/data_writer_factory.h"
 #include "tkc/data_writer_file.h"
+#include "tkc/data_writer_wbuffer.h"
 
 TEST(DataWriterFactory, basic) {
   data_writer_t* writer = NULL;

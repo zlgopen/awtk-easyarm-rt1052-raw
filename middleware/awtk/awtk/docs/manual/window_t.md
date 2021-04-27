@@ -17,7 +17,7 @@ window\_t是[window\_base\_t](window_base_t.md)的子类控件，window\_base\_t
 ```
 
 >
-更多用法请参考：[window.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
+更多用法请参考：[window.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/)
 
 在c代码中使用函数window\_create创建窗口。如：
 
@@ -39,7 +39,7 @@ demo](https://github.com/zlgopen/awtk-c-demos/blob/master/demos/)
 ```
 
 > 更多用法请参考：[theme
-default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L0)
+default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L0)
 ----------------------------------
 ### 函数
 <p id="window_t_methods">
@@ -58,6 +58,7 @@ default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/st
 | <a href="#window_t_window_create_default">window\_create\_default</a> | 以缺省的方式创建window对象。 |
 | <a href="#window_t_window_open">window\_open</a> | 从资源文件中加载并创建window_base对象。本函数在ui_loader/ui_builder_default里实现。 |
 | <a href="#window_t_window_open_and_close">window\_open\_and\_close</a> | 从资源文件中加载并创建window对象。本函数在ui_loader/ui_builder_default里实现。 |
+| <a href="#window_t_window_set_auto_scale_children">window\_set\_auto\_scale\_children</a> | 当设计分辨率和实际分辨率不一致时，自动调整子控件的位置和大小。 |
 | <a href="#window_t_window_set_fullscreen">window\_set\_fullscreen</a> | 设置为全屏窗口。 |
 ### 属性
 <p id="window_t_properties">
@@ -75,7 +76,7 @@ default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/st
 * 函数原型：
 
 ```
-ret_t image_blend (bitmap_t* dst, bitmap_t* src, rect_t* dst_r, rect_t* src_r, uint8_t global_alpha);
+ret_t image_blend (bitmap_t* dst, bitmap_t* src, const rect_t* dst_r, const rect_t* src_r, uint8_t global_alpha);
 ```
 
 * 参数说明：
@@ -85,8 +86,8 @@ ret_t image_blend (bitmap_t* dst, bitmap_t* src, rect_t* dst_r, rect_t* src_r, u
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败，返回失败则上层用软件实现。 |
 | dst | bitmap\_t* | 目标图片对象。 |
 | src | bitmap\_t* | 源图片对象。 |
-| dst\_r | rect\_t* | 目的区域。 |
-| src\_r | rect\_t* | 源区域。 |
+| dst\_r | const rect\_t* | 目的区域。 |
+| src\_r | const rect\_t* | 源区域。 |
 | global\_alpha | uint8\_t | 全局alpha。 |
 #### image\_clear 函数
 -----------------------
@@ -98,7 +99,7 @@ ret_t image_blend (bitmap_t* dst, bitmap_t* src, rect_t* dst_r, rect_t* src_r, u
 * 函数原型：
 
 ```
-ret_t image_clear (bitmap_t* dst, rect_t* dst_r, color_t c);
+ret_t image_clear (bitmap_t* dst, const rect_t* dst_r, color_t c);
 ```
 
 * 参数说明：
@@ -107,7 +108,7 @@ ret_t image_clear (bitmap_t* dst, rect_t* dst_r, color_t c);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败，返回失败则上层用软件实现。 |
 | dst | bitmap\_t* | 目标图片对象。 |
-| dst\_r | rect\_t* | 要填充的目标区域。 |
+| dst\_r | const rect\_t* | 要填充的目标区域。 |
 | c | color\_t | 颜色。 |
 #### image\_copy 函数
 -----------------------
@@ -119,7 +120,7 @@ ret_t image_clear (bitmap_t* dst, rect_t* dst_r, color_t c);
 * 函数原型：
 
 ```
-ret_t image_copy (bitmap_t* dst, bitmap_t* src, rect_t* src_r, xy_t dx, xy_t dy);
+ret_t image_copy (bitmap_t* dst, bitmap_t* src, const rect_t* src_r, xy_t dx, xy_t dy);
 ```
 
 * 参数说明：
@@ -129,7 +130,7 @@ ret_t image_copy (bitmap_t* dst, bitmap_t* src, rect_t* src_r, xy_t dx, xy_t dy)
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败，返回失败则上层用软件实现。 |
 | dst | bitmap\_t* | 目标图片对象。 |
 | src | bitmap\_t* | 源图片对象。 |
-| src\_r | rect\_t* | 要拷贝的区域。 |
+| src\_r | const rect\_t* | 要拷贝的区域。 |
 | dx | xy\_t | 目标位置的x坐标。 |
 | dy | xy\_t | 目标位置的y坐标。 |
 #### image\_fill 函数
@@ -142,7 +143,7 @@ ret_t image_copy (bitmap_t* dst, bitmap_t* src, rect_t* src_r, xy_t dx, xy_t dy)
 * 函数原型：
 
 ```
-ret_t image_fill (bitmap_t* dst, rect_t* dst_r, color_t c);
+ret_t image_fill (bitmap_t* dst, const rect_t* dst_r, color_t c);
 ```
 
 * 参数说明：
@@ -151,7 +152,7 @@ ret_t image_fill (bitmap_t* dst, rect_t* dst_r, color_t c);
 | -------- | ----- | --------- |
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败，返回失败则上层用软件实现。 |
 | dst | bitmap\_t* | 目标图片对象。 |
-| dst\_r | rect\_t* | 要填充的目标区域。 |
+| dst\_r | const rect\_t* | 要填充的目标区域。 |
 | c | color\_t | 颜色。 |
 #### image\_rotate 函数
 -----------------------
@@ -163,7 +164,7 @@ ret_t image_fill (bitmap_t* dst, rect_t* dst_r, color_t c);
 * 函数原型：
 
 ```
-ret_t image_rotate (bitmap_t* dst, bitmap_t* src, rect_t* src_r, lcd_orientation_t o);
+ret_t image_rotate (bitmap_t* dst, bitmap_t* src, const rect_t* src_r, lcd_orientation_t o);
 ```
 
 * 参数说明：
@@ -173,7 +174,7 @@ ret_t image_rotate (bitmap_t* dst, bitmap_t* src, rect_t* src_r, lcd_orientation
 | 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败，返回失败则上层用软件实现。 |
 | dst | bitmap\_t* | 目标图片对象。 |
 | src | bitmap\_t* | 源图片对象。 |
-| src\_r | rect\_t* | 要旋转并拷贝的区域。 |
+| src\_r | const rect\_t* | 要旋转并拷贝的区域。 |
 | o | lcd\_orientation\_t | 旋转角度(一般支持90度即可)。 |
 #### window\_cast 函数
 -----------------------
@@ -312,6 +313,29 @@ widget_t* window_open_and_close (const char* name, widget_t* to_close);
 | 返回值 | widget\_t* | 对象。 |
 | name | const char* | window的名称。 |
 | to\_close | widget\_t* | 关闭该窗口。 |
+#### window\_set\_auto\_scale\_children 函数
+-----------------------
+
+* 函数功能：
+
+> <p id="window_t_window_set_auto_scale_children">当设计分辨率和实际分辨率不一致时，自动调整子控件的位置和大小。
+
+> 当子控件有self_layout参数或者子控件的父控件有children_layout参数时，不会自动调整。
+
+* 函数原型：
+
+```
+ret_t window_set_auto_scale_children (widget_t* widget, uint32_t design_w, uint32_t design_h);
+```
+
+* 参数说明：
+
+| 参数 | 类型 | 说明 |
+| -------- | ----- | --------- |
+| 返回值 | ret\_t | 返回RET\_OK表示成功，否则表示失败。 |
+| widget | widget\_t* | window对象。 |
+| design\_w | uint32\_t | 设计时宽度。 |
+| design\_h | uint32\_t | 设计时高度。 |
 #### window\_set\_fullscreen 函数
 -----------------------
 
@@ -319,7 +343,7 @@ widget_t* window_open_and_close (const char* name, widget_t* to_close);
 
 > <p id="window_t_window_set_fullscreen">设置为全屏窗口。
 
->这里全屏是指与LCD相同大小，而非让SDL窗口全屏。
+>如果app_type是SIMULATOR，全屏是指与LCD相同大小，而非让SDL窗口全屏。
 
 * 函数原型：
 

@@ -21,7 +21,6 @@
 * api doc
 * 基本 layout 功能
 * 极速模式
-* Qt 界面文件转换器
 * stm32 移植
 * draw 9patch image
 * draw 3patch\_h image
@@ -102,12 +101,13 @@
 * 日期选择器。
 * 音频接口。
 * 支持文本双向排版
+* 支持 appuim 自动测试
+* table view
 
 ## 短期计划（顺序不定）
 * tree view
-* table view
 * drag & drop
-* 支持 appuim 自动测试
+* 多点触摸和手势识别
 
 ## 长期计划
 * Accessibility

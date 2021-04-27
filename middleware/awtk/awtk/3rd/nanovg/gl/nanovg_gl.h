@@ -610,7 +610,7 @@ static int glnvg__renderCreate(void* uptr) {
       "#endif\n"
       "   strokeAlpha = strokeMask();\n"
       "   if (strokeAlpha < strokeThr) discard;\n"
-      "   color = vec4(color.xyz*color.w,color.w);"
+      "   if (texType == 1) color = vec4(color.xyz*color.w,color.w);"
       "   result = innerCol * color * strokeAlpha;\n"
       " } else if(type == 7) {      // fill color\n"
       "   strokeAlpha = strokeMask();\n"
@@ -1362,8 +1362,8 @@ static int glnvg__VertsInScissor(const NVGvertex* verts, int nr, NVGscissor* sci
 
   float l = cx - hw;
   float t = cy - hh;
-  float r = l + 2 * hw - 1;
-  float b = t + 2 * hh - 1;
+  float r = l + 2 * hw;
+  float b = t + 2 * hh;
 
   for (i = 0; i < nr; i++) {
     const NVGvertex* iter = verts + i;

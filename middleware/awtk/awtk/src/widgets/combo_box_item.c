@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  combo_box_item
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,6 +46,7 @@ static ret_t combo_box_item_on_event(widget_t* widget, event_t* e) {
       pointer_event_t evt = *(pointer_event_t*)e;
       if (combo_box_item->pressed) {
         evt.e = event_init(EVT_CLICK, widget);
+        evt.e.size = sizeof(pointer_event_t);
         combo_box_item_set_checked(widget, TRUE);
         widget_dispatch(widget, (event_t*)&evt);
       }
@@ -128,11 +129,17 @@ static ret_t combo_box_item_set_checked_only(widget_t* widget, bool_t checked) {
   return_value_if_fail(combo_box_item != NULL, RET_BAD_PARAMS);
 
   if (combo_box_item->checked != checked) {
-    event_t e = event_init(EVT_VALUE_WILL_CHANGE, widget);
-    widget_dispatch(widget, &e);
-    combo_box_item->checked = checked;
-    e = event_init(EVT_VALUE_CHANGED, widget);
-    widget_dispatch(widget, &e);
+    value_change_event_t evt;
+    value_change_event_init(&evt, EVT_VALUE_WILL_CHANGE, widget);
+    value_set_bool(&(evt.old_value), combo_box_item->checked);
+    value_set_bool(&(evt.new_value), checked);
+
+    if (widget_dispatch(widget, (event_t*)&evt) != RET_STOP) {
+      combo_box_item->checked = checked;
+      evt.e.type = EVT_VALUE_CHANGED;
+      widget_dispatch(widget, (event_t*)&evt);
+      widget_invalidate(widget, NULL);
+    }
   }
 
   widget_set_need_update_style(widget);

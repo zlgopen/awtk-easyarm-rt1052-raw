@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  init config for app
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -43,6 +43,17 @@ typedef object_t* (*conf_load_t)(const char* url, bool_t create_if_not_exist);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t app_conf_init(conf_load_t load, const char* app_name, const char* extname);
+
+/**
+ * @method app_conf_reset
+ *
+ * 恢复出厂设置。
+ *
+ * @annotation ["global"]
+ * 
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t app_conf_reset(void);
 
 END_C_DECLS
 

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  switch
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -346,15 +346,20 @@ ret_t switch_set_value(widget_t* widget, bool_t value) {
   return_value_if_fail(aswitch != NULL, RET_BAD_PARAMS);
 
   if (aswitch->value != value) {
-    event_t e = event_init(EVT_VALUE_WILL_CHANGE, widget);
-    widget_dispatch(widget, &e);
-    aswitch->value = value;
-    e = event_init(EVT_VALUE_CHANGED, widget);
-    widget_dispatch(widget, &e);
-    widget_invalidate(widget, NULL);
+    value_change_event_t evt;
+    value_change_event_init(&evt, EVT_VALUE_WILL_CHANGE, widget);
+    value_set_bool(&(evt.old_value), aswitch->value);
+    value_set_bool(&(evt.new_value), value);
+
+    if (widget_dispatch(widget, (event_t*)&evt) != RET_STOP) {
+      aswitch->value = value;
+      evt.e.type = EVT_VALUE_CHANGED;
+      widget_dispatch(widget, (event_t*)&evt);
+      widget_invalidate(widget, NULL);
+    }
   }
 
-  if (value) {
+  if (aswitch->value) {
     aswitch->xoffset = 0;
   } else {
     aswitch->xoffset = aswitch->max_xoffset_ratio * widget->w;
@@ -373,6 +378,7 @@ static ret_t switch_get_prop(widget_t* widget, const char* name, value_t* v) {
     value_set_bool(v, aswitch->value);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_YOFFSET)) {
+    value_set_int(v, 0);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_XOFFSET)) {
     value_set_int(v, aswitch->xoffset);

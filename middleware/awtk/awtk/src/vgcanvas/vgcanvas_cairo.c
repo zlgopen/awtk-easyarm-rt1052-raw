@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  vector graphics canvas base on cairo
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -57,8 +57,8 @@ typedef struct _vg_cairo_cache_t {
 
 static darray_t vg_cairo_cache;
 
-ret_t vgcanvas_cairo_begin_frame(vgcanvas_t* vgcanvas, rect_t* dirty_rect) {
-  rect_t* r = dirty_rect;
+ret_t vgcanvas_cairo_begin_frame(vgcanvas_t* vgcanvas, const rect_t* dirty_rect) {
+  const rect_t* r = dirty_rect;
   vgcanvas_cairo_t* canvas = (vgcanvas_cairo_t*)vgcanvas;
   cairo_t* vg = canvas->vg;
 
@@ -423,7 +423,9 @@ static cairo_surface_t* create_surface(uint32_t w, uint32_t h, bitmap_format_t f
       cairo_format = CAIRO_FORMAT_RGB16_565;
       break;
     }
-    default: { return NULL; }
+    default: {
+      return NULL;
+    }
   }
 
   return cairo_image_surface_create_for_data(fbuff, cairo_format, w, h, w * bpp);
@@ -594,9 +596,12 @@ static ret_t vgcanvas_cairo_restore(vgcanvas_t* vgcanvas) {
 }
 
 static ret_t vgcanvas_cairo_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h,
-                                       framebuffer_object_t* fbo) {
+                                       bool_t custom_draw_model, framebuffer_object_t* fbo) {
   (void)vgcanvas;
   (void)fbo;
+  (void)w;
+  (void)h;
+  (void)custom_draw_model;
   return RET_NOT_IMPL;
 }
 

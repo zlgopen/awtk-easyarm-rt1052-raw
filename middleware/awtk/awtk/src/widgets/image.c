@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  image
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -111,6 +111,7 @@ static const char* const s_image_properties[] = {WIDGET_PROP_IMAGE,      WIDGET_
 static ret_t image_on_copy(widget_t* widget, widget_t* other) {
   image_t* image = IMAGE(widget);
   image_t* image_other = IMAGE(other);
+  return_value_if_fail(image != NULL && image_other != NULL, RET_BAD_PARAMS);
 
   image_base_on_copy(widget, other);
   image->draw_type = image_other->draw_type;
@@ -120,6 +121,8 @@ static ret_t image_on_copy(widget_t* widget, widget_t* other) {
 
 TK_DECL_VTABLE(image) = {.size = sizeof(image_t),
                          .type = WIDGET_TYPE_IMAGE,
+                         .space_key_to_activate = TRUE,
+                         .return_key_to_activate = TRUE,
                          .clone_properties = s_image_properties,
                          .persistent_properties = s_image_properties,
                          .parent = TK_PARENT_VTABLE(image_base),

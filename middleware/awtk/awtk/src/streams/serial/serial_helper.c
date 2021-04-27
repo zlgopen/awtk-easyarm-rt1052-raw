@@ -1,9 +1,9 @@
-﻿/**
+/**
  * File:   serial_helper.c
  * Author: AWTK Develop Team
  * Brief:  serial helper functions
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -381,7 +381,10 @@ int serial_close(serial_handle_t handle) {
   CloseHandle(dev);
 
   handle->closed = TRUE;
-  tk_thread_join(handle->thread);
+  if (handle->thread != NULL) {
+    tk_thread_join(handle->thread);
+    tk_thread_destroy(handle->thread);
+  }
 
   socket_close(handle->client_fd);
   socket_close(handle->server_fd);
@@ -441,7 +444,13 @@ int32_t serial_write(serial_handle_t handle, const uint8_t* buff, uint32_t max_s
 #endif
 
 #if defined(MAC_OS_X_VERSION_10_3) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_3)
+#if defined(IOS)
+#include <sys/termios.h>
+#include <sys/ttycom.h>
+#define IOSSIOSPEED _IOW('T', 2, speed_t)
+#else
 #include <IOKit/serial/ioss.h>
+#endif /*IOS*/
 #endif
 
 serial_handle_t serial_open(const char* port) {

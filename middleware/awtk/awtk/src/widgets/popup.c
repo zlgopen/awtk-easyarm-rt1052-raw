@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  popup
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,6 +41,9 @@ static ret_t popup_get_prop(widget_t* widget, const char* name, value_t* v) {
   } else if (tk_str_eq(name, WIDGET_PROP_CLOSE_WHEN_CLICK_OUTSIDE)) {
     value_set_bool(v, popup->close_when_click_outside);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_CLOSE_WHEN_TIMEOUT)) {
+    value_set_uint32(v, popup->close_when_timeout);
+    return RET_OK;
   }
 
   return window_base_get_prop(widget, name, v);
@@ -55,6 +58,9 @@ static ret_t popup_set_prop(widget_t* widget, const char* name, const value_t* v
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_CLOSE_WHEN_CLICK_OUTSIDE)) {
     popup->close_when_click_outside = value_bool(v);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_CLOSE_WHEN_TIMEOUT)) {
+    popup_set_close_when_timeout(widget, value_uint32(v));
     return RET_OK;
   }
 
@@ -145,11 +151,11 @@ static ret_t popup_on_event(widget_t* widget, event_t* e) {
             close_window = TRUE;
           }
         } else if (!popup->close_when_click) {
-          idle_add(popup_idle_check_if_need_set_background_state, widget);
+          widget_add_idle(widget, popup_idle_check_if_need_set_background_state);
         }
 
         if (close_window) {
-          idle_add(popup_idle_window_close, widget);
+          widget_add_idle(widget, popup_idle_window_close);
         }
       }
 
@@ -162,15 +168,9 @@ static ret_t popup_on_event(widget_t* widget, event_t* e) {
   return window_base_on_event(widget, e);
 }
 
-static const char* const s_popup_properties[] = {WIDGET_PROP_ANIM_HINT,
-                                                 WIDGET_PROP_OPEN_ANIM_HINT,
-                                                 WIDGET_PROP_CLOSE_ANIM_HINT,
-                                                 WIDGET_PROP_THEME,
-                                                 WIDGET_PROP_CLOSE_WHEN_CLICK,
+static const char* const s_popup_properties[] = {WIDGET_PROP_CLOSE_WHEN_CLICK,
                                                  WIDGET_PROP_CLOSE_WHEN_CLICK_OUTSIDE,
-                                                 WIDGET_PROP_MOVE_FOCUS_PREV_KEY,
-                                                 WIDGET_PROP_MOVE_FOCUS_NEXT_KEY,
-                                                 NULL};
+                                                 WIDGET_PROP_CLOSE_WHEN_TIMEOUT, NULL};
 
 TK_DECL_VTABLE(popup) = {.size = sizeof(popup_t),
                          .type = WIDGET_TYPE_POPUP,
@@ -211,6 +211,29 @@ ret_t popup_set_close_when_click_outside(widget_t* widget, bool_t close_when_cli
   return_value_if_fail(popup != NULL, RET_FAIL);
 
   popup->close_when_click_outside = close_when_click_outside;
+
+  return RET_OK;
+}
+
+static ret_t popup_on_timeout(const timer_info_t* info) {
+  window_close(WIDGET(info->ctx));
+
+  return RET_REMOVE;
+}
+
+ret_t popup_set_close_when_timeout(widget_t* widget, uint32_t close_when_timeout) {
+  popup_t* popup = POPUP(widget);
+  return_value_if_fail(popup != NULL, RET_FAIL);
+
+  popup->close_when_timeout = close_when_timeout;
+  if (popup->timer_id != TK_INVALID_ID) {
+    timer_remove(popup->timer_id);
+    popup->timer_id = TK_INVALID_ID;
+  }
+
+  if (close_when_timeout > 0) {
+    popup->timer_id = timer_add(popup_on_timeout, widget, close_when_timeout);
+  }
 
   return RET_OK;
 }

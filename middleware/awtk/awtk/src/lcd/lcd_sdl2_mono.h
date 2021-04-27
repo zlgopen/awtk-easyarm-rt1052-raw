@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mono lcd on sdl2
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -28,6 +28,8 @@
 BEGIN_C_DECLS
 
 lcd_t* lcd_sdl2_mono_init(SDL_Renderer* render);
+
+ret_t lcd_sdl2_mono_reinit(lcd_t* lcd, wh_t w, wh_t h, uint32_t line_length);
 
 END_C_DECLS
 

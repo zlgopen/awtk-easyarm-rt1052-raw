@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  single link list
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -72,29 +72,41 @@ void* slist_find(slist_t* slist, void* ctx) {
   return NULL;
 }
 
-ret_t slist_remove(slist_t* slist, void* ctx) {
+ret_t slist_remove_with_compare(slist_t* slist, void* ctx, tk_compare_t compare,
+                                int32_t remove_size) {
+  int32_t n = remove_size;
   slist_node_t* iter = NULL;
   slist_node_t* prev = NULL;
+  slist_node_t* next = NULL;
   return_value_if_fail(slist != NULL, RET_BAD_PARAMS);
 
   iter = slist->first;
   prev = slist->first;
   while (iter != NULL) {
-    if (slist->compare(iter->data, ctx) == 0) {
+    if (compare(iter->data, ctx) == 0) {
       if (iter == slist->first) {
         slist->first = slist->first->next;
       } else {
         prev->next = iter->next;
       }
+      next = iter->next;
       slist_node_destroy(iter, slist->destroy);
-
-      return RET_OK;
+      iter = next;
+      n--;
+      if (n == 0) {
+        return RET_OK;
+      }
+    } else {
+      prev = iter;
+      iter = iter->next;
     }
-    prev = iter;
-    iter = iter->next;
   }
 
-  return RET_NOT_FOUND;
+  return remove_size == n ? RET_NOT_FOUND : RET_OK;
+}
+
+ret_t slist_remove(slist_t* slist, void* ctx) {
+  return slist_remove_with_compare(slist, ctx, slist->compare, 1);
 }
 
 ret_t slist_append(slist_t* slist, void* data) {
@@ -146,6 +158,48 @@ ret_t slist_foreach(slist_t* slist, tk_visit_t visit, void* ctx) {
   }
 
   return RET_OK;
+}
+
+void* slist_tail_pop(slist_t* slist) {
+  void* data = NULL;
+  slist_node_t* iter = NULL;
+  slist_node_t* last_iter = NULL;
+  return_value_if_fail(slist != NULL, NULL);
+
+  iter = slist->first;
+  return_value_if_fail(iter != NULL, NULL);
+
+  if (iter->next == NULL) {
+    slist->first = NULL;
+  } else {
+    while (iter->next != NULL) {
+      last_iter = iter;
+      iter = iter->next;
+    }
+
+    last_iter->next = NULL;
+  }
+
+  data = iter->data;
+  TKMEM_FREE(iter);
+
+  return data;
+}
+
+void* slist_head_pop(slist_t* slist) {
+  void* data = NULL;
+  slist_node_t* iter = NULL;
+  return_value_if_fail(slist != NULL, NULL);
+
+  iter = slist->first;
+  return_value_if_fail(iter != NULL, NULL);
+
+  slist->first = iter->next;
+
+  data = iter->data;
+  TKMEM_FREE(iter);
+
+  return data;
 }
 
 int32_t slist_size(slist_t* slist) {
@@ -203,6 +257,31 @@ ret_t slist_destroy(slist_t* slist) {
   return_value_if_fail(slist != NULL, RET_BAD_PARAMS);
   slist_deinit(slist);
   TKMEM_FREE(slist);
+
+  return RET_OK;
+}
+
+ret_t slist_insert(slist_t* slist, uint32_t index, void* data) {
+  slist_node_t* node = NULL;
+  slist_node_t* iter = NULL;
+  slist_node_t* prev = NULL;
+  return_value_if_fail(slist != NULL, RET_BAD_PARAMS);
+
+  if (index == 0 || slist->first == NULL) {
+    return slist_prepend(slist, data);
+  }
+
+  iter = slist->first;
+  prev = slist->first;
+  while (iter != NULL && index > 0) {
+    index--;
+    prev = iter;
+    iter = iter->next;
+  }
+
+  node = slist_node_create(data);
+  node->next = prev->next;
+  prev->next = node;
 
   return RET_OK;
 }

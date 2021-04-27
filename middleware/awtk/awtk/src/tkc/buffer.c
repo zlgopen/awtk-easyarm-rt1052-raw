@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  buffer
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -31,6 +31,13 @@ wbuffer_t* wbuffer_init(wbuffer_t* wbuffer, uint8_t* data, uint32_t capacity) {
   wbuffer->capacity = capacity;
 
   return wbuffer;
+}
+
+ret_t wbuffer_rewind(wbuffer_t* wbuffer) {
+  return_value_if_fail(wbuffer != NULL, RET_BAD_PARAMS);
+
+  wbuffer->cursor = 0;
+  return RET_OK;
 }
 
 ret_t wbuffer_extend_capacity(wbuffer_t* wbuffer, uint32_t capacity) {
@@ -67,7 +74,7 @@ static ret_t wbuffer_extend_delta(wbuffer_t* wbuffer, uint32_t delta) {
 ret_t wbuffer_deinit(wbuffer_t* wbuffer) {
   return_value_if_fail(wbuffer != NULL, RET_BAD_PARAMS);
 
-  if (wbuffer->extendable) {
+  if (wbuffer->extendable && wbuffer->data != NULL) {
     TKMEM_FREE(wbuffer->data);
   }
   memset(wbuffer, 0x00, sizeof(wbuffer_t));
@@ -126,7 +133,34 @@ ret_t wbuffer_write_uint32(wbuffer_t* wbuffer, uint32_t value) {
   return RET_OK;
 }
 
-ret_t wbuffer_write_float(wbuffer_t* wbuffer, float_t value) {
+ret_t wbuffer_write_int32(wbuffer_t* wbuffer, int32_t value) {
+  return_value_if_fail(wbuffer_extend_delta(wbuffer, sizeof(value)) == RET_OK, RET_BAD_PARAMS);
+
+  memcpy(wbuffer->data + wbuffer->cursor, &value, sizeof(value));
+  wbuffer->cursor += sizeof(value);
+
+  return RET_OK;
+}
+
+ret_t wbuffer_write_uint64(wbuffer_t* wbuffer, uint64_t value) {
+  return_value_if_fail(wbuffer_extend_delta(wbuffer, sizeof(value)) == RET_OK, RET_BAD_PARAMS);
+
+  memcpy(wbuffer->data + wbuffer->cursor, &value, sizeof(value));
+  wbuffer->cursor += sizeof(value);
+
+  return RET_OK;
+}
+
+ret_t wbuffer_write_float(wbuffer_t* wbuffer, float value) {
+  return_value_if_fail(wbuffer_extend_delta(wbuffer, sizeof(value)) == RET_OK, RET_BAD_PARAMS);
+
+  memcpy(wbuffer->data + wbuffer->cursor, &value, sizeof(value));
+  wbuffer->cursor += sizeof(value);
+
+  return RET_OK;
+}
+
+ret_t wbuffer_write_double(wbuffer_t* wbuffer, double value) {
   return_value_if_fail(wbuffer_extend_delta(wbuffer, sizeof(value)) == RET_OK, RET_BAD_PARAMS);
 
   memcpy(wbuffer->data + wbuffer->cursor, &value, sizeof(value));
@@ -172,6 +206,13 @@ bool_t rbuffer_has_more(rbuffer_t* rbuffer) {
   return rbuffer->cursor < rbuffer->capacity;
 }
 
+ret_t rbuffer_rewind(rbuffer_t* rbuffer) {
+  return_value_if_fail(rbuffer != NULL, RET_BAD_PARAMS);
+
+  rbuffer->cursor = 0;
+  return RET_OK;
+}
+
 ret_t rbuffer_skip(rbuffer_t* rbuffer, int32_t offset) {
   return_value_if_fail(rbuffer != NULL && rbuffer->data != NULL, RET_BAD_PARAMS);
   return_value_if_fail(((int32_t)(rbuffer->cursor) + offset) >= 0, RET_BAD_PARAMS);
@@ -211,7 +252,37 @@ ret_t rbuffer_read_uint32(rbuffer_t* rbuffer, uint32_t* value) {
   return RET_OK;
 }
 
-ret_t rbuffer_read_float(rbuffer_t* rbuffer, float_t* value) {
+ret_t rbuffer_read_int32(rbuffer_t* rbuffer, int32_t* value) {
+  return_value_if_fail(rbuffer != NULL && rbuffer->data != NULL && value != NULL, RET_BAD_PARAMS);
+  return_value_if_fail((rbuffer->cursor + sizeof(*value)) <= rbuffer->capacity, RET_BAD_PARAMS);
+
+  memcpy(value, rbuffer->data + rbuffer->cursor, sizeof(*value));
+  rbuffer->cursor += sizeof(*value);
+
+  return RET_OK;
+}
+
+ret_t rbuffer_read_uint64(rbuffer_t* rbuffer, uint64_t* value) {
+  return_value_if_fail(rbuffer != NULL && rbuffer->data != NULL && value != NULL, RET_BAD_PARAMS);
+  return_value_if_fail((rbuffer->cursor + sizeof(*value)) <= rbuffer->capacity, RET_BAD_PARAMS);
+
+  memcpy(value, rbuffer->data + rbuffer->cursor, sizeof(*value));
+  rbuffer->cursor += sizeof(*value);
+
+  return RET_OK;
+}
+
+ret_t rbuffer_read_float(rbuffer_t* rbuffer, float* value) {
+  return_value_if_fail(rbuffer != NULL && rbuffer->data != NULL && value != NULL, RET_BAD_PARAMS);
+  return_value_if_fail((rbuffer->cursor + sizeof(*value)) <= rbuffer->capacity, RET_BAD_PARAMS);
+
+  memcpy(value, rbuffer->data + rbuffer->cursor, sizeof(*value));
+  rbuffer->cursor += sizeof(*value);
+
+  return RET_OK;
+}
+
+ret_t rbuffer_read_double(rbuffer_t* rbuffer, double* value) {
   return_value_if_fail(rbuffer != NULL && rbuffer->data != NULL && value != NULL, RET_BAD_PARAMS);
   return_value_if_fail((rbuffer->cursor + sizeof(*value)) <= rbuffer->capacity, RET_BAD_PARAMS);
 

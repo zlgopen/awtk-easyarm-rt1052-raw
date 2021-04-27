@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  sdl2 implemented lcd interface/
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -71,8 +71,8 @@ static ret_t lcd_sdl2_flush(lcd_t* lcd) {
   bitmap_t dst;
   int pitch = 0;
   void* addr = NULL;
-  rect_t* dr = &(lcd->dirty_rect);
-  rect_t* fps_r = &(lcd->fps_rect);
+  const rect_t* dr = &(lcd->dirty_rect);
+  const rect_t* fps_r = &(lcd->fps_rect);
   lcd_mem_special_t* special = (lcd_mem_special_t*)lcd;
   special_info_t* info = (special_info_t*)(special->ctx);
 
@@ -88,7 +88,6 @@ static ret_t lcd_sdl2_flush(lcd_t* lcd) {
     bitmap_init(&src, lcd->w, lcd->h, special->format, special->lcd_mem->offline_fb);
     image_copy(&dst, &src, dr, dr->x, dr->y);
     SDL_UnlockTexture(info->texture);
-    log_debug("dirty_rect: %d %d %d %d\n", dr->x, dr->y, dr->w, dr->h);
 
     SDL_RenderCopy(info->render, info->texture, &sr, &sr);
 

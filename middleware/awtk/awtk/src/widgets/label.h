@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  label
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -46,7 +46,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[label.xml](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/label.xml)
+ *https://github.com/zlgopen/awtk/blob/master/design/default/ui/label.xml)
  *
  * 在c代码中使用函数label\_create创建文本控件。如：
  *
@@ -70,7 +70,7 @@ BEGIN_C_DECLS
  *
  * > 更多用法请参考：
  * [theme default](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L144)
+ *https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L144)
  *
  */
 typedef struct _label_t {
@@ -83,6 +83,20 @@ typedef struct _label_t {
    * 主要用于动态改变显示字符的个数，来实现类似[拨号中...]的动画效果。
    */
   int32_t length;
+
+  /**
+   * @property {bool_t} line_wrap
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否自动换行。
+   */
+  bool_t line_wrap;
+
+  /**
+   * @property {bool_t} word_wrap
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否允许整个单词换行。(需要开启自动换行才有效果)
+   */
+  bool_t word_wrap;
 } label_t;
 
 /**
@@ -109,6 +123,28 @@ widget_t* label_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t label_set_length(widget_t* widget, int32_t length);
+
+/**
+ * @method label_set_line_wrap
+ * 设置是否自动换行。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t}  line_wrap 是否自动换行。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t label_set_line_wrap(widget_t* widget, bool_t line_wrap);
+
+/**
+ * @method label_set_word_wrap
+ * 设置是否允许整个单词换行。(需要开启自动换行才有效果)
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t}  word_wrap 是否允许整个单词换行。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t label_set_word_wrap(widget_t* widget, bool_t word_wrap);
 
 /**
  * @method label_resize_to_content
@@ -142,10 +178,6 @@ widget_t* label_cast(widget_t* widget);
 TK_EXTERN_VTABLE(label);
 
 /*public for test*/
-uint32_t line_breaker_count(const wchar_t* str);
-typedef ret_t (*line_breaker_on_line_t)(void* ctx, uint32_t index, const wchar_t* str,
-                                        uint32_t size);
-ret_t line_breaker_break(const wchar_t* str, line_breaker_on_line_t on_line, void* ctx);
 
 END_C_DECLS
 

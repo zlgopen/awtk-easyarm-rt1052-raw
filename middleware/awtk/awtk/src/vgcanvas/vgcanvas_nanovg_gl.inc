@@ -1,4 +1,5 @@
 ﻿#include "tkc/utils.h"
+#include "vgcanvas_nanovg.inc" 
 
 static ret_t vgcanvas_nanovg_reinit(vgcanvas_t* vg, uint32_t w, uint32_t h, uint32_t stride,
                                     bitmap_format_t format, void* data) {
@@ -11,7 +12,7 @@ static ret_t vgcanvas_nanovg_reinit(vgcanvas_t* vg, uint32_t w, uint32_t h, uint
 }
 
 static inline void vgcanvas_nanovg_set_offline_fb(vgcanvas_nanovg_t* canvas, uint32_t w,
-                                                  uint32_t h, rect_t* dirty_rect) {
+                                                  uint32_t h, const rect_t* dirty_rect) {
   GLint default_fbo = 0;
 
 #if WITH_LCD_CLEAR_ALPHA
@@ -85,25 +86,24 @@ static inline void vgcanvas_nanovg_offline_fb_flush(vgcanvas_nanovg_t* canvas) {
 #if defined NANOVG_GL3
     glBindVertexArray(shader_info->vao);
 #endif
+    glEnableVertexAttribArray(shader_info->coord_loc);
+    glEnableVertexAttribArray(shader_info->position_loc);
 
     glBindBuffer(GL_ARRAY_BUFFER, shader_info->vboIds[0]);
     glVertexAttribPointer(shader_info->position_loc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
-    glEnableVertexAttribArray(shader_info->position_loc);
 
     glBindBuffer(GL_ARRAY_BUFFER, shader_info->vboIds[1]);
     glVertexAttribPointer(shader_info->coord_loc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-    glEnableVertexAttribArray(shader_info->coord_loc);
 
     // Bind the texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, offline_fb->textureId);
     glUniform1i(shader_info->screentexture_loc, 0);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shader_info->vboIds[2]);
-    glDrawElements(GL_TRIANGLES, sizeof(shader_info->indexs) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, shader_info->draw_arrays);
 
-    glDisableVertexAttribArray(shader_info->position_loc);
     glDisableVertexAttribArray(shader_info->coord_loc);
+    glDisableVertexAttribArray(shader_info->position_loc);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -114,7 +114,7 @@ static inline void vgcanvas_nanovg_offline_fb_flush(vgcanvas_nanovg_t* canvas) {
   }
 }
 
-static ret_t vgcanvas_nanovg_begin_frame(vgcanvas_t* vgcanvas, rect_t* dirty_rect) {
+static ret_t vgcanvas_nanovg_begin_frame(vgcanvas_t* vgcanvas, const rect_t* dirty_rect) {
   float_t angle = 0.0f;
   float_t anchor_x = 0.0f;
   float_t anchor_y = 0.0f;
@@ -187,7 +187,7 @@ static ret_t vgcanvas_nanovg_end_frame(vgcanvas_t* vgcanvas) {
   return RET_OK;
 }
 
-static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h, framebuffer_object_t* fbo) {
+static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32_t h, bool_t custom_draw_model, framebuffer_object_t* fbo) {
   NVGLUframebuffer* handle = NULL;
   NVGcontext* vg = ((vgcanvas_nanovg_t*)vgcanvas)->vg;
 
@@ -202,6 +202,7 @@ static ret_t vgcanvas_nanovg_create_fbo(vgcanvas_t* vgcanvas, uint32_t w, uint32
   fbo->id = handle->image;
   fbo->ratio = vgcanvas->ratio;
   fbo->offline_fbo = handle->fbo;
+  fbo->custom_draw_model = custom_draw_model;
   fbo->online_fbo = nvgluGetCurrFramebuffer();
 
   return RET_OK;
@@ -229,19 +230,21 @@ static ret_t vgcanvas_nanovg_bind_fbo(vgcanvas_t* vgcanvas, framebuffer_object_t
   handle->fbo = fbo->offline_fbo;
   vgcanvas->dirty_rect = rect_init(0, 0, fbo->w, fbo->h);
   nvgluBindFramebuffer(handle);
-  glViewport(0, 0, fbo->w * fbo->ratio, fbo->h * fbo->ratio);
-
-  if (!fbo->init) {
-    glEnable(GL_SCISSOR_TEST);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glDisable(GL_SCISSOR_TEST);
-    fbo->init = TRUE;
+  if (!fbo->custom_draw_model) {
+    glViewport(0, 0, fbo->w * fbo->ratio, fbo->h * fbo->ratio);
+    if (!fbo->init) {
+      glScissor(0, 0, fbo->w * fbo->ratio, fbo->h * fbo->ratio);
+      glEnable(GL_SCISSOR_TEST);
+      glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+      glDisable(GL_SCISSOR_TEST);
+      fbo->init = TRUE;
+    }
+    nvgBeginFrameEx(vg, fbo->w, fbo->h, fbo->ratio, FALSE);
+    nvgSave(vg);
+    nvgReset(vg);
   }
 
-  nvgBeginFrame(vg, fbo->w, fbo->h, fbo->ratio);
-
-  
   return RET_OK;
 }
 
@@ -253,18 +256,25 @@ static ret_t vgcanvas_nanovg_unbind_fbo(vgcanvas_t* vgcanvas, framebuffer_object
   vg = canvas->vg;
 
   handle->fbo = fbo->online_fbo;
-  nvgEndFrame(vg);
+  if (!fbo->custom_draw_model) {
+    nvgRestore(vg);
+    nvgEndFrame(vg);
+  }
+
   nvgluBindFramebuffer(handle);
 
   vgcanvas->dirty_rect = rect_init(fbo->online_dirty_rect.x, fbo->online_dirty_rect.y, fbo->online_dirty_rect.w, fbo->online_dirty_rect.h);
   glViewport(0, 0, vgcanvas->w * fbo->ratio, vgcanvas->h * fbo->ratio);
-  nvgBeginFrame(vg, vgcanvas->w, vgcanvas->h, fbo->ratio);
-
+  glScissor(0, 0, vgcanvas->w * fbo->ratio, vgcanvas->h * fbo->ratio);
+  if (!fbo->custom_draw_model) {
+    nvgBeginFrameEx(vg, vgcanvas->w, vgcanvas->h, fbo->ratio, FALSE);
+  }
   return RET_OK;
 }
 
 static ret_t vgcanvas_nanovg_fbo_to_bitmap(vgcanvas_t* vgcanvas, framebuffer_object_t* fbo,
-                                           bitmap_t* img, rect_t* r) {
+                                           bitmap_t* img, const rect_t* r) {
+  uint32_t i = 0;
   uint32_t x = 0;
   uint32_t y = 0;
   uint32_t height = 0;
@@ -291,9 +301,28 @@ static ret_t vgcanvas_nanovg_fbo_to_bitmap(vgcanvas_t* vgcanvas, framebuffer_obj
 
   p = data + ((img->h - 1) * img->line_length);
 
-  /* 图像数据垂直翻转 */
+  /* 
+   * 图像数据垂直翻转
+   * opengles 出来的数据是预乘的数据，需要反算预乘。 
+   */
   while (TRUE) {
-    tk_memcpy32((uint32_t*)img_data, (uint32_t*)p, img->w);
+    uint8_t* src_data = p;
+    uint8_t* dst_data = img_data;
+    for (i = 0; i < img->w; i++) {
+        if (0x0 < src_data[3] && src_data[3] < 0xff) {
+          dst_data[0] = src_data[0] == src_data[3] ? 0xff : (src_data[0] << 8) / src_data[3];
+          dst_data[1] = src_data[1] == src_data[3] ? 0xff : (src_data[1] << 8) / src_data[3];
+          dst_data[2] = src_data[2] == src_data[3] ? 0xff : (src_data[2] << 8) / src_data[3];
+        } else {
+          dst_data[0] = src_data[0];
+          dst_data[1] = src_data[1];
+          dst_data[2] = src_data[2];
+        }
+        dst_data[3] = src_data[3];
+
+        src_data += 4;
+        dst_data += 4;
+    }
     if (p == data) {
       break;
     }
@@ -312,6 +341,7 @@ static ret_t vgcanvas_nanovg_destroy(vgcanvas_t* vgcanvas) {
   vgcanvas_nanovg_t* canvas = (vgcanvas_nanovg_t*)vgcanvas;
   NVGcontext* vg = canvas->vg;
 
+  vgcanvas_nanovg_deinit(vgcanvas);
 #if defined(WITH_NANOVG_GL3)
   nvgDeleteGL3(vg);
 #elif defined(WITH_NANOVG_GLES2)

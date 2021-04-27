@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  slide_view
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -51,7 +51,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[slide_view.xml](
- *https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/slide_view.xml)
+ *https://github.com/zlgopen/awtk/blob/master/design/default/ui/slide_view.xml)
  *
  * 在c代码中使用函数slide\_view\_create创建滑动视图控件。如：
  *
@@ -74,7 +74,7 @@ BEGIN_C_DECLS
  * > 如果希望背景图片跟随滚动，请将背景图片设置到页面上，否则设置到slide\_view上。
  *
  * > 更多用法请参考：[theme default](
- * https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L458)
+ * https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L458)
  *
  */
 typedef struct _slide_view_t {
@@ -121,6 +121,16 @@ typedef struct _slide_view_t {
   bool_t dragged;
   bool_t pressed;
   velocity_t velocity;
+
+  /* for save focused child */
+  str_t str_target;
+  uint32_t init_idle_id;
+  uint32_t focused_idle_id;
+
+  /*for animation*/
+  widget_t* prev;
+  widget_t* next;
+
 } slide_view_t;
 
 /**
@@ -170,7 +180,7 @@ ret_t slide_view_set_auto_play(widget_t* widget, uint16_t auto_play);
 
 /**
  * @method slide_view_set_active
- * 设置当前页的序号。
+ * 设置当前页的序号(默认启用动画)。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget slide_view对象。
  * @param {uint32_t} index 当前页的序号。
@@ -178,6 +188,18 @@ ret_t slide_view_set_auto_play(widget_t* widget, uint16_t auto_play);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t slide_view_set_active(widget_t* widget, uint32_t index);
+
+/**
+ * @method slide_view_set_active_ex
+ * 设置当前页的序号。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget slide_view对象。
+ * @param {uint32_t} index 当前页的序号。
+ * @param {bool_t} animate 是否启用动画。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t slide_view_set_active_ex(widget_t* widget, uint32_t index, bool_t animate);
 
 /**
  * @method slide_view_set_vertical

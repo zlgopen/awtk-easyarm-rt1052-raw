@@ -32,7 +32,11 @@ keyboard中按钮子控件的名称有些特殊要求：
 | backspace      | 删除键          |
 | tab            | tab键           |
 | space          | 空格键          |
-| close          | 关闭软键盘      |
+| close          | 关闭软键盘       |
+| clear          | 清除编辑器的内容 |
+| cancel         | 恢复编辑器的内容 |
+| back           | 关闭当前窗口     |
+| back_to_home   | 返回home窗口    |
 | 前缀key:        | 键值           |
 | 前缀hard_key:   | 模拟物理键盘    |
 | 前缀page:       | 切换到页面      |
@@ -88,7 +92,7 @@ x="0" y="0" w="100%" h="100%" children_layout="default(r=4,c=4,s=2,m=2)">
 ```
 
 > 更多用法请参考：
-[kb_default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/kb_default.xml)
+[kb_default](https://github.com/zlgopen/awtk/blob/master/design/default/ui/kb_default.xml)
 ----------------------------------
 ### 函数
 <p id="keyboard_t_methods">

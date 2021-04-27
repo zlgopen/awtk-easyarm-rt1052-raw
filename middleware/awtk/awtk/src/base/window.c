@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  window
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,14 +25,7 @@
 #include "base/window.h"
 #include "base/window_manager.h"
 
-static const char* s_window_properties[] = {WIDGET_PROP_ANIM_HINT,
-                                            WIDGET_PROP_OPEN_ANIM_HINT,
-                                            WIDGET_PROP_FULLSCREEN,
-                                            WIDGET_PROP_CLOSE_ANIM_HINT,
-                                            WIDGET_PROP_MOVE_FOCUS_PREV_KEY,
-                                            WIDGET_PROP_MOVE_FOCUS_NEXT_KEY,
-                                            WIDGET_PROP_THEME,
-                                            NULL};
+static const char* s_window_properties[] = {WIDGET_PROP_FULLSCREEN, NULL};
 
 static ret_t window_set_prop(widget_t* widget, const char* name, const value_t* v) {
   if (tk_str_eq(name, WIDGET_PROP_FULLSCREEN)) {
@@ -59,7 +52,17 @@ static ret_t window_get_prop(widget_t* widget, const char* name, value_t* v) {
 
 ret_t window_set_fullscreen(widget_t* widget, bool_t fullscreen) {
   window_t* window = WINDOW(widget);
+  bool_t change_native_window = system_info()->app_type != APP_SIMULATOR;
   return_value_if_fail(window != NULL, RET_BAD_PARAMS);
+
+#if defined(ANDROID) || defined(IOS)
+  change_native_window = TRUE;
+#endif /*ANDROID || IOS*/
+
+  if (change_native_window) {
+    native_window_t* native_window = widget_get_native_window(widget);
+    native_window_set_fullscreen(native_window, fullscreen);
+  }
 
   if (window->fullscreen != fullscreen) {
     window->fullscreen = fullscreen;

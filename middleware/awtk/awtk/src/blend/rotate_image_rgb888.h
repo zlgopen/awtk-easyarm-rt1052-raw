@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  rotate on rgb888
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +23,6 @@
 
 #include "base/bitmap.h"
 
-ret_t rotate_rgb888_image(bitmap_t* fb, bitmap_t* img, rect_t* src, lcd_orientation_t o);
+ret_t rotate_rgb888_image(bitmap_t* fb, bitmap_t* img, const rect_t* src, lcd_orientation_t o);
 
 #endif /*TK_ROTATE_IMAGE_RGB888_H*/

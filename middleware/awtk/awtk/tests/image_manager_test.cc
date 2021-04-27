@@ -17,6 +17,23 @@ TEST(ImageManager, basic) {
   ASSERT_EQ(image_manager_unload_unused(image_manager(), 0), RET_OK);
 }
 
+TEST(ImageManager, allloc) {
+  bitmap_t* bmp = bitmap_create();
+  ASSERT_EQ(image_manager_get_bitmap(image_manager(), "checked", bmp), RET_OK);
+  bitmap_destroy_with_self(bmp);
+
+  bmp = bitmap_create();
+  ASSERT_EQ(image_manager_lookup(image_manager(), "checked", bmp), RET_OK);
+  ASSERT_EQ(image_manager_get_bitmap(image_manager(), "not found", bmp), RET_NOT_FOUND);
+  bitmap_destroy_with_self(bmp);
+
+  bmp = bitmap_create();
+  ASSERT_EQ(image_manager_lookup(image_manager(), "unchecked", bmp), RET_NOT_FOUND);
+  bitmap_destroy_with_self(bmp);
+
+  ASSERT_EQ(image_manager_unload_unused(image_manager(), 0), RET_OK);
+}
+
 TEST(ImageManager, unload) {
   bitmap_t bmp;
   memset(&bmp, 0x00, sizeof(bmp));
@@ -80,7 +97,7 @@ TEST(ImageManager, locale) {
 #ifdef WITH_FS_RES
 TEST(ImageManager, fs) {
   bitmap_t bmp;
-  const char* filename = "file://./demos/assets/default/raw/images/xx/flag_CN.png";
+  const char* filename = "file://./res/assets/default/raw/images/xx/flag_CN.png";
 
   memset(&bmp, 0x00, sizeof(bmp));
   ASSERT_EQ(image_manager_get_bitmap(image_manager(), filename, &bmp), RET_OK);

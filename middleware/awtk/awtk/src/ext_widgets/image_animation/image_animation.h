@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  image_animation
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -44,7 +44,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [image_animation.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/image_animation.xml)
+ * [image_animation.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/image_animation.xml)
  *
  * 在c代码中使用函数image\_animation\_create创建图片动画控件。如：
  *
@@ -313,6 +313,16 @@ ret_t image_animation_set_unload_after_paint(widget_t* widget, bool_t unload_aft
  * @return {widget_t*} image_animation对象。
  */
 widget_t* image_animation_cast(widget_t* widget);
+
+/**
+ * @method image_animation_is_playing
+ * 判断是否在播放。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget image_animation对象。
+ *
+ * @return {bool_t} 返回TRUE表示是，否则表示否。
+ */
+bool_t image_animation_is_playing(widget_t* widget);
 
 #define IMAGE_ANIMATION_PROP_LOOP "loop"
 #define IMAGE_ANIMATION_PROP_SEQUENCE "sequence"

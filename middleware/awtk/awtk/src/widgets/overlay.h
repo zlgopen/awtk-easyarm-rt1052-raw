@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  overlay
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -47,7 +47,7 @@ BEGIN_C_DECLS
  * ```
  *
  * >
- * 更多用法请参考：[overlay.xml](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/)
+ * 更多用法请参考：[overlay.xml](https://github.com/zlgopen/awtk/blob/master/design/default/ui/)
  *
  * 在c代码中使用函数overlay\_create创建窗口。如：
  *
@@ -67,11 +67,30 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：[theme
- * default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/styles/default.xml#L0)
+ * default](https://github.com/zlgopen/awtk/blob/master/design/default/styles/default.xml#L0)
  */
 typedef struct _overlay_t {
   window_base_t overlay;
 
+  /**
+   * @property {bool_t} click_through
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 点击穿透。点击没有子控件的位置，是否穿透到底层窗口。
+   *
+   * 缺省不启用。
+   *
+   */
+  bool_t click_through;
+
+  /**
+   * @property {bool_t} always_on_top
+   * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
+   * 是否总在最上面。
+   *
+   * 缺省不启用。
+   *
+   */
+  bool_t always_on_top;
 } overlay_t;
 
 /**
@@ -87,6 +106,28 @@ typedef struct _overlay_t {
  * @return {widget_t*} 对象。
  */
 widget_t* overlay_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h);
+
+/**
+ * @method overlay_set_click_through
+ * 设置是否启用点击穿透。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t}  click_through 是否启用点击穿透。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t overlay_set_click_through(widget_t* widget, bool_t click_through);
+
+/**
+ * @method overlay_set_always_on_top
+ * 设置是否总是在最上面。
+ * @annotation ["scriptable"]
+ * @param {widget_t*} widget 控件对象。
+ * @param {bool_t}  always_on_top 是否总是在最上面。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t overlay_set_always_on_top(widget_t* widget, bool_t always_on_top);
 
 /**
  * @method overlay_cast

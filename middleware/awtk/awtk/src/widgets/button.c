@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  button
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -50,6 +50,8 @@ static ret_t button_on_repeat(const timer_info_t* info) {
   evt.x = 0;
   evt.y = 0;
   evt.e = event_init(EVT_CLICK, widget);
+  evt.e.size = sizeof(pointer_event_t);
+
   button->repeat_nr++;
   widget_dispatch(widget, (event_t*)&evt);
 
@@ -76,6 +78,7 @@ static ret_t button_on_long_press(const timer_info_t* info) {
   evt.x = 0;
   evt.y = 0;
   evt.e = event_init(EVT_LONG_PRESS, widget);
+  evt.e.size = sizeof(pointer_event_t);
 
   button_pointer_up_cleanup(widget);
   widget_dispatch(widget, (event_t*)&evt);
@@ -97,7 +100,8 @@ static ret_t button_on_event(widget_t* widget, event_t* e) {
       if (button->repeat > 0) {
         button->timer_id = timer_add(button_on_repeat, widget, button->repeat);
       } else if (button->enable_long_press) {
-        button->timer_id = timer_add(button_on_long_press, widget, TK_LONG_PRESS_TIME);
+        assert(button->long_press_time > 0);
+        button->timer_id = timer_add(button_on_long_press, widget, button->long_press_time);
       }
 
       widget_grab(widget->parent, widget);
@@ -111,6 +115,7 @@ static ret_t button_on_event(widget_t* widget, event_t* e) {
       pointer_event_t evt = *(pointer_event_t*)e;
       if (button->pressed && widget_is_point_in(widget, evt.x, evt.y, FALSE)) {
         evt.e = event_init(EVT_CLICK, widget);
+        evt.e.size = sizeof(pointer_event_t);
         button_pointer_up_cleanup(widget);
         widget_dispatch(widget, (event_t*)&evt);
       } else {
@@ -145,6 +150,15 @@ ret_t button_set_repeat(widget_t* widget, int32_t repeat) {
   return RET_OK;
 }
 
+ret_t button_set_long_press_time(widget_t* widget, uint32_t long_press_time) {
+  button_t* button = BUTTON(widget);
+  return_value_if_fail(button != NULL, RET_BAD_PARAMS);
+
+  button->long_press_time = long_press_time;
+
+  return RET_OK;
+}
+
 ret_t button_set_enable_long_press(widget_t* widget, bool_t enable_long_press) {
   button_t* button = BUTTON(widget);
   return_value_if_fail(button != NULL, RET_BAD_PARAMS);
@@ -161,6 +175,9 @@ static ret_t button_get_prop(widget_t* widget, const char* name, value_t* v) {
   if (tk_str_eq(name, WIDGET_PROP_REPEAT)) {
     value_set_int(v, button->repeat);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_LONG_PRESS_TIME)) {
+    value_set_int(v, button->long_press_time);
+    return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_ENABLE_LONG_PRESS)) {
     value_set_bool(v, button->enable_long_press);
     return RET_OK;
@@ -175,6 +192,9 @@ static ret_t button_get_prop_default_value(widget_t* widget, const char* name, v
   if (tk_str_eq(name, WIDGET_PROP_REPEAT)) {
     value_set_int(v, 0);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_LONG_PRESS_TIME)) {
+    value_set_int(v, TK_LONG_PRESS_TIME);
+    return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_ENABLE_LONG_PRESS)) {
     value_set_bool(v, FALSE);
     return RET_OK;
@@ -188,6 +208,8 @@ static ret_t button_set_prop(widget_t* widget, const char* name, const value_t* 
 
   if (tk_str_eq(name, WIDGET_PROP_REPEAT)) {
     return button_set_repeat(widget, value_int(v));
+  } else if (tk_str_eq(name, WIDGET_PROP_LONG_PRESS_TIME)) {
+    return button_set_long_press_time(widget, value_int(v));
   } else if (tk_str_eq(name, WIDGET_PROP_ENABLE_LONG_PRESS)) {
     return button_set_enable_long_press(widget, value_bool(v));
   }
@@ -199,7 +221,8 @@ static ret_t button_on_destroy(widget_t* widget) {
   return button_remove_timer(widget);
 }
 
-static const char* const s_button_properties[] = {WIDGET_PROP_REPEAT, NULL};
+static const char* const s_button_properties[] = {WIDGET_PROP_REPEAT, WIDGET_PROP_LONG_PRESS_TIME,
+                                                  WIDGET_PROP_ENABLE_LONG_PRESS, NULL};
 
 TK_DECL_VTABLE(button) = {.size = sizeof(button_t),
                           .type = WIDGET_TYPE_BUTTON,
@@ -226,6 +249,7 @@ widget_t* button_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   button->pressed = FALSE;
   button->enable_long_press = FALSE;
   button->timer_id = TK_INVALID_ID;
+  button->long_press_time = TK_LONG_PRESS_TIME;
 
   return widget;
 }

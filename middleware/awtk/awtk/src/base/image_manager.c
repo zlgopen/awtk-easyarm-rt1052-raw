@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  bitmap manager
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -72,6 +72,17 @@ image_manager_t* image_manager_create(void) {
   return_value_if_fail(imm != NULL, NULL);
 
   return image_manager_init(imm);
+}
+
+static locale_info_t* image_manager_get_locale_info(image_manager_t* imm) {
+  return_value_if_fail(imm != NULL, NULL);
+  locale_info_t* locale = locale_info();
+
+  if (imm->assets_manager != NULL && imm->assets_manager->locale_info != NULL) {
+    locale = imm->assets_manager->locale_info;
+  }
+
+  return locale;
 }
 
 image_manager_t* image_manager_init(image_manager_t* imm) {
@@ -219,17 +230,20 @@ ret_t image_manager_get_bitmap_exprs(image_manager_t* imm, const char* exprs, bi
 
 ret_t image_manager_get_bitmap(image_manager_t* imm, const char* name, bitmap_t* image) {
   return_value_if_fail(imm != NULL && name != NULL && image != NULL, RET_BAD_PARAMS);
+  locale_info_t* locale_info = image_manager_get_locale_info(imm);
 
   if (strstr(name, TK_LOCALE_MAGIC) != NULL) {
     char locale[TK_NAME_LEN + 1];
     char real_name[TK_NAME_LEN + 1];
-    const char* language = locale_info()->language;
-    const char* country = locale_info()->country;
+    const char* language = locale_info->language;
+    const char* country = locale_info->country;
 
-    tk_snprintf(locale, sizeof(locale) - 1, "%s_%s", language, country);
-    tk_replace_locale(name, real_name, locale);
-    if (image_manager_get_bitmap_impl(imm, real_name, image) == RET_OK) {
-      return RET_OK;
+    if (strlen(language) > 0 && strlen(country) > 0) {
+      tk_snprintf(locale, sizeof(locale) - 1, "%s_%s", language, country);
+      tk_replace_locale(name, real_name, locale);
+      if (image_manager_get_bitmap_impl(imm, real_name, image) == RET_OK) {
+        return RET_OK;
+      }
     }
 
     tk_replace_locale(name, real_name, language);

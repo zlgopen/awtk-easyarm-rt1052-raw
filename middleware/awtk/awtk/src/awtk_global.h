@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  awtk
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -139,6 +139,26 @@ ret_t tk_deinit_internal(void);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t tk_exit(void);
+
+/**
+ * @method tk_is_ui_thread
+ * 
+ * 判断当前线程是否是UI线程。
+ * @return {bool_t} 返回TRUE表示是，否则表示否。
+ */
+bool_t tk_is_ui_thread(void);
+
+/**
+ * @method tk_run_in_ui_thread
+ * 后台线程在UI线程执行指定的函数。
+ *
+ * @param {tk_callback_t} func 函数。
+ * @param {void*} ctx  回调函数的上下文。
+ * @param {bool_t} wait_until_done 是否等待完成。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t tk_run_in_ui_thread(tk_callback_t func, void* ctx, bool_t wait_until_done);
 
 END_C_DECLS
 

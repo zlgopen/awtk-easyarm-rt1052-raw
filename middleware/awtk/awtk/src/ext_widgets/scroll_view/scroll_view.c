@@ -1,9 +1,9 @@
-﻿/**
+/**
  * File:   scroll_view.c
  * Author: AWTK Develop Team
  * Brief:  scroll_view
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -29,6 +29,27 @@
 #include "base/image_manager.h"
 #include "widget_animators/widget_animator_scroll.h"
 
+#define SCROLL_VIEW_DEFAULT_XSPEED_SCALE 2.0f
+#define SCROLL_VIEW_DEFAULT_YSPEED_SCALE 2.0f
+
+static uint32_t scroll_view_get_curr_page(widget_t* widget);
+static uint32_t scroll_view_get_page_max_number(widget_t* widget);
+
+static ret_t scroll_view_get_item_rect(widget_t* parent, widget_t* widget, rect_t* item_rect) {
+  rect_t r;
+  point_t p;
+
+  WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
+  memset(&p, 0x0, sizeof(point_t));
+  widget_to_screen_ex(iter, parent, &p);
+  r = rect_init(p.x, p.y, iter->w, iter->h);
+  rect_merge(item_rect, &r);
+  scroll_view_get_item_rect(parent, iter, item_rect);
+  WIDGET_FOR_EACH_CHILD_END();
+
+  return RET_OK;
+}
+
 static ret_t scroll_view_update_virtual_size(widget_t* widget) {
   int32_t virtual_w = 0;
   int32_t virtual_h = 0;
@@ -39,8 +60,17 @@ static ret_t scroll_view_update_virtual_size(widget_t* widget) {
   virtual_h = tk_max(scroll_view->virtual_h, widget->h);
 
   WIDGET_FOR_EACH_CHILD_BEGIN(widget, iter, i)
-  int32_t r = iter->x + iter->w;
-  int32_t b = iter->y + iter->h;
+  int32_t r = 0;
+  int32_t b = 0;
+  if (scroll_view->recursive) {
+    rect_t rect = rect_init(0, 0, iter->w, iter->h);
+    scroll_view_get_item_rect(iter, iter, &rect);
+    r = iter->x + rect.x + rect.w;
+    b = iter->y + rect.y + rect.h;
+  } else {
+    r = iter->x + iter->w;
+    b = iter->y + iter->h;
+  }
   if (r > virtual_w) {
     virtual_w = r;
   }
@@ -68,6 +98,20 @@ static ret_t scroll_view_on_layout_children(widget_t* widget) {
                            tk_min(scroll_view->xoffset, (scroll_view->virtual_w - widget->w)),
                            tk_min(scroll_view->yoffset, (scroll_view->virtual_h - widget->h)));
   }
+  if (scroll_view->snap_to_page) {
+    int32_t curr_page = scroll_view_get_curr_page(widget);
+    uint32_t max_page = scroll_view_get_page_max_number(widget);
+    scroll_view->xoffset_end = scroll_view->xoffset;
+    scroll_view->yoffset_end = scroll_view->yoffset;
+    scroll_view->fix_end_offset(widget);
+    scroll_view->xoffset = scroll_view->xoffset_end;
+    scroll_view->yoffset = scroll_view->yoffset_end;
+    if (scroll_view->curr_page != curr_page || scroll_view->max_page != max_page) {
+      scroll_view->max_page = max_page;
+      scroll_view->curr_page = curr_page;
+      widget_dispatch_simple_event(widget, EVT_PAGE_CHANGED);
+    }
+  }
 
   return RET_OK;
 }
@@ -94,8 +138,10 @@ static ret_t scroll_view_on_scroll_done(void* ctx, event_t* e) {
   return_value_if_fail(widget != NULL && scroll_view != NULL, RET_BAD_PARAMS);
 
   scroll_view->wa = NULL;
+  scroll_view->curr_page = scroll_view_get_curr_page(widget);
   widget_invalidate_force(widget, NULL);
   widget_dispatch_simple_event(widget, EVT_SCROLL_END);
+  widget_dispatch_simple_event(widget, EVT_PAGE_CHANGED);
 
   return RET_REMOVE;
 }
@@ -128,12 +174,40 @@ static ret_t scroll_view_fix_end_offset_default(widget_t* widget) {
   return RET_OK;
 }
 
+static int32_t scroll_view_get_snap_to_page_offset_value(widget_t* widget, int32_t offset_end) {
+  uint32_t tmp = 0;
+  scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(scroll_view != NULL, offset_end);
+  if (scroll_view->xslidable && !scroll_view->yslidable) {
+    tmp = widget->w;
+  } else if (!scroll_view->xslidable && scroll_view->yslidable) {
+    tmp = widget->h;
+  }
+  if (tmp != 0) {
+    int32_t n = (int32_t)((offset_end + tmp * 0.5f) / tmp);
+    if (scroll_view->move_to_page) {
+      if (scroll_view->curr_page - n > 1) {
+        n = scroll_view->curr_page - 1;
+      } else if (n - scroll_view->curr_page > 1) {
+        n = scroll_view->curr_page + 1;
+      }
+    }
+    offset_end = n * tmp;
+  }
+  return offset_end;
+}
+
 ret_t scroll_view_scroll_to(widget_t* widget, int32_t xoffset_end, int32_t yoffset_end,
                             int32_t duration) {
   int32_t xoffset = 0;
   int32_t yoffset = 0;
   scroll_view_t* scroll_view = SCROLL_VIEW(widget);
   return_value_if_fail(scroll_view != NULL, RET_FAIL);
+
+  if (scroll_view->snap_to_page) {
+    xoffset_end = scroll_view_get_snap_to_page_offset_value(widget, xoffset_end);
+    yoffset_end = scroll_view_get_snap_to_page_offset_value(widget, yoffset_end);
+  }
 
   if (scroll_view->fix_end_offset) {
     scroll_view->xoffset_end = xoffset_end;
@@ -272,9 +346,13 @@ static ret_t scroll_view_notify_scrolled(scroll_view_t* scroll_view) {
 }
 
 static ret_t scroll_view_on_pointer_move(scroll_view_t* scroll_view, pointer_event_t* e) {
-  velocity_t* v = &(scroll_view->velocity);
-  int32_t dx = e->x - scroll_view->down.x;
-  int32_t dy = e->y - scroll_view->down.y;
+  int32_t dx = 0;
+  int32_t dy = 0;
+  velocity_t* v = NULL;
+  return_value_if_fail(scroll_view != NULL && e != NULL, RET_BAD_PARAMS);
+  v = &(scroll_view->velocity);
+  dx = e->x - scroll_view->down.x;
+  dy = e->y - scroll_view->down.y;
   velocity_update(v, e->e.time, e->x, e->y);
 
   if (scroll_view->wa == NULL) {
@@ -296,6 +374,7 @@ static ret_t scroll_view_on_pointer_move(scroll_view_t* scroll_view, pointer_eve
 static bool_t scroll_view_is_dragged(widget_t* widget, pointer_event_t* evt) {
   int32_t delta = 0;
   scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(scroll_view != NULL, FALSE);
   if (scroll_view->xslidable && scroll_view->yslidable) {
     int32_t xdelta = evt->x - scroll_view->down.x;
     int32_t ydelta = evt->y - scroll_view->down.y;
@@ -306,7 +385,7 @@ static bool_t scroll_view_is_dragged(widget_t* widget, pointer_event_t* evt) {
     delta = evt->x - scroll_view->down.x;
   }
 
-  return (tk_abs(delta) >= TK_DRAG_THRESHOLD);
+  return scroll_view->snap_to_page || (tk_abs(delta) >= TK_DRAG_THRESHOLD);
 }
 
 static ret_t scroll_view_on_event(widget_t* widget, event_t* e) {
@@ -372,13 +451,17 @@ static ret_t scroll_view_on_event(widget_t* widget, event_t* e) {
 }
 
 static ret_t scroll_view_on_paint_children(widget_t* widget, canvas_t* c) {
+  rect_t r;
   rect_t r_save;
-  vgcanvas_t* vg = canvas_get_vgcanvas(c);
-  rect_t r = rect_init(c->ox, c->oy, widget->w, widget->h);
-
+  int32_t xoffset = 0;
+  int32_t yoffset = 0;
+  vgcanvas_t* vg = NULL;
   scroll_view_t* scroll_view = SCROLL_VIEW(widget);
-  int32_t xoffset = -scroll_view->xoffset;
-  int32_t yoffset = -scroll_view->yoffset;
+  return_value_if_fail(widget != NULL && c != NULL && scroll_view != NULL, RET_BAD_PARAMS);
+  vg = canvas_get_vgcanvas(c);
+  xoffset = -scroll_view->xoffset;
+  yoffset = -scroll_view->yoffset;
+  r = rect_init(c->ox, c->oy, widget->w, widget->h);
 
   canvas_translate(c, xoffset, yoffset);
   canvas_get_clip_rect(c, &r_save);
@@ -429,6 +512,44 @@ static widget_t* scroll_view_find_target(widget_t* widget, xy_t x, xy_t y) {
   }
 }
 
+static uint32_t scroll_view_get_page_max_number(widget_t* widget) {
+  scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(widget != NULL && scroll_view != NULL, 0);
+  if (scroll_view->xslidable && !scroll_view->yslidable) {
+    return scroll_view->virtual_w / widget->w;
+  } else if (!scroll_view->xslidable && scroll_view->yslidable) {
+    return scroll_view->virtual_h / widget->h;
+  }
+  return 0;
+}
+
+static uint32_t scroll_view_get_curr_page(widget_t* widget) {
+  scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(widget != NULL && scroll_view != NULL, 0);
+  if (scroll_view->xslidable && !scroll_view->yslidable) {
+    return scroll_view->xoffset / widget->w;
+  } else if (!scroll_view->xslidable && scroll_view->yslidable) {
+    return scroll_view->yoffset / widget->h;
+  }
+  return 0;
+}
+
+static ret_t scroll_view_set_curr_page(widget_t* widget, int32_t new_page) {
+  scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(widget != NULL && scroll_view != NULL, RET_BAD_PARAMS);
+
+  if (scroll_view->xslidable && !scroll_view->yslidable) {
+    scroll_view->xoffset_end = new_page * widget->w;
+  } else if (!scroll_view->xslidable && scroll_view->yslidable) {
+    scroll_view->xoffset_end = new_page * widget->h;
+  }
+  scroll_view->snap_to_page = FALSE;
+  scroll_view_scroll_to(widget, scroll_view->xoffset_end, scroll_view->yoffset_end,
+                        TK_ANIMATING_TIME);
+  scroll_view->snap_to_page = TRUE;
+  return RET_OK;
+}
+
 static ret_t scroll_view_get_prop(widget_t* widget, const char* name, value_t* v) {
   scroll_view_t* scroll_view = SCROLL_VIEW(widget);
   return_value_if_fail(scroll_view != NULL && name != NULL && v != NULL, RET_BAD_PARAMS);
@@ -457,6 +578,24 @@ static ret_t scroll_view_get_prop(widget_t* widget, const char* name, value_t* v
   } else if (tk_str_eq(name, SCROLL_VIEW_Y_SPEED_SCALE)) {
     value_set_float(v, scroll_view->yspeed_scale);
     return RET_OK;
+  } else if (tk_str_eq(name, SCROLL_VIEW_RECURSIVE)) {
+    value_set_bool(v, scroll_view->recursive);
+    return RET_OK;
+  } else if (tk_str_eq(name, SCROLL_VIEW_MOVE_TO_PAGE)) {
+    value_set_bool(v, scroll_view->move_to_page);
+    return RET_OK;
+  } else if (tk_str_eq(name, SCROLL_VIEW_SNAP_TO_PAGE)) {
+    value_set_bool(v, scroll_view->snap_to_page);
+    return RET_OK;
+  }
+  if (scroll_view->snap_to_page) {
+    if (tk_str_eq(name, WIDGET_PROP_PAGE_MAX_NUMBER)) {
+      value_set_uint32(v, scroll_view_get_page_max_number(widget));
+      return RET_OK;
+    } else if (tk_str_eq(name, WIDGET_PROP_CURR_PAGE)) {
+      value_set_uint32(v, scroll_view_get_curr_page(widget));
+      return RET_OK;
+    }
   }
 
   return RET_NOT_FOUND;
@@ -494,6 +633,14 @@ static ret_t scroll_view_set_prop(widget_t* widget, const char* name, const valu
   } else if (tk_str_eq(name, SCROLL_VIEW_Y_SPEED_SCALE)) {
     scroll_view->yspeed_scale = value_float(v);
     return RET_OK;
+  } else if (tk_str_eq(name, SCROLL_VIEW_RECURSIVE)) {
+    return scroll_view_set_recursive(widget, value_bool(v));
+  } else if (tk_str_eq(name, SCROLL_VIEW_MOVE_TO_PAGE)) {
+    return scroll_view_set_move_to_page(widget, value_bool(v));
+  } else if (tk_str_eq(name, SCROLL_VIEW_SNAP_TO_PAGE)) {
+    return scroll_view_set_snap_to_page(widget, value_bool(v));
+  } else if (scroll_view->snap_to_page && tk_str_eq(name, WIDGET_PROP_CURR_PAGE)) {
+    return scroll_view_set_curr_page(widget, value_int(v));
   }
 
   return RET_NOT_FOUND;
@@ -502,7 +649,8 @@ static ret_t scroll_view_set_prop(widget_t* widget, const char* name, const valu
 static const char* s_scroll_view_clone_properties[] = {
     WIDGET_PROP_VIRTUAL_W,     WIDGET_PROP_VIRTUAL_H,     WIDGET_PROP_XSLIDABLE,
     WIDGET_PROP_YSLIDABLE,     WIDGET_PROP_XOFFSET,       WIDGET_PROP_YOFFSET,
-    SCROLL_VIEW_X_SPEED_SCALE, SCROLL_VIEW_Y_SPEED_SCALE, NULL};
+    SCROLL_VIEW_X_SPEED_SCALE, SCROLL_VIEW_Y_SPEED_SCALE, SCROLL_VIEW_RECURSIVE,
+    SCROLL_VIEW_MOVE_TO_PAGE,  SCROLL_VIEW_SNAP_TO_PAGE,  NULL};
 TK_DECL_VTABLE(scroll_view) = {.size = sizeof(scroll_view_t),
                                .type = WIDGET_TYPE_SCROLL_VIEW,
                                .scrollable = TRUE,
@@ -522,8 +670,9 @@ widget_t* scroll_view_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
   scroll_view_t* scroll_view = SCROLL_VIEW(widget);
   return_value_if_fail(scroll_view != NULL, NULL);
 
-  scroll_view->xspeed_scale = 2.0f;
-  scroll_view->yspeed_scale = 2.0f;
+  scroll_view->snap_to_page = FALSE;
+  scroll_view->xspeed_scale = SCROLL_VIEW_DEFAULT_XSPEED_SCALE;
+  scroll_view->yspeed_scale = SCROLL_VIEW_DEFAULT_YSPEED_SCALE;
   scroll_view->fix_end_offset = scroll_view_fix_end_offset_default;
 
   return widget;
@@ -561,6 +710,11 @@ ret_t scroll_view_set_offset(widget_t* widget, int32_t xoffset, int32_t yoffset)
   scroll_view_t* scroll_view = SCROLL_VIEW(widget);
   return_value_if_fail(scroll_view != NULL, RET_FAIL);
 
+  if (scroll_view->snap_to_page) {
+    xoffset = scroll_view_get_snap_to_page_offset_value(widget, xoffset);
+    yoffset = scroll_view_get_snap_to_page_offset_value(widget, yoffset);
+  }
+
   scroll_view->xoffset = xoffset;
   scroll_view->yoffset = yoffset;
 
@@ -585,6 +739,46 @@ ret_t scroll_view_set_yslidable(widget_t* widget, bool_t yslidable) {
   scroll_view->yslidable = yslidable;
 
   return RET_OK;
+}
+
+ret_t scroll_view_set_move_to_page(widget_t* widget, bool_t move_to_page) {
+  scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(scroll_view != NULL, RET_FAIL);
+
+  scroll_view->move_to_page = move_to_page;
+  return RET_OK;
+}
+
+ret_t scroll_view_set_snap_to_page(widget_t* widget, bool_t snap_to_page) {
+  scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(scroll_view != NULL, RET_FAIL);
+
+  scroll_view->snap_to_page = snap_to_page;
+  if (snap_to_page) {
+    if (scroll_view->xspeed_scale == SCROLL_VIEW_DEFAULT_XSPEED_SCALE) {
+      scroll_view->xspeed_scale /= 2;
+    }
+    if (scroll_view->yspeed_scale == SCROLL_VIEW_DEFAULT_YSPEED_SCALE) {
+      scroll_view->yspeed_scale /= 2;
+    }
+  }
+
+  return RET_OK;
+}
+
+ret_t scroll_view_set_recursive_only(widget_t* widget, bool_t recursive) {
+  scroll_view_t* scroll_view = SCROLL_VIEW(widget);
+  return_value_if_fail(scroll_view != NULL, RET_FAIL);
+
+  scroll_view->recursive = recursive;
+  return RET_OK;
+}
+
+ret_t scroll_view_set_recursive(widget_t* widget, bool_t recursive) {
+  ret_t ret = RET_OK;
+  ret = scroll_view_set_recursive_only(widget, recursive);
+  return_value_if_fail(ret == RET_OK, ret);
+  return widget_layout(widget);
 }
 
 widget_t* scroll_view_cast(widget_t* widget) {

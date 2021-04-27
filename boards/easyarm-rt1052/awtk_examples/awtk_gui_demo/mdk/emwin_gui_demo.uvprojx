@@ -863,6 +863,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port\platform.c</FilePath>
             </File>
+			<File>
+              <FileName>thread_null.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\middleware\awtk\awtk-rt1052-raw\awtk-port\thread_null.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

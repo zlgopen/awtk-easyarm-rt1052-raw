@@ -4,7 +4,7 @@
  * Author: AWTK Develop Team
  * Brief:  config
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -186,7 +186,7 @@
  */
 
 /**
- * 对于低端平台，如果内存不足以提供完整的FrameBuffer，请定义本宏启用局部FrameBuffer，可大幅度提高渲染性能。
+ * 对于低端平台，如果内存不足以提供完整的FrameBuffer，请定义本宏启用局部FrameBuffer，可大幅度提高渲染性能。(单位是像素个数)
  *
  * #define FRAGMENT_FRAME_BUFFER_SIZE 32 * 1024
  */
@@ -221,6 +221,18 @@
  * 
  * #define WITH_TEXT_BIDI 1
  * 
+ */
+
+/**
+ * 开启自定义的离线 canvas，如果板子使用特殊的画布的话，需要定义该宏来定义特殊离线 canvas 函数
+ * 
+ * #define WITH_CANVAS_OFFLINE_CUSTION 1
+ */
+
+/**
+ * 开启透明色背景的刷新机制，一般使用在多图层的透明背景使用
+ * 
+ * #define WITH_LCD_CLEAR_ALPHA 1
  */
 
 #endif /*AWTK_CONFIG_H*/

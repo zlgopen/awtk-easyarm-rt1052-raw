@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  generic value type
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -139,6 +139,7 @@ typedef enum _value_type_t {
   VALUE_TYPE_TOKEN,
 } value_type_t;
 
+#pragma pack(push, 1)
 typedef struct _binary_data_t {
   uint32_t size;
   void* data;
@@ -191,6 +192,7 @@ struct _value_t {
     sized_str_t sized_str;
   } value;
 };
+#pragma pack(pop)
 
 /**
  * @method value_set_bool
@@ -476,7 +478,6 @@ value_t* value_set_str(value_t* v, const char* value);
  * @method value_dup_str
  * 设置类型为字符串的值(并拷贝字符串)。
  *
- * > 供脚本语言使用。
  * @alias value_set_str
  * @annotation ["scriptable"]
  * @param {value_t*} v     value对象。
@@ -485,6 +486,18 @@ value_t* value_set_str(value_t* v, const char* value);
  * @return {value_t*} value对象本身。
  */
 value_t* value_dup_str(value_t* v, const char* value);
+
+/**
+ * @method value_dup_str_with_len
+ * 设置类型为字符串的值(并拷贝字符串)。
+ *
+ * @param {value_t*} v     value对象。
+ * @param {const char*}   value 待设置的值。
+ * @param {uint32_t} len 长度。
+ *
+ * @return {value_t*} value对象本身。
+ */
+value_t* value_dup_str_with_len(value_t* v, const char* value, uint32_t len);
 
 /**
  * @method value_set_wstr
@@ -505,6 +518,18 @@ value_t* value_set_wstr(value_t* v, const wchar_t* value);
  * @return {const char*} 值。
  */
 const char* value_str(const value_t* v);
+
+/**
+ * @method value_str_ex
+ * 获取类型为字符串的值。
+ * @annotation ["scriptable"]
+ * @param {value_t*} v value对象。
+ * @param {char*} buff 用于格式转换的缓冲区。
+ * @param {uint32_t} size 缓冲区大小。
+ *
+ * @return {const char*} 值。
+ */
+const char* value_str_ex(const value_t* v, char* buff, uint32_t size);
 
 /**
  * @method value_wstr
@@ -629,6 +654,17 @@ sized_str_t* value_sized_str(const value_t* v);
 value_t* value_set_binary_data(value_t* v, void* data, uint32_t size);
 
 /**
+ * @method value_dup_binary_data
+ * 设置类型为binary_data的值(复制数据)。
+ * @param {value_t*} v  value对象。
+ * @param {const void*}  value 待设置的值。
+ * @param {uint32_t}  size 长度。
+ *
+ * @return {value_t*} value对象本身。
+ */
+value_t* value_dup_binary_data(value_t* v, const void* data, uint32_t size);
+
+/**
  * @method value_binary_data
  * 获取为binary_data的值。
  * @param {value_t*} v value对象。
@@ -717,6 +753,16 @@ ret_t value_reset(value_t* v);
  * @return {value_t*} 对象。
  */
 value_t* value_cast(value_t* value);
+
+/**
+ * @method value_type_size
+ * 获取指定类型数据大小。
+ * @annotation ["static"]
+ * @param {value_type_t} type 类型。
+ *
+ * @return {uint32_t} 返回对应数据类型的长度。
+ */
+uint32_t value_type_size(value_type_t type);
 
 END_C_DECLS
 

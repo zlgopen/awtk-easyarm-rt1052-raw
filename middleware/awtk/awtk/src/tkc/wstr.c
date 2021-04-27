@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  width char
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -149,6 +149,16 @@ ret_t wstr_clear(wstr_t* str) {
   if (str->str != NULL) {
     str->str[0] = '\0';
   }
+
+  return RET_OK;
+}
+
+ret_t wstr_set_utf8_with_len(wstr_t* str, const char* text, uint32_t len) {
+  return_value_if_fail(str != NULL && text != NULL, RET_BAD_PARAMS);
+  return_value_if_fail(wstr_extend(str, len + 2) == RET_OK, RET_OOM);
+
+  tk_utf8_to_utf16_ex(text, len, str->str, str->capacity - 1);
+  str->size = wcslen(str->str);
 
   return RET_OK;
 }
@@ -454,4 +464,20 @@ ret_t wstr_normalize_newline(wstr_t* str, wchar_t newline) {
   str->size = d - str->str;
 
   return RET_OK;
+}
+
+uint32_t wstr_count_char(wstr_t* str, wchar_t c) {
+  uint32_t i = 0;
+  uint32_t n = 0;
+  wchar_t* p = NULL;
+  return_value_if_fail(str != NULL, 0);
+
+  p = str->str;
+  for (i = 0; i < str->size; i++) {
+    if (p[i] == c) {
+      n++;
+    }
+  }
+
+  return n;
 }

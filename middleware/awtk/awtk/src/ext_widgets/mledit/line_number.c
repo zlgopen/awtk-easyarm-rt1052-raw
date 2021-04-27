@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  line_number
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -71,7 +71,7 @@ static ret_t line_number_on_paint_self(widget_t* widget, canvas_t* c) {
   rect_t clip_r = {0, 0, 0, 0};
   rect_t edit_r = {0, 0, 0, 0};
   line_number_t* line_number = LINE_NUMBER(widget);
-
+  return_value_if_fail(line_number != NULL, RET_BAD_PARAMS);
   canvas_get_clip_rect(c, &save_r);
 
   edit_r = rect_init(c->ox, c->oy + line_number->top_margin, widget->w,

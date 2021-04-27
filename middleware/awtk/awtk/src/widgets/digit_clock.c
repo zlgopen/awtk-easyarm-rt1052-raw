@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  digit_clock
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -93,7 +93,7 @@ static ret_t digit_clock_on_timer(const timer_info_t* info) {
   digit_clock_update_time(widget);
 
   if (!wstr_equal(&(digit_clock->last_time), &(widget->text))) {
-    widget_invalidate(widget, NULL);
+    widget_invalidate_force(widget, NULL);
   }
 
   return RET_REPEAT;

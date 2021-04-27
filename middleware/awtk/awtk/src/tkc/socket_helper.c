@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  socket helper functions
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -100,7 +100,7 @@ int tcp_listen(int port) {
 
   return_value_if_fail(socket_bind(sock, port) == RET_OK, -1);
 
-  if (listen(sock, 1) < 0) {
+  if (listen(sock, 5) < 0) {
     log_debug("listen error\n");
     return -1;
   }

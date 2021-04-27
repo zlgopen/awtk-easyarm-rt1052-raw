@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  native window sdl
  *
- * Copyright (c) 2019 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2019 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -88,6 +88,11 @@ static ret_t native_window_sdl_resize(native_window_t* win, wh_t w, wh_t h) {
 
 #if !defined(ANDROID) && !defined(IOS)
   if (system_info()->lcd_orientation == LCD_ORIENTATION_0 && (w != info.w || h != info.h)) {
+#ifdef WIN32
+    w = w * win->ratio;
+    h = h * win->ratio;
+#endif /*WIN32*/
+
     SDL_SetWindowSize(sdl->window, w, h);
   }
 #endif /*ANDROID*/
@@ -156,10 +161,6 @@ static ret_t native_window_sdl_close(native_window_t* win) {
 
   if (sdl->render != NULL) {
     SDL_DestroyRenderer(sdl->render);
-  }
-
-  if (sdl->window != NULL) {
-    SDL_DestroyWindow(sdl->window);
   }
 
   if (sdl->context != NULL) {
@@ -576,6 +577,7 @@ static ret_t sdl_init_gl(void) {
 ret_t native_window_sdl_init(bool_t shared, uint32_t w, uint32_t h) {
   const char* title = system_info()->app_name;
 
+  SDL_SetHint(SDL_HINT_VIDEO_ALLOW_SCREENSAVER, "1");
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) != 0) {
     log_debug("Failed to initialize SDL: %s", SDL_GetError());
     exit(0);
@@ -599,6 +601,13 @@ ret_t native_window_sdl_init(bool_t shared, uint32_t w, uint32_t h) {
 
 ret_t native_window_sdl_deinit(void) {
   if (s_shared_win != NULL) {
+    native_window_sdl_t* sdl = NATIVE_WINDOW_SDL(s_shared_win);
+
+    if (sdl->cursor_surface != NULL) {
+      SDL_FreeSurface(sdl->cursor_surface);
+      sdl->cursor_surface = NULL;
+    }
+
     object_unref(OBJECT(s_shared_win));
     s_shared_win = NULL;
   }

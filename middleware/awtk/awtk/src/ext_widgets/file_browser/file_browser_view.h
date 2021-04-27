@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  file manager/browser/choosor
  *
- * Copyright (c) 2020 - 2020 Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021 Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -64,7 +64,7 @@ BEGIN_C_DECLS
  *
  * 完整示例请参考：
  *
- * https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/file_chooser_for_open.xml
+ * https://github.com/zlgopen/awtk/blob/master/design/default/ui/file_chooser_for_open.xml
  *
  */
 typedef struct _file_browser_view_t {

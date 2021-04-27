@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  widget vtable default impl
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,7 +22,9 @@
 #include "base/widget_vtable.h"
 #include "tkc/mem.h"
 
-ret_t widget_invalidate_default(widget_t* widget, rect_t* r) {
+ret_t widget_invalidate_default(widget_t* widget, const rect_t* rect) {
+  rect_t t = *rect;
+  rect_t* r = &t;
   if (widget->vt->scrollable) {
     int32_t ox = widget_get_prop_int(widget, WIDGET_PROP_XOFFSET, 0);
     int32_t oy = widget_get_prop_int(widget, WIDGET_PROP_YOFFSET, 0);
@@ -174,21 +176,16 @@ widget_t* widget_find_target_default(widget_t* widget, xy_t x, xy_t y) {
   }
 
   widget_to_local(widget, &p);
-  xx = p.x;
-  yy = p.y;
   WIDGET_FOR_EACH_CHILD_BEGIN_R(widget, iter, i)
-  if (yy < iter->y || yy >= (iter->y + iter->h)) {
-    continue;
-  }
-
-  if (xx < iter->x || xx >= (iter->x + iter->w)) {
-    continue;
-  }
-
   if (!iter->sensitive || !iter->enable) {
     continue;
   }
 
+  xx = p.x - iter->x;
+  yy = p.y - iter->y;
+  if (!widget_is_point_in(iter, xx, yy, TRUE)) {
+    continue;
+  }
   return iter;
   WIDGET_FOR_EACH_CHILD_END();
 

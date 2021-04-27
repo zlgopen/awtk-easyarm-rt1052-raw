@@ -23,6 +23,7 @@
 | EVT\_FOCUS | 得到焦点事件名(event\_t)。 |
 | EVT\_BLUR | 失去焦点事件名(event\_t)。 |
 | EVT\_KEY\_DOWN | 键按下事件名(key\_event\_t)。 |
+| EVT\_KEY\_LONG\_PRESS | 键长按事件名(key\_event\_t)。 |
 | EVT\_KEY\_DOWN\_BEFORE\_CHILDREN | 键按下事件名，在子控件处理之前触发(key\_event\_t)。 |
 | EVT\_KEY\_REPEAT | 按键repeat事件名(key\_event\_t)。 |
 | EVT\_KEY\_UP | 键抬起事件名(key\_event\_t)。 |
@@ -33,9 +34,9 @@
 | EVT\_RESIZE | 调整Widget大小的事件名(event\_t)。 |
 | EVT\_WILL\_MOVE\_RESIZE | 即将调整Widget大小/位置的事件名(event\_t)。 |
 | EVT\_MOVE\_RESIZE | 调整Widget大小/位置的事件名(event\_t)。 |
-| EVT\_VALUE\_WILL\_CHANGE | 控件的值即将改变的事件名(event\_t)。 |
-| EVT\_VALUE\_CHANGED | 控件的值改变的事件名(event\_t)。 |
-| EVT\_VALUE\_CHANGING | 控件的值持续改变(如编辑器正在编辑)的事件名(event\_t)。 |
+| EVT\_VALUE\_WILL\_CHANGE | 控件的值即将改变的事件名(value\_change\_event\_t)。 |
+| EVT\_VALUE\_CHANGED | 控件的值改变的事件名(value\_change\_event\_t)。 |
+| EVT\_VALUE\_CHANGING | 控件的值持续改变(如编辑器正在编辑)的事件名(value\_change\_event\_t)。 |
 | EVT\_PAINT | 绘制的事件名(paint\_event\_t)。 |
 | EVT\_BEFORE\_PAINT | 即将绘制的事件名(paint\_event\_t)。 |
 | EVT\_AFTER\_PAINT | 绘制完成的事件名(paint\_event\_t)。 |
@@ -55,7 +56,11 @@
 | EVT\_WINDOW\_CLOSE | 窗口关闭事件。 |
 | EVT\_REQUEST\_CLOSE\_WINDOW | 请求关闭窗口的事件(event\_t)。 |
 | EVT\_TOP\_WINDOW\_CHANGED | 顶层窗口改变的事件(window\_event\_t)。 |
+| EVT\_IM\_START | 输入法启动(event\_t)。 |
+| EVT\_IM\_STOP | 输入法停止(event\_t)。 |
 | EVT\_IM\_COMMIT | 输入法提交输入的文本事件(im\_commit\_event\_t)。 |
+| EVT\_IM\_CLEAR | 清除编辑器内容(event\_t)。 |
+| EVT\_IM\_CANCEL | 取消编辑，恢复之前的内容(event\_t)。 |
 | EVT\_IM\_PREEDIT | 进入预编辑状态(event\_t)。 |
 | EVT\_IM\_PREEDIT\_CONFIRM | 确认预编辑内容，退出预编辑状态(event\_t)。 |
 | EVT\_IM\_PREEDIT\_ABORT | 删除预编辑内容，退出预编辑状态event\_t)。 |
@@ -67,6 +72,7 @@
 | EVT\_DRAG\_START | 开始拖动(event\_t)。 |
 | EVT\_DRAG | 拖动(event\_t)。 |
 | EVT\_DRAG\_END | 结束拖动(event\_t)。 |
+| EVT\_RESET | Reset(event\_t)。 |
 | EVT\_SCREEN\_SAVER | 在指定的时间内(WITH\_SCREEN\_SAVER\_TIME)，没有用户输入事件，由窗口管理器触发。 |
 | EVT\_LOW\_MEMORY | 内存不足(event\_t)。 |
 | EVT\_OUT\_OF\_MEMORY | 内存耗尽(event\_t)。 |
@@ -80,6 +86,12 @@
 | EVT\_SCROLL\_START | scroll view开始滚动(event\_t)。 |
 | EVT\_SCROLL | scroll view滚动(event\_t)。 |
 | EVT\_SCROLL\_END | scroll view结束滚动(event\_t)。 |
+| EVT\_MULTI\_GESTURE | 多点触摸手势(multi\_gesture\_event\_t)。 |
+| EVT\_PAGE\_CHANGED | 页面改变了(event\_t)。 |
+| EVT\_ASSET\_MANAGER\_LOAD\_ASSET | 资源管理加载某个资源(assets\_event\_t)。 |
+| EVT\_ASSET\_MANAGER\_UNLOAD\_ASSET | 资源管理卸载某个资源(assets\_event\_t)。 |
+| EVT\_ASSET\_MANAGER\_CLEAR\_CACHE | 资源管理移除同种资源缓存(assets\_event\_t)。 |
+| EVT\_TIMER | 定时器(event\_t)。 |
 | EVT\_REQ\_START | event queue其它请求编号起始值。 |
 | EVT\_USER\_START | 用户定义事件起始值。 |
 | EVT\_NONE | 无效事件名称。 |

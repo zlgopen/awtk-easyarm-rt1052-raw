@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  keyboard
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -60,7 +60,11 @@ BEGIN_C_DECLS
  *| backspace      | 删除键          |
  *| tab            | tab键           |
  *| space          | 空格键          |
- *| close          | 关闭软键盘      |
+ *| close          | 关闭软键盘       |
+ *| clear          | 清除编辑器的内容 |
+ *| cancel         | 恢复编辑器的内容 |
+ *| back           | 关闭当前窗口     |
+ *| back_to_home   | 返回home窗口    |
  *| 前缀key:        | 键值           |
  *| 前缀hard_key:   | 模拟物理键盘    |
  *| 前缀page:       | 切换到页面      |
@@ -116,7 +120,7 @@ BEGIN_C_DECLS
  * ```
  *
  * > 更多用法请参考：
- * [kb_default](https://github.com/zlgopen/awtk/blob/master/demos/assets/default/raw/ui/kb_default.xml)
+ * [kb_default](https://github.com/zlgopen/awtk/blob/master/design/default/ui/kb_default.xml)
  *
  */
 

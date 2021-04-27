@@ -41,9 +41,9 @@ TEST(ProgressCircle, basic) {
   ASSERT_EQ(widget_get_prop(s, PROGRESS_CIRCLE_PROP_COUNTER_CLOCK_WISE, &v2), RET_OK);
   ASSERT_EQ(value_bool(&v1), value_bool(&v2));
 
-  value_set_str(&v1, "C");
-  ASSERT_EQ(widget_set_prop(s, PROGRESS_CIRCLE_PROP_UNIT, &v1), RET_OK);
-  ASSERT_EQ(widget_get_prop(s, PROGRESS_CIRCLE_PROP_UNIT, &v2), RET_OK);
+  value_set_str(&v1, "%02.2f");
+  ASSERT_EQ(widget_set_prop(s, WIDGET_PROP_FORMAT, &v1), RET_OK);
+  ASSERT_EQ(widget_get_prop(s, WIDGET_PROP_FORMAT, &v2), RET_OK);
   ASSERT_EQ(string(value_str(&v1)), string(value_str(&v2)));
 
   widget_destroy(s);
@@ -73,6 +73,34 @@ TEST(ProgressCircle, cast) {
   widget_t* w = progress_circle_create(NULL, 10, 20, 30, 40);
 
   ASSERT_EQ(w, progress_circle_cast(w));
+
+  widget_destroy(w);
+}
+
+TEST(ProgressCircle, change_value) {
+  widget_t* w = progress_circle_create(NULL, 10, 20, 30, 40);
+  value_change_event_t evt;
+  memset(&evt, 0x00, sizeof(evt));
+
+  widget_on(w, EVT_VALUE_WILL_CHANGE, on_value_will_changed_accept, NULL);
+  widget_on(w, EVT_VALUE_CHANGED, on_value_changed, &evt);
+  ASSERT_EQ(widget_set_prop_int(w, WIDGET_PROP_VALUE, 3), RET_OK);
+  ASSERT_EQ(widget_get_prop_int(w, WIDGET_PROP_VALUE, 0), 3);
+
+  ASSERT_EQ(value_int(&(evt.old_value)), 0);
+  ASSERT_EQ(value_int(&(evt.new_value)), 3);
+
+  widget_destroy(w);
+}
+
+TEST(ProgressCircle, change_value_abort) {
+  widget_t* w = progress_circle_create(NULL, 10, 20, 30, 40);
+  value_change_event_t evt;
+  memset(&evt, 0x00, sizeof(evt));
+
+  widget_on(w, EVT_VALUE_WILL_CHANGE, on_value_will_changed_abort, NULL);
+  ASSERT_EQ(widget_set_prop_int(w, WIDGET_PROP_VALUE, 3), RET_OK);
+  ASSERT_EQ(widget_get_prop_int(w, WIDGET_PROP_VALUE, 3), 0);
 
   widget_destroy(w);
 }

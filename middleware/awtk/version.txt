@@ -1,6 +1,4 @@
-awtk-v1.4+rc.2
+awtk-v1.6
 ====================
-awtk:1.4+sha.0e09b18
-awtk-examples.v2:2.0.1+sha.6f4fbf7
-awtk-aworks-rt1052:1.3.4+sha.f7f8cff
-awtk-linux-fb:1.1.4+sha.ee359f3
+awtk:1.6+sha.d782f03a7f25773025d4e674ad4711b3b0d2e93c
+awtk-rt1052-raw:1.5+sha.e93f501238e4ab7f908f0e206965fe3f592d9190

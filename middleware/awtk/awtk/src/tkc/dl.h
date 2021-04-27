@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  dynamic libaray api
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -61,6 +61,29 @@ void* tk_dl_sym(tk_dl_t* dl, const char* name);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t tk_dl_close(tk_dl_t* dl);
+
+/**
+ * @method tk_dl_error
+ * 获取最后的错误信息。
+ *
+ * @return {const char*} 返回error message.
+ */
+const char* tk_dl_error(void);
+
+#ifndef TK_DLL_EXT_NAME
+
+#ifdef WIN32
+#define TK_DLL_EXT_NAME ".dll"
+#define TK_DLL_PRE_NAME ""
+#elif defined MACOS
+#define TK_DLL_PRE_NAME "lib"
+#define TK_DLL_EXT_NAME ".dylib"
+#else
+#define TK_DLL_PRE_NAME "lib"
+#define TK_DLL_EXT_NAME ".so"
+#endif
+
+#endif /*TK_DLL_EXT_NAME*/
 
 END_C_DECLS
 

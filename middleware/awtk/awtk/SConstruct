@@ -5,11 +5,12 @@ APP_TOOLS = None
 if awtk.TOOLS_NAME != '' :
   APP_TOOLS = [awtk.TOOLS_NAME]
 
+awtk.genIdlAndDef();
 DefaultEnvironment(TOOLS = APP_TOOLS,
   CCFLAGS = awtk.AWTK_CCFLAGS,
   LIBS = awtk.LIBS,
   LIBPATH = awtk.LIBPATH,
-  CPPPATH = awtk.CPPPATH,
+  CPPPATH = awtk.CPPPATH + [awtk.joinPath(awtk.TK_ROOT, 'res')],
   LINKFLAGS = awtk.LINKFLAGS,
   TARGET_ARCH=awtk.TARGET_ARCH,
   OS_SUBSYSTEM_CONSOLE=awtk.OS_SUBSYSTEM_CONSOLE,
@@ -26,9 +27,10 @@ SConscriptFiles=awtk.NANOVG_BACKEND_PROJS + [
   '3rd/miniz/SConscript',
   '3rd/fribidi/SConscript',
   'src/SConscript',
+  'src/csv/SConscript',
   'src/conf_io/SConscript',
+  'src/hal/SConscript',
   'src/streams/SConscript',
-  'src/file_transfer/SConscript',
   'src/compressors/SConscript',
   'src/ubjson/SConscript',
   'tools/common/SConscript', 
@@ -39,7 +41,6 @@ SConscriptFiles=awtk.NANOVG_BACKEND_PROJS + [
   'tools/image_dither/SConscript',
   'tools/res_gen/SConscript', 
   'tools/str_gen/SConscript', 
-  'tools/ui_gen/qt_to_xml/SConscript',
   'tools/ui_gen/xml_to_ui/SConscript',
   'tools/svg_gen/SConscript',
   'demos/SConscript', 

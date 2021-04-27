@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  mledit
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +22,7 @@
 #include "tkc/mem.h"
 #include "tkc/utf8.h"
 #include "tkc/utils.h"
+#include "tkc/time_now.h"
 #include "base/events.h"
 #include "mledit/mledit.h"
 #include "mledit/line_number.h"
@@ -30,10 +31,47 @@
 
 static ret_t mledit_update_status(widget_t* widget);
 
-static ret_t mledit_dispatch_event(widget_t* widget, event_type_t type) {
-  event_t evt = event_init(type, widget);
-  widget_dispatch(widget, &evt);
+static ret_t mledit_save_text(widget_t* widget) {
+  mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
 
+  if (mledit->cancelable) {
+    wstr_set(&(mledit->saved_text), widget->text.str);
+  }
+
+  return RET_OK;
+}
+
+static ret_t mledit_rollback_text(widget_t* widget) {
+  mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
+
+  if (mledit->cancelable) {
+    widget_set_text(widget, mledit->saved_text.str);
+  }
+
+  return RET_OK;
+}
+
+static ret_t mledit_commit_text(widget_t* widget) {
+  mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
+
+  if (mledit->cancelable) {
+    wstr_set(&(mledit->saved_text), widget->text.str);
+    mledit_update_status(widget);
+  }
+
+  return RET_OK;
+}
+
+static ret_t mledit_dispatch_event(widget_t* widget, event_type_t type) {
+  value_change_event_t evt;
+  value_change_event_init(&evt, type, widget);
+  value_set_wstr(&(evt.old_value), widget->text.str);
+  value_set_wstr(&(evt.new_value), widget->text.str);
+
+  widget_dispatch(widget, (event_t*)&evt);
   return RET_OK;
 }
 
@@ -42,7 +80,7 @@ ret_t mledit_set_tips(widget_t* widget, const char* tips) {
   return_value_if_fail(mledit != NULL && tips != NULL, RET_BAD_PARAMS);
 
   mledit->tips = tk_str_copy(mledit->tips, tips);
-  text_edit_set_tips(mledit->model, mledit->tips);
+  text_edit_set_tips(mledit->model, mledit->tips, TRUE);
 
   return RET_OK;
 }
@@ -50,7 +88,7 @@ ret_t mledit_set_tips(widget_t* widget, const char* tips) {
 static ret_t mledit_apply_tr_text_before_paint(void* ctx, event_t* e) {
   widget_t* widget = WIDGET(ctx);
   mledit_t* mledit = MLEDIT(widget);
-
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   if (mledit->tr_tips != NULL) {
     const char* tr_tips = locale_info_tr(widget_get_locale_info(widget), mledit->tr_tips);
     mledit_set_tips(widget, tr_tips);
@@ -103,6 +141,15 @@ ret_t mledit_set_readonly(widget_t* widget, bool_t readonly) {
   return RET_OK;
 }
 
+ret_t mledit_set_cancelable(widget_t* widget, bool_t cancelable) {
+  mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
+
+  mledit->cancelable = cancelable;
+
+  return RET_OK;
+}
+
 ret_t mledit_set_wrap_word(widget_t* widget, bool_t wrap_word) {
   mledit_t* mledit = MLEDIT(widget);
   return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
@@ -130,6 +177,9 @@ static ret_t mledit_get_prop(widget_t* widget, const char* name, value_t* v) {
   if (tk_str_eq(name, WIDGET_PROP_READONLY)) {
     value_set_bool(v, mledit->readonly);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_CANCELABLE)) {
+    value_set_bool(v, mledit->cancelable);
+    return RET_OK;
   } else if (tk_str_eq(name, MLEDIT_PROP_WRAP_WORD)) {
     value_set_bool(v, mledit->wrap_word);
     return RET_OK;
@@ -140,16 +190,42 @@ static ret_t mledit_get_prop(widget_t* widget, const char* name, value_t* v) {
     value_set_int(v, mledit->scroll_line);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_LEFT_MARGIN)) {
-    value_set_int(v, mledit->left_margin);
+    uint32_t margin = 0;
+    if (widget->astyle != NULL) {
+      TEXT_EDIT_GET_STYLE_MARGIN(widget->astyle, margin, LEFT);
+    }
+    if (margin == 0) {
+      margin = mledit->left_margin != 0 ? mledit->left_margin : mledit->margin;
+    }
+    value_set_int(v, margin);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_RIGHT_MARGIN)) {
-    value_set_int(v, mledit->right_margin);
+    uint32_t margin = 0;
+    if (widget->astyle != NULL) {
+      TEXT_EDIT_GET_STYLE_MARGIN(widget->astyle, margin, RIGHT);
+    }
+    if (margin == 0) {
+      margin = mledit->right_margin != 0 ? mledit->right_margin : mledit->margin;
+    }
+    value_set_int(v, margin);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_TOP_MARGIN)) {
-    value_set_int(v, mledit->top_margin);
+    uint32_t margin = 0;
+    if (widget->astyle != NULL) {
+      TEXT_EDIT_GET_STYLE_MARGIN(widget->astyle, margin, TOP);
+    }
+    if (margin == 0) {
+      margin = mledit->top_margin != 0 ? mledit->top_margin : mledit->margin;
+    }
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_BOTTOM_MARGIN)) {
-    value_set_int(v, mledit->bottom_margin);
+    uint32_t margin = 0;
+    if (widget->astyle != NULL) {
+      TEXT_EDIT_GET_STYLE_MARGIN(widget->astyle, margin, BOTTOM);
+    }
+    if (margin == 0) {
+      margin = mledit->bottom_margin != 0 ? mledit->bottom_margin : mledit->margin;
+    }
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_TIPS)) {
     value_set_str(v, mledit->tips);
@@ -176,12 +252,25 @@ static ret_t mledit_get_prop(widget_t* widget, const char* name, value_t* v) {
     text_edit_get_state(mledit->model, &state);
     value_set_int(v, state.caret.y - state.oy);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_OPEN_IM_WHEN_FOCUSED)) {
+    value_set_bool(v, mledit->open_im_when_focused);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_CLOSE_IM_WHEN_BLURED)) {
+    value_set_bool(v, mledit->close_im_when_blured);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_INPUTING)) {
+    int64_t delta = (time_now_ms() - mledit->last_user_action_time);
+    bool_t inputing =
+        (delta < TK_INPUTING_TIMEOUT) && (mledit->last_user_action_time > 0) && widget->focused;
+    value_set_bool(v, inputing);
+    return RET_OK;
   }
 
   return RET_NOT_FOUND;
 }
 
-static inline void mledit_reset_text_edit_layout(text_edit_t* text_edit) {
+static void mledit_reset_text_edit_layout(text_edit_t* text_edit) {
+  text_edit_layout(text_edit);
   text_edit_set_offset(text_edit, 0, 0);
   text_edit_set_select(text_edit, 0, 0);
   text_edit_set_cursor(text_edit, text_edit_get_cursor(text_edit));
@@ -196,7 +285,9 @@ static ret_t mledit_set_text(widget_t* widget, const value_t* v) {
   if (!wstr_equal(&(widget->text), &str)) {
     wstr_set(&(widget->text), str.str);
     mledit_reset_text_edit_layout(mledit->model);
+    text_edit_layout(mledit->model);
     mledit_dispatch_event(widget, EVT_VALUE_CHANGED);
+    mledit_update_status(widget);
   }
 
   wstr_reset(&str);
@@ -213,6 +304,9 @@ static ret_t mledit_set_prop(widget_t* widget, const char* name, const value_t* 
   } else if (tk_str_eq(name, WIDGET_PROP_READONLY)) {
     mledit->readonly = value_bool(v);
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_CANCELABLE)) {
+    mledit->cancelable = value_bool(v);
+    return RET_OK;
   } else if (tk_str_eq(name, MLEDIT_PROP_WRAP_WORD)) {
     mledit_set_wrap_word(widget, value_bool(v));
     return RET_OK;
@@ -222,12 +316,14 @@ static ret_t mledit_set_prop(widget_t* widget, const char* name, const value_t* 
   } else if (tk_str_eq(name, MLEDIT_PROP_SCROLL_LINE)) {
     mledit_set_scroll_line(widget, value_int(v));
     return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_OPEN_IM_WHEN_FOCUSED)) {
+    mledit->open_im_when_focused = value_bool(v);
+    return RET_OK;
+  } else if (tk_str_eq(name, WIDGET_PROP_CLOSE_IM_WHEN_BLURED)) {
+    mledit->close_im_when_blured = value_bool(v);
+    return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_MARGIN)) {
-    int margin = value_int(v);
-    mledit->left_margin = margin;
-    mledit->right_margin = margin;
-    mledit->top_margin = margin;
-    mledit->bottom_margin = margin;
+    mledit->margin = value_int(v);
     mledit_reset_text_edit_layout(mledit->model);
     return RET_OK;
   } else if (tk_str_eq(name, WIDGET_PROP_LEFT_MARGIN)) {
@@ -280,6 +376,7 @@ static ret_t mledit_on_destroy(widget_t* widget) {
   TKMEM_FREE(mledit->tips);
   TKMEM_FREE(mledit->tr_tips);
   TKMEM_FREE(mledit->keyboard);
+  wstr_reset(&(mledit->saved_text));
   text_edit_destroy(mledit->model);
 
   return RET_OK;
@@ -287,7 +384,7 @@ static ret_t mledit_on_destroy(widget_t* widget) {
 
 static ret_t mledit_on_paint_self(widget_t* widget, canvas_t* c) {
   mledit_t* mledit = MLEDIT(widget);
-
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   text_edit_paint(mledit->model, c);
 
   return RET_OK;
@@ -295,6 +392,7 @@ static ret_t mledit_on_paint_self(widget_t* widget, canvas_t* c) {
 
 static ret_t mledit_commit_str(widget_t* widget, const char* str) {
   mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   wstr_set_utf8(&(mledit->temp), str);
 
   text_edit_paste(mledit->model, mledit->temp.str, mledit->temp.size);
@@ -305,7 +403,7 @@ static ret_t mledit_commit_str(widget_t* widget, const char* str) {
 
 static ret_t mledit_request_input_method_on_window_open(void* ctx, event_t* e) {
   mledit_t* mledit = MLEDIT(ctx);
-
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   if (!mledit->readonly) {
     input_method_request(input_method(), WIDGET(ctx));
   }
@@ -315,7 +413,7 @@ static ret_t mledit_request_input_method_on_window_open(void* ctx, event_t* e) {
 
 static ret_t mledit_request_input_method(widget_t* widget) {
   mledit_t* mledit = MLEDIT(widget);
-
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   if (mledit->readonly) {
     return RET_OK;
   }
@@ -358,16 +456,27 @@ static ret_t mledit_update_caret(const timer_info_t* timer) {
 }
 
 static ret_t mledit_update_status(widget_t* widget) {
+  mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL && widget != NULL, RET_BAD_PARAMS);
   if (widget->text.size == 0) {
     if (widget->focused) {
       widget_set_state(widget, WIDGET_STATE_EMPTY_FOCUS);
     } else {
       widget_set_state(widget, WIDGET_STATE_EMPTY);
     }
-  } else if (widget->focused) {
-    widget_set_state(widget, WIDGET_STATE_FOCUSED);
   } else {
-    widget_set_state(widget, WIDGET_STATE_NORMAL);
+    if (mledit->cancelable) {
+      if (!wstr_equal(&(mledit->saved_text), &(widget->text))) {
+        widget_set_state(widget, WIDGET_STATE_CHANGED);
+        return RET_OK;
+      }
+    }
+
+    if (widget->focused) {
+      widget_set_state(widget, WIDGET_STATE_FOCUSED);
+    } else {
+      widget_set_state(widget, WIDGET_STATE_NORMAL);
+    }
   }
 
   return RET_OK;
@@ -409,6 +518,7 @@ ret_t mledit_set_scroll_line(widget_t* widget, uint32_t scroll_line) {
 
 static ret_t mledit_focus_set_cursor(const idle_info_t* info) {
   mledit_t* mledit = MLEDIT(info->ctx);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   mledit_set_cursor(WIDGET(mledit), text_edit_get_cursor(mledit->model));
 
   return RET_REMOVE;
@@ -418,8 +528,11 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
   ret_t ret = RET_OK;
   uint32_t type = e->type;
   mledit_t* mledit = MLEDIT(widget);
-  return_value_if_fail(widget != NULL && mledit != NULL, RET_BAD_PARAMS);
-  return_value_if_fail(widget->visible, RET_OK);
+  return_value_if_fail(widget != NULL && mledit != NULL && e != NULL, RET_BAD_PARAMS);
+
+  if (!widget->visible) {
+    return RET_OK;
+  }
 
   switch (type) {
     case EVT_POINTER_DOWN: {
@@ -432,6 +545,7 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
       if (widget->target == NULL) {
         mledit_request_input_method(widget);
       }
+      mledit->last_user_action_time = e->time;
       mledit_update_status(widget);
       widget_invalidate(widget, NULL);
       break;
@@ -449,11 +563,16 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
           ret = RET_STOP;
         }
       }
+
+      if (evt.pressed) {
+        mledit->last_user_action_time = e->time;
+      }
       widget_invalidate(widget, NULL);
       break;
     }
     case EVT_POINTER_UP: {
       widget_ungrab(widget->parent, widget);
+      mledit->last_user_action_time = e->time;
       widget_invalidate(widget, NULL);
       break;
     }
@@ -474,6 +593,7 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
 
       mledit_update_status(widget);
       ret = RET_STOP;
+      mledit->last_user_action_time = e->time;
       widget_invalidate(widget, NULL);
       break;
     }
@@ -495,18 +615,22 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
       }
       mledit_commit_str(widget, evt->text);
       mledit_update_status(widget);
+      mledit->last_user_action_time = e->time;
       widget_invalidate(widget, NULL);
       break;
     }
     case EVT_IM_PREEDIT: {
+      mledit->last_user_action_time = e->time;
       text_edit_preedit(mledit->model);
       break;
     }
     case EVT_IM_PREEDIT_CONFIRM: {
+      mledit->last_user_action_time = e->time;
       text_edit_preedit_confirm(mledit->model);
       break;
     }
     case EVT_IM_PREEDIT_ABORT: {
+      mledit->last_user_action_time = e->time;
       text_edit_preedit_abort(mledit->model);
       break;
     }
@@ -522,14 +646,21 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
       } else {
         ret = text_edit_key_up(mledit->model, key_event);
       }
+      mledit->last_user_action_time = e->time;
       widget_invalidate(widget, NULL);
       break;
     }
+    case EVT_IM_CANCEL: {
+      mledit_rollback_text(widget);
+      break;
+    }
     case EVT_BLUR: {
-      input_method_request(input_method(), NULL);
-
+      if (mledit->close_im_when_blured) {
+        input_method_request(input_method(), NULL);
+      }
       mledit_update_status(widget);
       mledit_dispatch_event(widget, EVT_VALUE_CHANGED);
+      mledit_commit_text(widget);
       break;
     }
     case EVT_FOCUS: {
@@ -538,23 +669,26 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
       }
 
       if (widget->target == NULL) {
-        mledit_request_input_method(widget);
-        idle_add(mledit_focus_set_cursor, mledit);
+        if (mledit->open_im_when_focused) {
+          mledit_request_input_method(widget);
+        }
+        widget_add_idle(widget, mledit_focus_set_cursor);
       }
+      mledit_save_text(widget);
       break;
     }
     case EVT_WHEEL: {
       key_event_t kevt;
       wheel_event_t* evt = (wheel_event_t*)e;
       int32_t delta = evt->dy;
-      text_edit_t* text_edit = mledit->model;
       widget_t* vscroll_bar = widget_lookup_by_type(widget, WIDGET_TYPE_SCROLL_BAR_DESKTOP, TRUE);
 
       if (vscroll_bar != NULL) {
+        int32_t font_size = style_get_int(widget->astyle, STYLE_ID_FONT_SIZE, TK_DEFAULT_FONT_SIZE);
         if (delta > 0) {
-          scroll_bar_add_delta(vscroll_bar, -text_edit->c->font_size * mledit->scroll_line);
+          scroll_bar_add_delta(vscroll_bar, -font_size * mledit->scroll_line);
         } else if (delta < 0) {
-          scroll_bar_add_delta(vscroll_bar, text_edit->c->font_size * mledit->scroll_line);
+          scroll_bar_add_delta(vscroll_bar, font_size * mledit->scroll_line);
         }
       } else {
         if (delta > 0) {
@@ -566,6 +700,7 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
         }
       }
       ret = RET_STOP;
+      mledit->last_user_action_time = e->time;
       widget_invalidate(widget, NULL);
       break;
     }
@@ -589,6 +724,7 @@ static ret_t mledit_on_event(widget_t* widget, event_t* e) {
 
 static ret_t mledit_on_re_translate(widget_t* widget) {
   mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   if (mledit->tr_tips != NULL) {
     const char* tr_tips = locale_info_tr(widget_get_locale_info(widget), mledit->tr_tips);
     mledit_set_tips(widget, tr_tips);
@@ -600,7 +736,7 @@ static ret_t mledit_on_re_translate(widget_t* widget) {
 static ret_t mledit_sync_line_number(widget_t* widget, text_edit_state_t* state) {
   mledit_t* mledit = MLEDIT(widget);
   widget_t* line_number = widget_lookup_by_type(widget, WIDGET_TYPE_LINE_NUMBER, TRUE);
-
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
   if (line_number != NULL) {
     line_number_set_yoffset(line_number, state->oy);
     line_number_set_line_height(line_number, state->line_height);
@@ -615,10 +751,13 @@ static ret_t mledit_sync_line_number(widget_t* widget, text_edit_state_t* state)
 
 static ret_t mledit_sync_scrollbar(widget_t* widget, text_edit_state_t* state) {
   xy_t y = 0;
+  wh_t virtual_h = 0;
+  widget_t* vscroll_bar = NULL;
   mledit_t* mledit = MLEDIT(widget);
-  wh_t virtual_h = (state->last_line_number + 1) * state->line_height + mledit->top_margin +
-                   mledit->bottom_margin;
-  widget_t* vscroll_bar = widget_lookup_by_type(widget, WIDGET_TYPE_SCROLL_BAR_DESKTOP, TRUE);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
+  virtual_h = (state->last_line_number + 1) * state->line_height + mledit->top_margin +
+              mledit->bottom_margin;
+  vscroll_bar = widget_lookup_by_type(widget, WIDGET_TYPE_SCROLL_BAR_DESKTOP, TRUE);
 
   if (vscroll_bar != NULL) {
     virtual_h = virtual_h >= vscroll_bar->h ? virtual_h : vscroll_bar->h;
@@ -651,7 +790,7 @@ static ret_t mledit_on_text_edit_state_changed(void* ctx, text_edit_state_t* sta
 static ret_t mledit_on_scroll_bar_value_changed(void* ctx, event_t* e) {
   int32_t value = 0;
   mledit_t* mledit = MLEDIT(ctx);
-  widget_t* vscroll_bar = WIDGET(e->target);
+  widget_t* vscroll_bar = e != NULL ? WIDGET(e->target) : NULL;
   scroll_bar_t* scroll_bar = SCROLL_BAR(vscroll_bar);
 
   return_value_if_fail(vscroll_bar != NULL && scroll_bar != NULL, RET_BAD_PARAMS);
@@ -660,6 +799,24 @@ static ret_t mledit_on_scroll_bar_value_changed(void* ctx, event_t* e) {
   value = (scroll_bar->virtual_size - vscroll_bar->h) * value / scroll_bar->virtual_size;
 
   text_edit_set_offset(mledit->model, 0, value);
+
+  return RET_OK;
+}
+
+ret_t mledit_set_open_im_when_focused(widget_t* widget, bool_t open_im_when_focused) {
+  mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
+
+  mledit->open_im_when_focused = open_im_when_focused;
+
+  return RET_OK;
+}
+
+ret_t mledit_set_close_im_when_blured(widget_t* widget, bool_t close_im_when_blured) {
+  mledit_t* mledit = MLEDIT(widget);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
+
+  mledit->close_im_when_blured = close_im_when_blured;
 
   return RET_OK;
 }
@@ -681,6 +838,7 @@ static ret_t mledit_on_add_child(widget_t* widget, widget_t* child) {
 static ret_t mledit_init_idle_func(const idle_info_t* info) {
   text_edit_state_t state = {0};
   mledit_t* mledit = MLEDIT(info->ctx);
+  return_value_if_fail(mledit != NULL, RET_BAD_PARAMS);
 
   mledit_set_cursor(WIDGET(mledit), 0);
   text_edit_get_state(mledit->model, &state);
@@ -690,6 +848,7 @@ static ret_t mledit_init_idle_func(const idle_info_t* info) {
 }
 
 const char* s_mledit_properties[] = {WIDGET_PROP_READONLY,
+                                     WIDGET_PROP_CANCELABLE,
                                      WIDGET_PROP_MARGIN,
                                      WIDGET_PROP_LEFT_MARGIN,
                                      WIDGET_PROP_RIGHT_MARGIN,
@@ -698,6 +857,8 @@ const char* s_mledit_properties[] = {WIDGET_PROP_READONLY,
                                      WIDGET_PROP_TIPS,
                                      WIDGET_PROP_TR_TIPS,
                                      WIDGET_PROP_KEYBOARD,
+                                     WIDGET_PROP_OPEN_IM_WHEN_FOCUSED,
+                                     WIDGET_PROP_CLOSE_IM_WHEN_BLURED,
                                      MLEDIT_PROP_MAX_LINES,
                                      MLEDIT_PROP_WRAP_WORD,
                                      MLEDIT_PROP_SCROLL_LINE,
@@ -727,13 +888,17 @@ widget_t* mledit_create(widget_t* parent, xy_t x, xy_t y, wh_t w, wh_t h) {
 
   mledit->model = text_edit_create(widget, FALSE);
   ENSURE(mledit->model != NULL);
-  mledit->left_margin = 1;
-  mledit->top_margin = 1;
-  mledit->right_margin = 1;
-  mledit->bottom_margin = 1;
+  mledit->margin = 1;
+  mledit->top_margin = 0;
+  mledit->left_margin = 0;
+  mledit->right_margin = 0;
+  mledit->bottom_margin = 0;
   mledit->scroll_line = 1.0f;
   wstr_init(&(mledit->temp), 0);
   widget_set_text(widget, L"");
+  mledit->close_im_when_blured = TRUE;
+  mledit->open_im_when_focused = TRUE;
+  wstr_init(&(mledit->saved_text), 0);
 
   mledit_update_status(widget);
   widget_add_idle(widget, mledit_init_idle_func);

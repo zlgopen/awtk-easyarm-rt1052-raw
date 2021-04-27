@@ -240,11 +240,11 @@ TEST(Str, expand_vars) {
 
   str_set(s, "");
   ASSERT_EQ(str_expand_vars(s, "${abc}", vars), RET_OK);
-  ASSERT_STREQ(s->str, "");
+  ASSERT_STREQ(s->str, "abc");
 
   str_set(s, "");
   ASSERT_EQ(str_expand_vars(s, "123${abc}456", vars), RET_OK);
-  ASSERT_STREQ(s->str, "123456");
+  ASSERT_STREQ(s->str, "123abc456");
 
   str_set(s, "");
   ASSERT_EQ(str_expand_vars(s, "123${}456", vars), RET_OK);
@@ -252,7 +252,7 @@ TEST(Str, expand_vars) {
 
   str_set(s, "");
   ASSERT_EQ(str_expand_vars(s, "123${abc+$x}456", vars), RET_OK);
-  ASSERT_STREQ(s->str, "123456");
+  ASSERT_STREQ(s->str, "123abc100456");
 
   object_unref(vars);
   str_reset(s);
@@ -317,4 +317,69 @@ TEST(Str, append_more2) {
   ASSERT_STREQ(s->str, "123abc");
 
   str_reset(s);
+}
+
+TEST(Str, encode_hex_basic) {
+  str_t str;
+  str_t* s = NULL;
+  s = str_init(&str, 100);
+  uint8_t data[] = {1, 0x01, 0x0a, 0x2a};
+  ASSERT_EQ(str_encode_hex(s, data, sizeof(data), NULL), RET_OK);
+  ASSERT_STREQ(s->str, "01010a2a");
+  str_reset(s);
+}
+
+TEST(Str, encode_hex_upper) {
+  str_t str;
+  str_t* s = NULL;
+  s = str_init(&str, 100);
+  uint8_t data[] = {1, 0x01, 0x0a, 0x2a};
+  ASSERT_EQ(str_encode_hex(s, data, sizeof(data), "%02X"), RET_OK);
+  ASSERT_STREQ(s->str, "01010A2A");
+  str_reset(s);
+}
+
+TEST(Str, encode_hex_sep) {
+  str_t str;
+  str_t* s = NULL;
+  s = str_init(&str, 100);
+  uint8_t data[] = {1, 0x01, 0x0a, 0x2a};
+  ASSERT_EQ(str_encode_hex(s, data, sizeof(data), "%02X "), RET_OK);
+  ASSERT_STREQ(s->str, "01 01 0A 2A ");
+  str_reset(s);
+}
+
+TEST(Str, encode_hex_sep1) {
+  str_t str;
+  str_t* s = NULL;
+  s = str_init(&str, 100);
+  uint8_t data[] = {1, 0x01, 0x0a, 0x2a};
+  ASSERT_EQ(str_encode_hex(s, data, sizeof(data), "0x%02X "), RET_OK);
+  ASSERT_STREQ(s->str, "0x01 0x01 0x0A 0x2A ");
+  str_reset(s);
+}
+TEST(Str, decode_hex) {
+  str_t str;
+  ret_t ret;
+  uint8_t data[6];
+
+  memset(data, 0, sizeof(data));
+  str_init(&str, 100);
+  str_append(&str, "fF fe 12    0x65");
+  str_decode_hex(&str, data, sizeof(data));
+  ASSERT_TRUE(data[0] == 0xff && data[1] == 0xfe && data[2] == 0x12 && data[3] == 0x65);
+
+  str_append(&str, "ya    e8");
+  str_decode_hex(&str, data, sizeof(data));
+  ASSERT_TRUE(data[0] == 0xff && data[1] == 0xfe && data[2] == 0x12 && data[3] == 0x65);
+  ASSERT_TRUE(data[4] == 0 && data[5] == 0xe8);
+
+  ret = str_append(&str, "6b  33");
+  ASSERT_EQ(ret, RET_OK);
+  str_decode_hex(&str, data, sizeof(data));
+  ASSERT_TRUE(data[0] == 0xff && data[1] == 0xfe && data[2] == 0x12 && data[3] == 0x65);
+  ASSERT_TRUE(data[4] == 0);
+  ASSERT_EQ(data[5], 0xe8);
+
+  str_reset(&str);
 }

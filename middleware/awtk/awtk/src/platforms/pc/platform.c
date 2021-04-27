@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  default platform
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -64,12 +64,24 @@ static ret_t date_time_get_now_impl(date_time_t* dt) {
 }
 
 static ret_t date_time_set_now_impl(date_time_t* dt) {
-  return RET_NOT_IMPL;
-}
+  SYSTEMTIME wtm;
+  memset(&wtm, 0x00, sizeof(wtm));
 
-static ret_t date_time_from_time_impl(date_time_t* dt, uint64_t timeval) {
-  /*TODO*/
-  return RET_NOT_IMPL;
+  wtm.wMinute = dt->minute;
+  wtm.wSecond = dt->second;
+  wtm.wHour = dt->hour;
+  wtm.wDay = dt->day;
+  wtm.wMonth = dt->month;
+  wtm.wYear = dt->year;
+
+  if (SetLocalTime(&wtm)) {
+    return RET_OK;
+  } else {
+    uint32_t last_error = (uint32_t)GetLastError();
+    log_debug("SetLocalTime(%d-%d-%d %d:%d:%d) failed: %u\n", (int)wtm.wYear, (int)wtm.wMonth,
+              (int)wtm.wDay, (int)wtm.wHour, (int)wtm.wMinute, (int)wtm.wSecond, last_error);
+    return RET_FAIL;
+  }
 }
 
 #else
@@ -118,6 +130,8 @@ static ret_t date_time_set_now_impl(date_time_t* dt) {
   return RET_OK;
 }
 
+#endif
+
 static ret_t date_time_from_time_impl(date_time_t* dt, uint64_t timeval) {
   time_t tm = timeval;
   struct tm* t = localtime(&tm);
@@ -136,17 +150,40 @@ static ret_t date_time_from_time_impl(date_time_t* dt, uint64_t timeval) {
   return RET_OK;
 }
 
-#endif
+static uint64_t date_time_to_time_impl(date_time_t* dt) {
+  time_t tm = 0;
+  struct tm* t = localtime(&tm);
+  return_value_if_fail(dt != NULL, RET_BAD_PARAMS);
+
+  t->tm_sec = dt->second;
+  t->tm_min = dt->minute;
+  t->tm_hour = dt->hour;
+  t->tm_mday = dt->day;
+  t->tm_mon = dt->month - 1;
+  t->tm_year = dt->year - 1900;
+  t->tm_wday = dt->wday;
+
+  return (uint64_t)mktime(t);
+}
 
 uint64_t stm_now_ms();
+uint64_t stm_now_us();
 void stm_time_init(void);
 
 uint64_t get_time_ms64() {
   return stm_now_ms();
 }
 
+uint64_t get_time_us64() {
+  return stm_now_us();
+}
+
 static const date_time_vtable_t s_date_time_vtable = {
-    date_time_get_now_impl, date_time_set_now_impl, date_time_from_time_impl};
+    date_time_get_now_impl,
+    date_time_set_now_impl,
+    date_time_from_time_impl,
+    date_time_to_time_impl,
+};
 
 void sleep_ms(uint32_t ms) {
 #ifdef WIN32
@@ -168,6 +205,7 @@ ret_t platform_prepare(void) {
 #endif /*HAS_STD_MALLOC*/
 
   date_time_global_init_ex(&s_date_time_vtable);
+  srandom(time(0));
 
   return RET_OK;
 }

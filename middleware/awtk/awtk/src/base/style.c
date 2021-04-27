@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  style interface
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -19,15 +19,28 @@
  *
  */
 
+#include "tkc/mem.h"
 #include "tkc/utils.h"
 #include "tkc/value.h"
 #include "base/style.h"
 
 ret_t style_notify_widget_state_changed(style_t* s, widget_t* widget) {
-  return_value_if_fail(s != NULL && s->vt != NULL && s->vt->notify_widget_state_changed != NULL,
-                       RET_BAD_PARAMS);
-
+  return_value_if_fail(
+      s != NULL && s->vt != NULL && s->vt->notify_widget_state_changed != NULL && widget != NULL,
+      RET_BAD_PARAMS);
   return s->vt->notify_widget_state_changed(s, widget);
+}
+
+ret_t style_update_state(style_t* s, theme_t* theme, const char* widget_type,
+                         const char* style_name, const char* widget_state) {
+  return_value_if_fail(s != NULL && s->vt != NULL && s->vt->update_state != NULL, RET_BAD_PARAMS);
+  return s->vt->update_state(s, theme, widget_type, style_name, widget_state);
+}
+
+uint32_t style_get_uint(style_t* s, const char* name, uint32_t defval) {
+  return_value_if_fail(s != NULL && s->vt != NULL && s->vt->get_int != NULL, defval);
+
+  return s->vt->get_uint(s, name, defval);
 }
 
 int32_t style_get_int(style_t* s, const char* name, int32_t defval) {
@@ -71,10 +84,32 @@ ret_t style_set(style_t* s, const char* state, const char* name, const value_t* 
   return s->vt->set(s, state, name, value);
 }
 
+ret_t style_set_style_data(style_t* s, const uint8_t* data, const char* state) {
+  return_value_if_fail(s != NULL && s->vt != NULL && s->vt->set_style_data != NULL && data != NULL,
+                       RET_BAD_PARAMS);
+  return s->vt->set_style_data(s, data, state);
+}
+
+const char* style_get_style_state(style_t* s) {
+  return_value_if_fail(s != NULL && s->vt != NULL, NULL);
+  if (s->vt->get_style_state != NULL) {
+    return s->vt->get_style_state(s);
+  }
+  return NULL;
+}
+
 bool_t style_is_mutable(style_t* s) {
   return_value_if_fail(s != NULL && s->vt != NULL, FALSE);
 
   return s->vt->is_mutable;
+}
+
+const char* style_get_style_type(style_t* s) {
+  return_value_if_fail(s != NULL && s->vt != NULL, NULL);
+  if (s->vt->get_style_type != NULL) {
+    return s->vt->get_style_type(s);
+  }
+  return NULL;
 }
 
 #include "base/enums.h"
@@ -106,7 +141,7 @@ static uint32_t to_border(const char* value) {
 static uint32_t to_icon_at(const char* value) {
   uint32_t icon_at = ICON_AT_AUTO;
 
-  if (strstr(value, "centre")) {
+  if (strstr(value, "cent")) {
     icon_at = ICON_AT_CENTRE;
   }
   if (strstr(value, "left")) {
@@ -143,12 +178,14 @@ ret_t style_normalize_value(const char* name, const char* value, value_t* out) {
     value_set_int(v, to_icon_at(value));
   } else if (strstr(name, "color") != NULL) {
     color_t c = color_parse(value);
-    value_set_int(v, c.color);
+    value_set_uint32(v, c.color);
   } else if (strstr(name, "image") != NULL || strstr(name, "name") != NULL ||
              strstr(name, "icon") != NULL) {
     value_dup_str(v, value);
   } else {
     if (isdigit(*value)) {
+      value_set_uint32(v, tk_atoi(value));
+    } else if (strlen(value) > 1 && *value == '-' && isdigit(*(value + 1))) {
       value_set_int(v, tk_atoi(value));
     } else {
       value_dup_str(v, value);

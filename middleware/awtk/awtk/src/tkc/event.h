@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  event
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -113,6 +113,12 @@ typedef struct _event_t {
    * 类型。
    */
   uint32_t type;
+  /**
+   * @property {int32_t} size
+   * @annotation ["readable", "scriptable"]
+   * 结构体的大小。
+   */
+  uint32_t size;
   /**
    * @property {uint64_t} time
    * @annotation ["readable", "scriptable"]
@@ -371,6 +377,13 @@ typedef struct _cmd_exec_event_t {
    * 执行结果(适用于EXECED)。
    */
   ret_t result;
+
+  /**
+   * @property {bool_t} can_exec
+   * @annotation ["readable", "scriptable"]
+   * 标识命令是否可以执行(适用于CAN_EXEC)。
+   */
+  bool_t can_exec;
 } cmd_exec_event_t;
 
 /**

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  utf8 encode decode
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -242,12 +242,20 @@ char* tk_utf8_from_utf16(const wchar_t* str, char* out, uint32_t size) {
 }
 
 wchar_t* tk_utf8_to_utf16(const char* str, wchar_t* out, uint32_t size) {
+  return_value_if_fail(str != NULL && out != NULL, NULL);
+
+  return tk_utf8_to_utf16_ex(str, strlen(str), out, size);
+}
+
+wchar_t* tk_utf8_to_utf16_ex(const char* str, uint32_t size, wchar_t* out, uint32_t out_size) {
   uint32_t i = 0;
   const char* p = str;
+  const char* end = NULL;
   const char* next = NULL;
   return_value_if_fail(str != NULL && out != NULL, NULL);
 
-  while (p != NULL && *p && (i + 1) < size) {
+  end = str + size;
+  while (p != NULL && p < end && (i + 1) < out_size) {
     out[i++] = utf8_get_char(p, &next);
     p = next;
   }
@@ -255,3 +263,4 @@ wchar_t* tk_utf8_to_utf16(const char* str, wchar_t* out, uint32_t size) {
 
   return out;
 }
+

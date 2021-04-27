@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  fill on bgr565
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -41,10 +41,10 @@
 
 #include "fill_image.inc"
 
-ret_t fill_bgr565_rect(bitmap_t* fb, rect_t* dst, color_t c) {
+ret_t fill_bgr565_rect(bitmap_t* fb, const rect_t* dst, color_t c) {
   return fill_image(fb, dst, c);
 }
 
-ret_t clear_bgr565_rect(bitmap_t* fb, rect_t* dst, color_t c) {
+ret_t clear_bgr565_rect(bitmap_t* fb, const rect_t* dst, color_t c) {
   return clear_image(fb, dst, c);
 }

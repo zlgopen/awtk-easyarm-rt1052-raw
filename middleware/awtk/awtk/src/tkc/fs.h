@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  simple fs api
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -145,6 +145,20 @@ struct _fs_file_t {
  * @return {int32_t} 返回实际读取的字节数。
  */
 int32_t fs_file_read(fs_file_t* file, void* buffer, uint32_t size);
+
+/**
+ * @method fs_file_read_line
+ *
+ * 读取一行文本。
+ * > 需要用二进制格式打开，否则Windows下，系统会修改换行符。
+ *
+ * @param {fs_file_t*} file 文件对象。
+ * @param {char*} buffer 用于返回数据的缓冲区。
+ * @param {uint32_t} size 缓冲区大小。
+ *
+ * @return {int32_t} 返回实际读取的字节数。
+ */
+int32_t fs_file_read_line(fs_file_t* file, char* buffer, uint32_t size);
 
 /**
  * @method fs_file_write
@@ -362,6 +376,7 @@ typedef ret_t (*fs_file_rename_t)(fs_t* fs, const char* name, const char* new_na
 typedef fs_dir_t* (*fs_open_dir_t)(fs_t* fs, const char* name);
 typedef ret_t (*fs_remove_dir_t)(fs_t* fs, const char* name);
 typedef ret_t (*fs_create_dir_t)(fs_t* fs, const char* name);
+typedef ret_t (*fs_change_dir_t)(fs_t* fs, const char* name);
 typedef bool_t (*fs_dir_exist_t)(fs_t* fs, const char* name);
 typedef ret_t (*fs_dir_rename_t)(fs_t* fs, const char* name, const char* new_name);
 
@@ -372,6 +387,7 @@ typedef ret_t (*fs_get_exe_t)(fs_t* fs, char path[MAX_PATH + 1]);
 typedef ret_t (*fs_get_cwd_t)(fs_t* fs, char path[MAX_PATH + 1]);
 typedef ret_t (*fs_stat_t)(fs_t* fs, const char* name, fs_stat_info_t* fst);
 typedef ret_t (*fs_get_user_storage_path_t)(fs_t* fs, char path[MAX_PATH + 1]);
+typedef ret_t (*fs_get_temp_path_t)(fs_t* fs, char path[MAX_PATH + 1]);
 
 /**
  * @class fs_t
@@ -387,6 +403,7 @@ struct _fs_t {
 
   fs_open_dir_t open_dir;
   fs_create_dir_t create_dir;
+  fs_change_dir_t change_dir;
   fs_remove_dir_t remove_dir;
   fs_dir_exist_t dir_exist;
   fs_dir_rename_t dir_rename;
@@ -397,6 +414,7 @@ struct _fs_t {
   fs_get_exe_t get_exe;
   fs_get_user_storage_path_t get_user_storage_path;
   fs_stat_t stat;
+  fs_get_temp_path_t get_temp_path;
 };
 
 /**
@@ -450,6 +468,32 @@ bool_t fs_file_exist(fs_t* fs, const char* name);
 ret_t fs_file_rename(fs_t* fs, const char* name, const char* new_name);
 
 /**
+ * @method fs_copy_file
+ *
+ * 拷贝文件。
+ *
+ * @param {fs_t*} fs 文件系统对象，一般赋值为os_fs()。
+ * @param {const char*} src 源文件名。
+ * @param {const char*} dst 目标文件名。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_copy_file(fs_t* fs, const char* src, const char* dst);
+
+/**
+ * @method fs_copy_dir
+ *
+ * 拷贝目录。
+ *
+ * @param {fs_t*} fs 文件系统对象，一般赋值为os_fs()。
+ * @param {const char*} src 源目录。
+ * @param {const char*} dst 目标目录。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_copy_dir(fs_t* fs, const char* src, const char* dst);
+
+/**
  * @method fs_open_dir
  *
  * 打开目录。
@@ -460,6 +504,18 @@ ret_t fs_file_rename(fs_t* fs, const char* name, const char* new_name);
  * @return {fs_dir_t} 返回非NULL表示成功，否则表示失败。
  */
 fs_dir_t* fs_open_dir(fs_t* fs, const char* name);
+
+/**
+ * @method fs_change_dir
+ *
+ * 修改当前目录。
+ *
+ * @param {fs_t*} fs 文件系统对象，一般赋值为os_fs()。
+ * @param {const char*} name 目录名称。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_change_dir(fs_t* fs, const char* name);
 
 /**
  * @method fs_create_dir
@@ -484,6 +540,30 @@ ret_t fs_create_dir(fs_t* fs, const char* name);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t fs_remove_dir(fs_t* fs, const char* name);
+
+/**
+ * @method fs_create_dir_r
+ *
+ * 递归创建目录。
+ *
+ * @param {fs_t*} fs 文件系统对象，一般赋值为os_fs()。
+ * @param {const char*} name 目录名称。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_create_dir_r(fs_t* fs, const char* name);
+
+/**
+ * @method fs_remove_dir_r
+ *
+ * 递归刪除目录。
+ *
+ * @param {fs_t*} fs 文件系统对象，一般赋值为os_fs()。
+ * @param {const char*} name 目录名称。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_remove_dir_r(fs_t* fs, const char* name);
 
 /**
  * @method fs_dir_exist
@@ -574,6 +654,18 @@ ret_t fs_get_exe(fs_t* fs, char path[MAX_PATH + 1]);
 ret_t fs_get_user_storage_path(fs_t* fs, char path[MAX_PATH + 1]);
 
 /**
+ * @method fs_get_temp_path
+ *
+ * 获取临时目录。
+ *
+ * @param {fs_t*} fs 文件系统对象，一般赋值为os_fs()。
+ * @param {char*} path 保存路径。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_get_temp_path(fs_t* fs, char path[MAX_PATH + 1]);
+
+/**
  * @method fs_get_cwd
  *
  * 获取当前所在目录。
@@ -584,6 +676,20 @@ ret_t fs_get_user_storage_path(fs_t* fs, char path[MAX_PATH + 1]);
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t fs_get_cwd(fs_t* fs, char path[MAX_PATH + 1]);
+
+/**
+ * @method fs_build_user_storage_file_name
+ *
+ * 生成一个保存数据文件的完整路径的文件名。
+ *
+ * @param {char*} filename 用于返回完整路径的文件名。
+ * @param {const char*} appname 应用程序的名称。
+ * @param {const char*} name 文件名(不包括路径)。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
+ret_t fs_build_user_storage_file_name(char filename[MAX_PATH + 1], const char* appname,
+                                      const char* name);
 
 /**
  * @method os_fs
@@ -605,6 +711,17 @@ fs_t* os_fs(void);
  * @return {bool_t} 返回TRUE表示成功，否则表示失败。
  */
 bool_t file_exist(const char* name);
+
+/**
+ * @method dir_exist
+ *
+ * 判断目录是否存在。
+ *
+ * @param {const char*} name 目录名。
+ *
+ * @return {bool_t} 返回TRUE表示成功，否则表示失败。
+ */
+bool_t dir_exist(const char* name);
 
 /**
  * @method file_remove

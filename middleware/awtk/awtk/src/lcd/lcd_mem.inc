@@ -74,7 +74,7 @@ static bitmap_t* lcd_mem_init_online_fb(lcd_t* lcd, bitmap_t* fb, lcd_orientatio
   return fb;
 }
 
-static ret_t lcd_mem_begin_frame(lcd_t* lcd, rect_t* dirty_rect) {
+static ret_t lcd_mem_begin_frame(lcd_t* lcd, const rect_t* dirty_rect) {
 #if WITH_LCD_CLEAR_ALPHA
   rect_t r;
   bitmap_t fb;
@@ -103,6 +103,16 @@ static ret_t lcd_mem_fill_rect_with_color(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh
 
 static ret_t lcd_mem_fill_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
   return lcd_mem_fill_rect_with_color(lcd, x, y, w, h, lcd->fill_color);
+}
+
+static ret_t lcd_mem_clear_rect(lcd_t* lcd, xy_t x, xy_t y, wh_t w, wh_t h) {
+  bitmap_t fb;
+  rect_t r = rect_init(x, y, w, h);
+  color_t c = lcd->fill_color;
+  c.rgba.a = (c.rgba.a * lcd->global_alpha) / 0xff;
+
+  lcd_mem_init_drawing_fb(lcd, &fb);
+  return image_clear(&fb, &r, c);
 }
 
 static ret_t lcd_mem_draw_hline(lcd_t* lcd, xy_t x, xy_t y, wh_t w) {
@@ -168,7 +178,7 @@ static color_t lcd_mem_get_point_color(lcd_t* lcd, xy_t x, xy_t y) {
   return c;
 }
 
-static ret_t lcd_mem_draw_glyph(lcd_t* lcd, glyph_t* glyph, rect_t* src, xy_t x, xy_t y) {
+static ret_t lcd_mem_draw_glyph(lcd_t* lcd, glyph_t* glyph, const rect_t* src, xy_t x, xy_t y) {
   wh_t i = 0;
   wh_t j = 0;
   wh_t sx = src->x;
@@ -208,8 +218,8 @@ static ret_t lcd_mem_draw_glyph(lcd_t* lcd, glyph_t* glyph, rect_t* src, xy_t x,
 
 static ret_t lcd_mem_draw_image_matrix(lcd_t* lcd, draw_image_info_t* info) {
   matrix_t* m = &(info->matrix);
-  rect_t* s = &(info->src);
-  rect_t* d = &(info->dst);
+  const rect_t* s = &(info->src);
+  const rect_t* d = &(info->dst);
   vgcanvas_t* canvas = lcd_get_vgcanvas(lcd);
 
   if (canvas != NULL) {
@@ -226,7 +236,7 @@ static ret_t lcd_mem_draw_image_matrix(lcd_t* lcd, draw_image_info_t* info) {
   return RET_NOT_IMPL;
 }
 
-static ret_t lcd_mem_draw_image(lcd_t* lcd, bitmap_t* img, rect_t* src, rect_t* dst) {
+static ret_t lcd_mem_draw_image(lcd_t* lcd, bitmap_t* img, const rect_t* src, const rect_t* dst) {
   bitmap_t fb;
   ret_t ret = RET_OK;
   bool_t is_opaque = (img->flags & BITMAP_FLAG_OPAQUE || img->format == BITMAP_FMT_RGB565);
@@ -256,6 +266,7 @@ static vgcanvas_t* lcd_mem_get_vgcanvas(lcd_t* lcd) {
 
   if (mem->vgcanvas == NULL) {
     mem->vgcanvas = vgcanvas_create(w, h, line_length, format, fbdata);
+    vgcanvas_clip_rect(mem->vgcanvas, 0, 0, w, h);
   } else {
     vgcanvas_reinit(mem->vgcanvas, w, h, line_length, format, fbdata);
   }
@@ -278,7 +289,7 @@ static ret_t lcd_mem_take_snapshot(lcd_t* lcd, bitmap_t* img, bool_t auto_rotate
 static ret_t lcd_mem_flush(lcd_t* lcd) {
   bitmap_t online_fb;
   bitmap_t offline_fb;
-  rect_t* r = &(lcd->dirty_rect);
+  const rect_t* r = &(lcd->dirty_rect);
   system_info_t* info = system_info();
   lcd_orientation_t o = info->lcd_orientation;
 
@@ -335,6 +346,7 @@ static ret_t lcd_mem_resize(lcd_t* lcd, wh_t w, wh_t h, uint32_t line_length) {
   lcd->w = w;
   lcd->h = h;
   mem->line_length = tk_max(mem->base.w * bpp, line_length);
+  vgcanvas_clip_rect(mem->vgcanvas, 0, 0, w, h);
 
   return RET_OK;
 }
@@ -365,6 +377,7 @@ static lcd_t* lcd_mem_create(wh_t w, wh_t h, bool_t alloc) {
   base->draw_vline = lcd_mem_draw_vline;
   base->draw_hline = lcd_mem_draw_hline;
   base->fill_rect = lcd_mem_fill_rect;
+  base->clear_rect = lcd_mem_clear_rect;
   base->draw_image = lcd_mem_draw_image;
   base->draw_image_matrix = lcd_mem_draw_image_matrix;
   base->draw_glyph = lcd_mem_draw_glyph;

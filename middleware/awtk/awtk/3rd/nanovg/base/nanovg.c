@@ -384,15 +384,16 @@ void nvgDeleteInternal(NVGcontext* ctx)
 	free(ctx);
 }
 
-void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio)
+void nvgBeginFrameEx(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio, int reset)
 {
 /*	printf("Tris: draws:%d  fill:%d  stroke:%d  text:%d  TOT:%d\n",
 		ctx->drawCallCount, ctx->fillTriCount, ctx->strokeTriCount, ctx->textTriCount,
 		ctx->fillTriCount+ctx->strokeTriCount+ctx->textTriCount);*/
-
-	ctx->nstates = 0;
-	nvgSave(ctx);
-	nvgReset(ctx);
+	if (reset != 0) {
+		ctx->nstates = 0;
+		nvgSave(ctx);
+		nvgReset(ctx);
+	}
 
 	nvg__setDevicePixelRatio(ctx, devicePixelRatio);
 
@@ -402,6 +403,11 @@ void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float
 	ctx->fillTriCount = 0;
 	ctx->strokeTriCount = 0;
 	ctx->textTriCount = 0;
+}
+
+void nvgBeginFrame(NVGcontext* ctx, float windowWidth, float windowHeight, float devicePixelRatio)
+{
+	nvgBeginFrameEx(ctx, windowWidth, windowHeight, devicePixelRatio, 1);
 }
 
 void nvgCancelFrame(NVGcontext* ctx)
@@ -709,7 +715,7 @@ void nvgLineCap(NVGcontext* ctx, int cap)
 {
 	NVGstate* state = nvg__getState(ctx);
 	state->lineCap = cap;
-	if(ctx->params.setLineJoin != NULL)
+	if(ctx->params.setLineCap != NULL)
 	{
 		ctx->params.setLineCap(ctx->params.userPtr, cap);
 	}
@@ -2500,6 +2506,13 @@ void nvgEllipse(NVGcontext* ctx, float cx, float cy, float rx, float ry)
 void nvgCircle(NVGcontext* ctx, float cx, float cy, float r)
 {
 	nvgEllipse(ctx, cx,cy, r,r);
+}
+
+int nvgClearCache(NVGcontext* ctx) {
+	if(ctx->params.clearCache != NULL) {
+		ctx->params.clearCache(ctx->params.userPtr);
+	}
+	return 0;
 }
 
 #ifdef WITH_NANOVG_GPU

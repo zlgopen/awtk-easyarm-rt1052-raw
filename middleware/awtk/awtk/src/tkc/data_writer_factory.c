@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  data writer factory
  *
- * Copyright (c) 2020 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2020 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -82,9 +82,9 @@ data_writer_t* data_writer_factory_create_writer(data_writer_factory_t* factory,
 
   if (p != NULL) {
     return_value_if_fail((p - url) < TK_NAME_LEN, NULL);
-    strncpy(protocol, url, p - url);
+    tk_strncpy(protocol, url, p - url);
   } else {
-    strncpy(protocol, "file", 4);
+    tk_strncpy(protocol, "file", 4);
   }
 
   iter = darray_find(&(factory->creators), (void*)protocol);

@@ -3,7 +3,7 @@
  * Author: AWTK Develop Team
  * Brief:  touch screen calibration win
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -86,6 +86,14 @@ static ret_t calibration_win_on_event(widget_t* widget, event_t* e) {
   }
 
   switch (type) {
+    case EVT_WINDOW_OPEN: {
+      widget_grab(widget->parent, widget);
+      return RET_OK;
+    }
+    case EVT_WINDOW_CLOSE: {
+      widget_ungrab(widget->parent, widget);
+      return RET_OK;
+    }
     case EVT_POINTER_UP: {
       point_t* p = win->points + win->cursor;
       pointer_event_t* evt = (pointer_event_t*)e;
@@ -105,12 +113,12 @@ static ret_t calibration_win_on_event(widget_t* widget, event_t* e) {
       if (win->cursor == PT_MAX_NR) {
         if (win->on_done != NULL) {
           if (win->on_done(win->on_done_ctx, win->points) == RET_OK) {
-            window_close(widget);
+            window_close_force(widget);
           } else {
             win->cursor = 0;
           }
         } else {
-          window_close(widget);
+          window_close_force(widget);
         }
 #if 0        
         p = win->points;
