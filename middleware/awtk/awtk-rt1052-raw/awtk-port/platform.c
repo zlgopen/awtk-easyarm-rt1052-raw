@@ -26,17 +26,14 @@
 #include "tkc/mem.h"
 #include "base/timer.h"
 #include "tkc/platform.h"
-
-extern volatile uint32_t g_systick_count;
+#include "platforms/common/sys_tick_common.inc"
 
 uint64_t get_time_ms64() {
-  return g_systick_count;
+  return tk_sys_tick_get_tick64();
 }
 
 void sleep_ms(uint32_t ms) {
-    uint32_t old_ms = g_systick_count;
-    
-    while (g_systick_count < (old_ms + ms));
+  tk_sys_tick_sleep_tick(ms);
 }
 
 uint32_t awtk_mem[2 * 1024 * 1024];

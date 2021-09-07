@@ -289,11 +289,10 @@ void APP_ELCDIF_Init(void)
     ELCDIF_RgbModeInit(APP_ELCDIF, &config);
 }
 
-volatile uint32_t g_systick_count = 0;
-
+extern void tk_sys_tick_inc(uint32_t tick_period);
 void SysTick_Handler (void)
 {
-    g_systick_count++;
+  tk_sys_tick_inc(1);
 }
 
 /*!
